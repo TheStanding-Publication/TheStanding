@@ -106,32 +106,105 @@ module.exports = function (eleventyConfig) {
       )
     );
 
+    // Allowed values for enumerated fields, declared once for reuse + error messages.
+    const ALLOWED_CONFIDENCE = ["confirmed", "well-reported", "developing", "alleged"];
+    const ALLOWED_STATUS = ["draft", "published", "corrected", "retracted"];
+    const ALLOWED_SOURCE_TIERS = ["primary", "investigative", "secondary"];
+    const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
     // Schema validation.
     for (const entry of all) {
       const slug = entry.data.slug || entry.fileSlug;
 
-      // Abuses must exist in the taxonomy.
+      // --- Required frontmatter fields ---
+      if (!entry.data.headline) {
+        throw new Error(`Entry "${slug}": missing required "headline" frontmatter.`);
+      }
+      if (!entry.data.summary) {
+        throw new Error(`Entry "${slug}": missing required "summary" frontmatter.`);
+      }
+      if (!entry.data.date) {
+        throw new Error(`Entry "${slug}": missing required "date" frontmatter.`);
+      }
+
+      // --- Date format ---
+      // YAML may parse dates as Date objects (when unquoted) or strings (when quoted).
+      // Accept both, but if it's a string, require YYYY-MM-DD shape.
+      if (typeof entry.data.date === "string" && !DATE_RE.test(entry.data.date)) {
+        throw new Error(
+          `Entry "${slug}": date "${entry.data.date}" must be in YYYY-MM-DD format.`
+        );
+      }
+
+      // --- Confidence enum ---
+      if (entry.data.confidence && !ALLOWED_CONFIDENCE.includes(entry.data.confidence)) {
+        throw new Error(
+          `Entry "${slug}": confidence "${entry.data.confidence}" must be one of: ${ALLOWED_CONFIDENCE.join(", ")}.`
+        );
+      }
+
+      // --- Status enum ---
+      if (entry.data.status && !ALLOWED_STATUS.includes(entry.data.status)) {
+        throw new Error(
+          `Entry "${slug}": status "${entry.data.status}" must be one of: ${ALLOWED_STATUS.join(", ")}.`
+        );
+      }
+
+      // --- Abuses must exist in the taxonomy ---
       for (const a of entry.data.abuses || []) {
         if (!abuseBySlug.has(a)) {
-          throw new Error(`Entry "${slug}": unknown abuse "${a}". Add it to taxonomy/abuses.yaml or fix the entry.`);
+          throw new Error(
+            `Entry "${slug}": unknown abuse "${a}". Add it to taxonomy/abuses.yaml or fix the entry.`
+          );
         }
       }
 
-      // Episode references must exist.
+      // --- Episode references must exist ---
       for (const epSlug of entry.data.episodes || []) {
         if (!episodeSlugs.has(epSlug)) {
-          throw new Error(`Entry "${slug}": references unknown episode "${epSlug}". Add it to src/content/episodes/ or fix the entry.`);
+          throw new Error(
+            `Entry "${slug}": references unknown episode "${epSlug}". Add it to src/content/episodes/ or fix the entry.`
+          );
         }
       }
 
-      // Sourcing rule: at least one primary source OR two independent investigative sources.
+      // --- Source-level validation ---
       const sources = entry.data.sources || [];
+      for (let i = 0; i < sources.length; i++) {
+        const s = sources[i];
+        if (!s.url) {
+          throw new Error(`Entry "${slug}": source #${i + 1} missing required "url".`);
+        }
+        if (!s.publisher) {
+          throw new Error(`Entry "${slug}": source #${i + 1} missing required "publisher".`);
+        }
+        if (!s.tier) {
+          throw new Error(`Entry "${slug}": source #${i + 1} missing required "tier".`);
+        }
+        if (!ALLOWED_SOURCE_TIERS.includes(s.tier)) {
+          throw new Error(
+            `Entry "${slug}": source #${i + 1} tier "${s.tier}" must be one of: ${ALLOWED_SOURCE_TIERS.join(", ")}.`
+          );
+        }
+      }
+
+      // --- Sourcing rule: at least one primary source OR two independent investigative sources ---
       const primaries = sources.filter((s) => s.tier === "primary").length;
       const investigatives = sources.filter((s) => s.tier === "investigative").length;
       if (primaries < 1 && investigatives < 2) {
         throw new Error(
           `Entry "${slug}": insufficient sourcing. Requires at least 1 primary source OR 2 investigative sources.`
         );
+      }
+
+      // --- Quote length: editorial standard requires < 15 words ---
+      if (entry.data.quote && entry.data.quote.text) {
+        const wordCount = entry.data.quote.text.trim().split(/\s+/).filter(Boolean).length;
+        if (wordCount >= 15) {
+          throw new Error(
+            `Entry "${slug}": quote text is ${wordCount} words; editorial standard requires fewer than 15.`
+          );
+        }
       }
     }
 

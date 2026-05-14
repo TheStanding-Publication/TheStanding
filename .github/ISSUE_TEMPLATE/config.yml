@@ -1,0 +1,22 @@
+# Issue-template picker config.
+# Disables the "Open a blank issue" option (forces use of a template)
+# and adds external links for sensitive tips and direct correction requests.
+
+blank_issues_enabled: false
+
+contact_links:
+  - name: Sensitive tip via email
+    url: mailto:tips@thestanding.us
+    about: |
+      For whistleblowers, government employees taking risks, or anyone who needs source protection.
+      Use email rather than a public GitHub issue. The publication protects source anonymity for citizens documenting government conduct.
+
+  - name: Correction request via email
+    url: mailto:editor@thestanding.us
+    about: |
+      Prefer to send a correction privately rather than through a public issue? Email the editor directly.
+
+  - name: Editorial standards
+    url: https://thestanding.us/standards/
+    about: |
+      Read our editorial standards — scope, sourcing requirements, corrections protocol, and source-protection policy — before submitting a tip or correction.
