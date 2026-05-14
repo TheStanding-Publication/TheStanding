@@ -1,0 +1,73 @@
+name: Correction request
+description: Report an error of fact, attribution, framing, or formatting in a published entry.
+title: "[Correction] "
+labels: ["correction"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping us keep the record accurate. The Standing's [corrections protocol](https://thestanding.us/standards/#corrections-and-retractions) is public — substantive corrections become their own archive entries with the original preserved; minor edits are logged in the corrected entry's correction log. Both stay live forever.
+
+        Before submitting, please review our [editorial standards](https://thestanding.us/standards/) to understand what we will and won't correct.
+
+  - type: input
+    id: entry_url
+    attributes:
+      label: Entry URL
+      description: Link to the entry that contains the error.
+      placeholder: "https://thestanding.us/entries/2026/03/15/some-slug/"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: error_type
+    attributes:
+      label: Type of error
+      description: What kind of error are you reporting?
+      options:
+        - Factual error (something stated as fact is wrong)
+        - Attribution error (wrong actor, wrong role, or wrong role-at-time)
+        - Framing concern (how the event is characterized)
+        - Sourcing concern (a cited source doesn't support the claim)
+        - Typo or formatting error
+        - Broken or paywalled link
+        - Other (explain below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_is_wrong
+    attributes:
+      label: What is wrong
+      description: Quote or describe the specific text or claim in the entry that is incorrect.
+      placeholder: "The entry states that X happened on Y date, but..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_should_say
+    attributes:
+      label: What it should say instead (if known)
+      description: If you can suggest a corrected version, include it here. Not required.
+    validations:
+      required: false
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source supporting the correction
+      description: |
+        Link or describe the source(s) that establish the correct fact. The Standing's [sourcing standard](https://thestanding.us/standards/#sourcing) requires at least one primary source (court filing, agency record, transcript, citizen-captured documentation) or two independent investigative outlets.
+      placeholder: |
+        Primary source: https://...
+        Coverage: https://...
+    validations:
+      required: true
+
+  - type: input
+    id: your_contact
+    attributes:
+      label: How can we reach you for follow-up (optional)
+      description: Email or other contact, only used if we need to ask a clarifying question. Leave blank to remain anonymous.
+    validations:
+      required: false
