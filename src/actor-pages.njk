@@ -1,0 +1,30 @@
+---
+pagination:
+  data: collections.actorsWithEntries
+  size: 1
+  alias: actor
+permalink: "/actors/{{ actor.slug }}/index.html"
+eleventyComputed:
+  title: "{{ actor.canonical }}"
+layout: layouts/base.njk
+---
+
+<article class="actor">
+  <header>
+    <h1>{{ actor.canonical }}</h1>
+    {% if actor.type %}<p class="actor-type">{{ actor.type }}</p>{% endif %}
+    {% if not actor.registered %}
+      <p class="actor-stub-note">
+        <em>Auto-generated actor page. Add an entry in <code>taxonomy/aliases.yaml</code>
+        to enrich the metadata.</em>
+      </p>
+    {% endif %}
+  </header>
+
+  <section class="actor-entries">
+    <h2>Entries involving this actor ({{ actor.entries.length }})</h2>
+    {% for entry in actor.entries %}
+      {% include "partials/entry-card.njk" %}
+    {% endfor %}
+  </section>
+</article>

@@ -1,0 +1,83 @@
+# The 12 democratic ideals that anchor the publication.
+# Each entry is tagged with one or more abuses (see abuses.yaml); the parent
+# ideal is auto-derived at build time. Adding a new ideal is a deliberate
+# editorial decision and requires updating this file.
+
+- slug: free-and-fair-elections
+  title: "Free and fair elections"
+  short_description: >
+    Elections that are accessible, accurate, peaceful, and respected by losers
+    as well as winners. The foundation of democratic legitimacy.
+
+- slug: rule-of-law
+  title: "Rule of law and equal application"
+  short_description: >
+    The same law applies to everyone, including those who wield power.
+    Lawful processes — not personal will — determine outcomes.
+
+- slug: separation-of-powers
+  title: "Separation of powers and independent oversight"
+  short_description: >
+    Checks and balances among branches of government, plus independent
+    watchdogs (inspectors general, GAO, the courts) functioning without
+    political interference.
+
+- slug: free-press
+  title: "Free press"
+  short_description: >
+    Journalists able to report on power without fear of retaliation,
+    prosecution, or coercive access restrictions. A free press is the
+    public's primary tool for accountability.
+
+- slug: speech-and-assembly
+  title: "Freedom of speech, assembly, and association"
+  short_description: >
+    The right to speak, protest, organize, and associate — including in
+    criticism of those in power — without state retaliation.
+
+- slug: public-service
+  title: "Public service over self-dealing"
+  short_description: >
+    Public office is held in trust for the public. Officials do not enrich
+    themselves, their families, or their donors through the exercise of
+    public power.
+
+- slug: civilian-control
+  title: "Civilian control of armed and uniformed services"
+  short_description: >
+    Military and law enforcement are subordinate to civilian, lawful authority
+    and do not serve as instruments of political power against citizens.
+
+- slug: government-data-integrity
+  title: "Honest government data and scientific integrity"
+  short_description: >
+    Public records, agency data, and scientific findings reflect reality,
+    not the preferences of those in power. Government scientists and
+    statisticians can do their jobs without political retaliation.
+
+- slug: civil-rights
+  title: "Civil rights and equal protection"
+  short_description: >
+    Government does not target, exclude, or disadvantage people on the basis
+    of identity, belief, or association. The protection of law extends
+    equally to all.
+
+- slug: due-process
+  title: "Due process"
+  short_description: >
+    Before the state takes liberty, property, or status, there is notice,
+    a hearing, counsel where required, and meaningful opportunity to be heard.
+
+- slug: national-sovereignty
+  title: "National sovereignty and freedom from foreign influence"
+  short_description: >
+    Decisions made by US officials reflect lawful US interests — not
+    undisclosed foreign payments, foreign electoral interference, or
+    irregular foreign-intelligence relationships.
+
+- slug: accountable-force
+  title: "Accountable use of state force"
+  short_description: >
+    When the state wields coercive power — police, corrections, federal
+    law enforcement, immigration enforcement — that wielding is itself
+    subject to law, oversight, and consequence.

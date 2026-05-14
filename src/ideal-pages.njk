@@ -1,0 +1,36 @@
+---
+pagination:
+  data: collections.idealsWithEntries
+  size: 1
+  alias: ideal
+permalink: "/ideals/{{ ideal.slug }}/index.html"
+eleventyComputed:
+  title: "{{ ideal.title }}"
+layout: layouts/base.njk
+---
+
+{% set explainer = collections.explainersBySlug[ideal.slug] %}
+
+<article class="ideal">
+  <header>
+    <h1>{{ ideal.title }}</h1>
+    {% if not explainer %}<p class="ideal-blurb">{{ ideal.short_description }}</p>{% endif %}
+  </header>
+
+  {% if explainer %}
+    <section class="ideal-explainer">
+      {{ explainer.templateContent | safe }}
+    </section>
+  {% endif %}
+
+  <section class="ideal-entries">
+    <h2>Entries</h2>
+    {% if ideal.entries.length %}
+      {% for entry in ideal.entries %}
+        {% include "partials/entry-card.njk" %}
+      {% endfor %}
+    {% else %}
+      <p><em>No entries yet documenting abuses under this ideal.</em></p>
+    {% endif %}
+  </section>
+</article>

@@ -1,0 +1,35 @@
+---
+layout: layouts/base.njk
+title: Episodes
+permalink: /episodes/index.html
+---
+
+<h1>Episodes</h1>
+<p>
+  Episodes are named compound real-world happenings — protests, election days,
+  congressional hearings, operations, court rulings with multiple defiance responses —
+  that contain multiple recorded entries. Each episode page provides editorial overview
+  of what the compound event was and lists every entry filed against it in chronological
+  order.
+</p>
+
+{% if collections.episodes.length %}
+  <ul class="episode-list">
+    {% for episode in collections.episodes %}
+      {% set episodeSlug = episode.data.slug or episode.fileSlug %}
+      {% set entryCount = (collections.entriesByEpisode[episodeSlug] or []).length %}
+      <li>
+        <h2><a href="/episodes/{{ episodeSlug }}/">{{ episode.data.title }}</a></h2>
+        <p class="episode-dates">
+          <time>{{ episode.data.start_date | formatDate }}</time>
+          {% if episode.data.end_date and episode.data.end_date != episode.data.start_date %}
+            &ndash; <time>{{ episode.data.end_date | formatDate }}</time>
+          {% endif %}
+        </p>
+        <p class="episode-counts">{{ entryCount }} entr{{ "y" if entryCount == 1 else "ies" }} documented.</p>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p><em>No episodes yet.</em></p>
+{% endif %}

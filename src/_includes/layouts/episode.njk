@@ -1,0 +1,32 @@
+---
+layout: layouts/base.njk
+---
+{% set episodeSlug = slug or page.fileSlug %}
+{% set episodeEntries = collections.entriesByEpisode[episodeSlug] or [] %}
+
+<article class="episode">
+  <header class="episode-header">
+    <p class="episode-dates">
+      <time datetime="{{ start_date | isoDate }}">{{ start_date | formatDate }}</time>
+      {% if end_date and end_date != start_date %}
+        &ndash; <time datetime="{{ end_date | isoDate }}">{{ end_date | formatDate }}</time>
+      {% endif %}
+    </p>
+    <h1 class="episode-title">{{ title }}</h1>
+  </header>
+
+  <section class="episode-overview">
+    {{ content | safe }}
+  </section>
+
+  <section class="episode-entries">
+    <h2>Documented in this episode ({{ episodeEntries.length }})</h2>
+    {% if episodeEntries.length %}
+      {% for entry in episodeEntries %}
+        {% include "partials/entry-card.njk" %}
+      {% endfor %}
+    {% else %}
+      <p><em>No entries yet linked to this episode.</em></p>
+    {% endif %}
+  </section>
+</article>

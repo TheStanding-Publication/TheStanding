@@ -1,0 +1,10 @@
+---
+slug: accountable-force
+permalink: false
+---
+
+When the state wields coercive power — through police, corrections, federal law enforcement, immigration enforcement, or the National Guard — that wielding is itself subject to law, oversight, and consequence. Officers act lawfully or they are held accountable; uses of force are proportional and necessary or they are not justified. The state's monopoly on legitimate violence is legitimate precisely because it is constrained. A democracy without accountable force is not a democracy; it is whatever the people with guns say it is.
+
+The patterns tracked under this ideal include [excessive force by law enforcement](/ideals/accountable-force/excessive-force-by-law-enforcement/), [deaths in custody](/ideals/accountable-force/deaths-in-custody/), [misuse of no-knock warrants](/ideals/accountable-force/no-knock-raid-misuse/), the [militarization of routine policing](/ideals/accountable-force/militarization-of-policing/), [prosecutorial or legislative actions that shield officers](/ideals/accountable-force/shielding-officers-from-prosecution/) from accountability for misconduct, [departmental refusal to discipline established misconduct](/ideals/accountable-force/failure-to-discipline-misconduct/), [corrections abuse](/ideals/accountable-force/corrections-abuse/), [abusive conditions and force in immigration enforcement](/ideals/accountable-force/violence-in-immigration-enforcement/), and the [deployment of federal armed forces in coercive roles against US civilians](/ideals/accountable-force/federal-deployment-against-civilians/). As with every other ideal, the action is what matters; the politics of the officer or the politics of the target do not change whether the event is recorded.
+
+*Further reading: National Constitution Center Interactive Constitution — [Fourth Amendment](https://constitutioncenter.org/the-constitution/amendments/amendment-iv) (search, seizure, force), [Eighth Amendment](https://constitutioncenter.org/the-constitution/amendments/amendment-viii) (cruel and unusual punishment).*

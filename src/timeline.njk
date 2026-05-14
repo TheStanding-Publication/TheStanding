@@ -1,0 +1,28 @@
+---
+layout: layouts/base.njk
+title: Timeline
+permalink: /timeline/index.html
+---
+
+<h1>Timeline</h1>
+<p>Every entry in the archive, ordered by event date.</p>
+
+{% if collections.entries.length %}
+  {% set currentYear = "" %}
+  {% set currentMonth = "" %}
+  {% for entry in collections.entries %}
+    {% set entryYear = entry.data.date | isoDate | slice(0, 4) %}
+    {% set entryMonth = entry.data.date | isoDate | slice(0, 7) %}
+    {% if entryYear != currentYear %}
+      <h2 class="timeline-year">{{ entryYear }}</h2>
+      {% set currentYear = entryYear %}
+    {% endif %}
+    {% if entryMonth != currentMonth %}
+      <h3 class="timeline-month">{{ entry.data.date | formatDate | replace(",.*","","i") }}</h3>
+      {% set currentMonth = entryMonth %}
+    {% endif %}
+    {% include "partials/entry-card.njk" %}
+  {% endfor %}
+{% else %}
+  <p><em>No entries yet.</em></p>
+{% endif %}

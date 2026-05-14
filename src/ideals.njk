@@ -1,0 +1,46 @@
+---
+layout: layouts/base.njk
+title: Ideals
+permalink: /ideals/index.html
+---
+
+<h1>Democratic ideals</h1>
+<p>
+  The publication is organized around twelve democratic ideals. Each entry is
+  tagged with one or more specific abuses; abuses roll up to a single parent
+  ideal. Explore an ideal to see its definition and the events that erode it.
+</p>
+
+<section class="sources-we-draw-on">
+  <h2>Sources we draw on</h2>
+  <p>
+    Where useful, individual ideal pages link to authoritative non-partisan references.
+    The publication's primary anchor is the National Constitution Center's
+    <a href="https://constitutioncenter.org/the-constitution/interactive-constitution">Interactive Constitution</a>,
+    which pairs leading liberal and conservative scholars on each constitutional clause.
+    For supplementary federal case-law and statutory coverage, the Library of Congress's
+    <a href="https://constitution.congress.gov/">Constitution Annotated</a>
+    — produced by the Congressional Research Service — is the closest thing to a
+    definitive reference work. Specific topics also draw on the
+    <a href="https://www.gao.gov/">Government Accountability Office</a>,
+    the <a href="https://www.oge.gov/">U.S. Office of Government Ethics</a>, the
+    <a href="https://www.fec.gov/">Federal Election Commission</a>, and the Cornell Law
+    School's <a href="https://www.law.cornell.edu/constitution">Legal Information Institute</a>.
+    We intentionally avoid sourcing from advocacy-affiliated organizations, even highly
+    credible ones, because the publication's claim to non-partisanship is part of the
+    editorial product.
+  </p>
+</section>
+
+<ul class="ideal-list">
+  {% for ideal in collections.idealsWithEntries %}
+    <li>
+      <h2><a href="/ideals/{{ ideal.slug }}/">{{ ideal.title }}</a></h2>
+      <p>{{ ideal.short_description }}</p>
+      <p class="ideal-counts">
+        {{ ideal.abuses.length }} abuse{{ "" if ideal.abuses.length == 1 else "s" }} tracked,
+        {{ ideal.entries.length }} entr{{ "y" if ideal.entries.length == 1 else "ies" }} documented.
+      </p>
+    </li>
+  {% endfor %}
+</ul>
