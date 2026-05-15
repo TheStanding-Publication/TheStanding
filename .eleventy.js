@@ -269,6 +269,24 @@ module.exports = function (eleventyConfig) {
     return map;
   });
 
+  // Feed entries: sorted by archived (publication) date descending — different from
+  // the main `entries` collection which sorts by event date. Capped at 30 most
+  // recent so the feed stays reasonably sized. Used by /feed.xml for RSS-to-email
+  // delivery via Buttondown and for any other feed-reader subscribers.
+  eleventyConfig.addCollection("feedEntries", function (collectionApi) {
+    const all = collectionApi
+      .getFilteredByGlob("src/entries/**/*.md")
+      .filter((e) => e.data.status !== "draft");
+
+    return all
+      .sort((a, b) => {
+        const dateA = new Date(a.data.archived || a.data.date);
+        const dateB = new Date(b.data.archived || b.data.date);
+        return dateB - dateA;
+      })
+      .slice(0, 30);
+  });
+
   // Ideals: each ideal object with its rolled-up entries attached.
   eleventyConfig.addCollection("idealsWithEntries", function (collectionApi) {
     const entries = collectionApi
@@ -414,6 +432,20 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addFilter("head", (arr, n) => {
     if (!Array.isArray(arr)) return arr;
     return arr.slice(0, n);
+  });
+
+  // RFC 3339 / ISO 8601 date formatter for the Atom feed.
+  eleventyConfig.addFilter("rfc3339", (d) => {
+    if (!d) return new Date().toISOString();
+    return new Date(d).toISOString();
+  });
+
+  // Returns the most recent archived date across a list of entries, formatted
+  // as RFC 3339. Used for the feed's top-level <updated> element.
+  eleventyConfig.addFilter("newestEntryDate", (entries) => {
+    if (!entries || entries.length === 0) return new Date().toISOString();
+    const dates = entries.map((e) => new Date(e.data.archived || e.data.date).getTime());
+    return new Date(Math.max(...dates)).toISOString();
   });
 
   // ---- Markdown ----
