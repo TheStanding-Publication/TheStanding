@@ -1,0 +1,83 @@
+name: Tip submission
+description: Submit an event you think should be documented in the archive.
+title: "[Tip] "
+labels: ["tip"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The Standing documents events involving authoritarianism, anti-democratic behavior, and corruption in US governance — applied to all actors regardless of party. Before submitting, please review our [scope](https://thestanding.us/standards/#scope) and [sourcing standard](https://thestanding.us/standards/#sourcing).
+
+        **Sensitive sources should NOT submit through this public form.** GitHub issues are public and indexed. If you are a whistleblower, a government employee taking real risks, or have documentation that requires source protection, email **tips@thestanding.us** instead. The publication will publish more secure channels (Signal, SecureDrop) as it matures.
+
+  - type: textarea
+    id: event_description
+    attributes:
+      label: What happened
+      description: Describe the event briefly — what occurred, by whom, when, where.
+      placeholder: "On [date], [actor] did [action] at [location]..."
+    validations:
+      required: true
+
+  - type: input
+    id: event_date
+    attributes:
+      label: When
+      description: When did this event occur? (YYYY-MM-DD if known, or approximate.)
+      placeholder: "2026-05-12"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: jurisdiction
+    attributes:
+      label: Jurisdiction
+      description: What level of government, or which kind of actor?
+      options:
+        - Federal
+        - State
+        - Local (county, city, school board, sheriff, etc.)
+        - International (with US-governance implications)
+        - Private actor (contractor, platform, foreign state) in a public-facing capacity
+    validations:
+      required: true
+
+  - type: textarea
+    id: actors
+    attributes:
+      label: Who was involved
+      description: Named actors — officials, agencies, candidates, organizations — that participated in or were targeted by the event. Include roles or titles where useful.
+      placeholder: "Jane Doe (Sheriff, Example County)\nExample County Board of Elections"
+    validations:
+      required: true
+
+  - type: textarea
+    id: abuses
+    attributes:
+      label: Which abuses
+      description: |
+        Which specific abuse(s) from our [taxonomy](https://thestanding.us/ideals/) does this event involve? You can list slugs (e.g., `voter-suppression`, `excessive-force-by-law-enforcement`) or describe in plain English.
+      placeholder: "voter-suppression, election-worker-intimidation"
+    validations:
+      required: false
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: |
+        Links to primary sources (court filings, agency records, official statements, citizen-captured video) or original investigative reporting from credentialed outlets. See our [citizen-evidence policy](https://thestanding.us/standards/#citizen-captured-evidence) for the verification bar — anonymous citizen documentation is acceptable when the recording itself is verifiable.
+      placeholder: |
+        Court filing: https://...
+        News coverage: https://...
+        Video / photos: https://...
+    validations:
+      required: true
+
+  - type: input
+    id: your_contact
+    attributes:
+      label: How can we reach you for follow-up (optional)
+      description: Email or other contact, used only if we need to ask a clarifying question. Leave blank to remain anonymous — anonymous citizen documentation is acceptable when the evidence itself is verifiable.
+    validations:
+      required: false
