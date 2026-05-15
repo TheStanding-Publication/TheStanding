@@ -17,10 +17,12 @@ permalink: /index.html
   </p>
 </section>
 
+{% include "partials/subscribe.njk" %}
+
 <section class="latest">
   <h2>Latest</h2>
-  {% if collections.entries.length %}
-    {% for entry in collections.entries | head(20) %}
+  {% if collections.feedEntries.length %}
+    {% for entry in collections.feedEntries | head(20) %}
       {% include "partials/entry-card.njk" %}
     {% endfor %}
   {% else %}
