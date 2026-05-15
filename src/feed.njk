@@ -1,0 +1,45 @@
+---
+permalink: /feed.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{{ site.name }}</title>
+  <subtitle>{{ site.tagline }}</subtitle>
+  <link href="{{ site.url }}/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="{{ site.url }}/" />
+  <updated>{{ collections.feedEntries | newestEntryDate }}</updated>
+  <id>{{ site.url }}/</id>
+  <author>
+    <name>{{ site.author }}</name>
+    <email>{{ site.editorEmail }}</email>
+  </author>
+  <rights>{{ site.name }}. Published under Creative Commons Attribution 4.0 (CC BY 4.0).</rights>
+
+{% for entry in collections.feedEntries %}
+  <entry>
+    <title>{{ entry.data.headline }}</title>
+    <link href="{{ site.url }}{{ entry.url }}" />
+    <id>{{ site.url }}{{ entry.url }}</id>
+    <published>{{ (entry.data.archived or entry.data.date) | rfc3339 }}</published>
+    <updated>{{ (entry.data.archived or entry.data.date) | rfc3339 }}</updated>
+    <summary>{{ entry.data.summary }}</summary>
+    <content type="html"><![CDATA[
+<p><em>{{ entry.data.summary }}</em></p>
+{{ entry.templateContent | safe }}
+{% if entry.data.sources and entry.data.sources.length %}
+<h3>Sources</h3>
+<ol>
+{% for s in entry.data.sources %}
+  <li><a href="{{ s.url }}">{{ s.title or s.url }}</a> — {{ s.publisher }} ({{ s.tier }})</li>
+{% endfor %}
+</ol>
+{% endif %}
+<p><a href="{{ site.url }}{{ entry.url }}">Read on the web</a></p>
+]]></content>
+    <author>
+      <name>{{ site.author }}</name>
+    </author>
+  </entry>
+{% endfor %}
+</feed>
