@@ -473,6 +473,114 @@ p, ul, ol { margin: 0.8em 0 1.1em; }
   margin-bottom: 0;
 }
 
+/* --- Subscribe (Buttondown embed) --- */
+
+.subscribe {
+  background: var(--soft);
+  border-left: 3px solid var(--accent);
+  padding: 1.5rem 1.6rem 1.7rem;
+  margin: 2rem 0 3rem;
+}
+
+.subscribe-heading {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  border: none;
+  padding: 0;
+}
+
+.subscribe-description {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.subscribe-form { margin: 0; }
+
+/* Accessible-but-visually-hidden label — the placeholder + heading carry the
+   visible context. */
+.subscribe-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.subscribe-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.subscribe-input {
+  flex: 1 1 16rem;
+  min-width: 0;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 2px;
+  line-height: 1.4;
+}
+.subscribe-input::placeholder { color: var(--muted); opacity: 0.85; }
+.subscribe-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.subscribe-button {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.4rem;
+  background: var(--accent);
+  color: var(--paper);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.subscribe-button:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.subscribe-footer {
+  margin: 0.85rem 0 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-family: var(--sans);
+}
+.subscribe-footer a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+.subscribe-footer a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 36rem) {
+  .subscribe-row { flex-direction: column; }
+  .subscribe-input, .subscribe-button { width: 100%; }
+}
+
 /* --- Episodes --- */
 
 .episode-header {

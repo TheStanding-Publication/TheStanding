@@ -1,0 +1,32 @@
+{# Reusable subscribe block. Include with: {% include "partials/subscribe.njk" %}
+   The form posts directly to Buttondown's embed-subscribe API endpoint. #}
+<section class="subscribe" aria-labelledby="subscribe-heading">
+  <h2 id="subscribe-heading" class="subscribe-heading">Receive the daily digest by email</h2>
+  <p class="subscribe-description">
+    One email each morning with every entry filed the day before. Free. No tracking, no ads. Unsubscribe anytime.
+  </p>
+
+  <form
+    action="https://buttondown.com/api/emails/embed-subscribe/thestanding"
+    method="post"
+    class="subscribe-form embeddable-buttondown-form"
+    target="popupwindow"
+    onsubmit="window.open('https://buttondown.com/thestanding', 'popupwindow')"
+  >
+    <label for="bd-email" class="subscribe-label">Email address</label>
+    <div class="subscribe-row">
+      <input
+        type="email"
+        name="email"
+        id="bd-email"
+        placeholder="you@example.com"
+        required
+        class="subscribe-input"
+      />
+      <input type="submit" value="Subscribe" class="subscribe-button" />
+    </div>
+    <p class="subscribe-footer">
+      <a href="https://buttondown.com/refer/thestanding" target="_blank" rel="noopener">Powered by Buttondown.</a>
+    </p>
+  </form>
+</section>

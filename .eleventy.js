@@ -90,6 +90,7 @@ module.exports = function (eleventyConfig) {
 
   // ---- Passthrough copy ----
   eleventyConfig.addPassthroughCopy({ "src/css": "css" });
+  eleventyConfig.addPassthroughCopy({ "src/images": "images" });
 
   // ---- Collections ----
 
