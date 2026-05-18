@@ -1,0 +1,40 @@
+# Build verification for The Standing.
+#
+# Runs the Eleventy build on every PR and every push to main. The build
+# itself enforces the schema — unknown abuses, missing episode references,
+# insufficient sourcing, missing required fields, and other rules in
+# .eleventy.js will fail the build and thus fail the check.
+#
+# Once this workflow has run at least once successfully, the "Validate and build"
+# status check can be required in the main-branch ruleset at
+# .../settings/rules → Protect main → Require status checks to pass.
+
+name: Build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Validate and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
