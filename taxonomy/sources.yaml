@@ -1,0 +1,173 @@
+national_news:
+- name: Associated Press (AP News)
+  type: Wire service
+  rss_feed: https://apnews.com/apf-services/v2/homepage.rss
+  coverage: General US news, politics, government
+  reliability: high
+  notes: Primary source for breaking news distribution
+- name: Reuters
+  type: Wire service
+  rss_feed: https://www.reutersagency.com/feed/?taxonomy=best-topics&output=rss
+  coverage: US politics, government, elections
+  reliability: high
+  notes: International perspective on US governance
+- name: NPR
+  type: Broadcast/Digital
+  rss_feed: https://feeds.npr.org/1001/rss.xml
+  coverage: US news, politics, democracy-focused reporting
+  reliability: high
+  notes: Strong coverage of voting rights, civil rights
+- name: New York Times
+  type: Newspaper
+  rss_feed: https://rss.nytimes.com/services/xml/rss/nyt/US.xml
+  coverage: Investigative reporting, politics, civil rights
+  reliability: high
+  notes: Detailed policy analysis and investigation
+- name: Washington Post
+  type: Newspaper
+  rss_feed: https://feeds.washingtonpost.com/rss/politics
+  coverage: Politics, government accountability, investigations
+  reliability: high
+  notes: Federal government focus
+- name: BBC News (US & Canada)
+  type: Broadcast/Digital
+  rss_feed: https://feeds.bbc.co.uk/news/world/us_and_canada/rss.xml
+  coverage: US democracy, elections, civil unrest
+  reliability: high
+  notes: International perspective on US events
+- name: ProPublica
+  type: Nonprofit investigative journalism
+  rss_feed: https://www.propublica.org/feeds/big-story
+  coverage: Government accountability, civil rights, elections
+  reliability: high
+  notes: Deep investigative work on democracy issues
+- name: Politico
+  type: Politics/Government news
+  rss_feed: https://www.politico.com/feed/news-updates.xml
+  coverage: Federal politics, Congress, White House
+  reliability: high
+  notes: Congress and executive branch focus
+government_sources:
+- name: Congressional Record
+  type: Official government record
+  url: https://www.congress.gov/congressional-record
+  coverage: Official statements, votes, testimony
+  reliability: authoritative
+  notes: Primary source for congressional activity
+- name: Federal Register
+  type: Official government publication
+  rss_feed: https://www.federalregister.gov/documents/search.atom
+  coverage: Executive orders, agency rules, notices
+  reliability: authoritative
+  notes: Track executive action, regulatory changes
+- name: Supreme Court Opinions
+  type: Judicial opinions
+  rss_feed: https://www.supremecourt.gov/xml/feed_pressreleases.xml
+  coverage: SCOTUS decisions affecting voting rights, civil rights, elections
+  reliability: authoritative
+  notes: Landmark decisions on democracy issues
+- name: Court Listener
+  type: Court opinion aggregator
+  url: https://www.courtlistener.com
+  coverage: Federal and state court opinions
+  reliability: high
+  notes: Searchable database of court filings
+- name: Government Accountability Office (GAO)
+  type: Congressional oversight agency
+  url: https://www.gao.gov
+  coverage: Government investigations, audits, reports
+  reliability: authoritative
+  notes: Official audits of government programs and spending
+- name: Office of Inspector General Reports
+  type: Executive branch oversight
+  url: https://www.ignet.gov
+  coverage: Agency investigations, audits, misconduct findings
+  reliability: authoritative
+  notes: Distributed across multiple agencies
+watchdog_sources:
+- name: Brennan Center for Justice
+  type: Democracy watchdog
+  url: https://www.brennancenter.org
+  coverage: Voting rights, campaign finance, government accountability
+  reliability: high
+  notes: Primary source on election integrity issues
+- name: Common Cause
+  type: Democracy advocacy
+  url: https://www.commoncause.org
+  coverage: Campaign finance, voting rights, redistricting
+  reliability: high
+  notes: Tracks gerrymandering and voter suppression
+- name: Democracy Forward
+  type: Civil rights/government accountability
+  url: https://democracyforward.org
+  coverage: Executive overreach, ethics, civil rights
+  reliability: high
+  notes: Litigation and advocacy on democracy issues
+- name: Election Assistance Commission (EAC)
+  type: Federal election authority
+  url: https://www.eac.gov
+  coverage: Election security, voting systems, data
+  reliability: authoritative
+  notes: Official source on election administration
+- name: Fair Fight Action
+  type: Voting rights advocacy
+  url: https://www.fairfightaction.com
+  coverage: Voter suppression, ballot access, elections
+  reliability: high
+  notes: State-level voting rights focus
+- name: Lawyers' Committee for Civil Rights Under Law
+  type: Civil rights law organization
+  url: https://lawyerscommittee.org
+  coverage: Civil rights enforcement, voting rights, discrimination
+  reliability: high
+  notes: Legal analysis and litigation on rights issues
+- name: American Civil Liberties Union (ACLU)
+  type: Civil rights advocacy
+  url: https://www.aclu.org
+  coverage: First Amendment, due process, civil rights
+  reliability: high
+  notes: Broad civil rights coverage
+press_freedom_sources:
+- name: Reporters Without Borders (RSF)
+  type: Press freedom organization
+  url: https://rsf.org
+  coverage: Press freedom, journalist safety, government attacks on media
+  reliability: high
+  notes: International perspective on US press freedom
+- name: Committee to Protect Journalists (CPJ)
+  type: Press freedom organization
+  url: https://cpj.org
+  coverage: Journalist arrests, prosecutions, government threats
+  reliability: high
+  notes: Tracks attacks on journalists globally and in US
+- name: Freedom of the Press Foundation
+  type: Press freedom advocacy
+  url: https://freedom.press
+  coverage: First Amendment, surveillance, press freedom
+  reliability: high
+  notes: Digital rights and press freedom focus
+specialized_sources:
+- name: Democracy Now!
+  type: Independent news
+  url: https://www.democracynow.org
+  coverage: Government accountability, protests, civil rights
+  reliability: high
+  notes: Democracy and social justice focus
+- name: The Guardian (US)
+  type: Newspaper
+  rss_feed: https://www.theguardian.com/us-news/rss
+  coverage: US politics, government, civil rights
+  reliability: high
+  notes: International outlet with strong US coverage
+- name: SCOTUS Blog
+  type: Supreme Court analysis
+  url: https://www.scotusblog.com
+  coverage: Supreme Court opinions, decisions affecting rights
+  reliability: high
+  notes: Expert analysis of SCOTUS decisions
+- name: Inside Elections
+  type: Election analysis
+  url: https://insideelections.com
+  coverage: Elections, voting rights, redistricting
+  reliability: high
+  notes: Expert analysis of election law and trends

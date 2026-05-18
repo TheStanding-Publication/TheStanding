@@ -4,7 +4,7 @@ A non-partisan US publication and historical archive that documents authoritaria
 
 The name carries two meanings of "standing": legal standing (the right to be heard, the right to be part of the record) and civic standing (where we stand as a democracy). The publication asks both questions in the daily record.
 
-See [`PROJECT_PLAN.md`](./PROJECT_PLAN.md) for the full project plan, including mission, editorial standard, technical stack, data model, and roadmap. See [`src/standards.md`](./src/standards.md) for the editorial standards page.
+See [`docs/PROJECT_PLAN.md`](./docs/PROJECT_PLAN.md) for the full project plan, including mission, editorial standard, technical stack, data model, and roadmap. See [`src/standards.md`](./src/standards.md) for the editorial standards page. See [`/sources/`](https://thestanding.us/sources/) for the public list of news sources used in automated monitoring.
 
 ## Stack
 
@@ -13,6 +13,18 @@ See [`PROJECT_PLAN.md`](./PROJECT_PLAN.md) for the full project plan, including 
 - **Newsletter:** Buttondown
 - **Content store:** this public GitHub repo. Each entry is a Markdown file.
 - **Search (later):** [Pagefind](https://pagefind.app/)
+
+## Monitoring sources
+
+The Standing uses automated news monitoring to surface relevant stories from a curated, public list of sources. The list includes:
+
+- **National news outlets** — AP, Reuters, NPR, NYT, WaPo, BBC, ProPublica, and others
+- **Government sources** — Congressional Record, Federal Register, Supreme Court opinions, GAO reports
+- **Civil rights watchdogs** — Brennan Center, Common Cause, Democracy Forward, ACLU
+- **Press freedom organizations** — Reporters Without Borders, Committee to Protect Journalists
+- **Investigative outlets** — specialized sources focused on democracy accountability
+
+All sources are **public and transparent** — see [`taxonomy/sources.yaml`](./taxonomy/sources.yaml) for the complete list, or visit [thestanding.us/sources/](https://thestanding.us/sources/) for the web version.
 
 ## Local development
 
@@ -35,10 +47,21 @@ taxonomy/
   ideals.yaml    # the 12 democratic ideals
   abuses.yaml    # specific abuses, each tied to a parent ideal
   aliases.yaml   # actor-name normalization (built up over time)
+  sources.yaml   # curated list of news sources for monitoring
 
-PROJECT_PLAN.md  # full design document
+docs/
+  PROJECT_PLAN.md           # full design document
+  WORKFLOWS_COMPLETED.md    # workflow status and architecture summary
+  skills/                   # workflow skill documentation
+    STANDING_MONITOR_SKILL.md
+    ENTRY_RECORDING_SKILL.md
+    EDITORIAL_WORKFLOW_SKILL.md
+    TAXONOMY_APPLICATION_SKILL.md
+    DAILY_DIGEST_SKILL.md
+    ACTOR_NORMALIZATION_SKILL.md
+    STANDING_MONITOR_TEST_SKILL.md
 ```
 
 ## Contributing
 
-Drafts live on feature branches; merges to `main` publish. See `PROJECT_PLAN.md` § 8 for editorial principles and § 5 for the entry data model.
+Drafts live on feature branches; merges to `main` publish. See `docs/PROJECT_PLAN.md` § 8 for editorial principles and § 5 for the entry data model.
