@@ -75,6 +75,7 @@ module.exports = function (eleventyConfig) {
   const ideals = loadYaml("taxonomy/ideals.yaml");
   const abuses = loadYaml("taxonomy/abuses.yaml");
   const aliases = loadYaml("taxonomy/aliases.yaml");
+  const monitoringSources = loadYaml("taxonomy/sources.yaml");
 
   const idealBySlug = new Map(ideals.map((i) => [i.slug, i]));
   const abuseBySlug = new Map(abuses.map((a) => [a.slug, a]));
@@ -87,6 +88,7 @@ module.exports = function (eleventyConfig) {
   }
 
   eleventyConfig.addGlobalData("taxonomy", { ideals, abuses, aliases });
+  eleventyConfig.addGlobalData("monitoringSources", monitoringSources);
 
   // ---- Passthrough copy ----
   eleventyConfig.addPassthroughCopy({ "src/css": "css" });

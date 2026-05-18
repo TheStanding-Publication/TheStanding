@@ -46,6 +46,10 @@ The publication classifies every source into one of three tiers:
 
 Secondary sources may appear but cannot satisfy the sourcing minimum.
 
+### Curated monitoring sources
+
+The publication maintains a [public list of monitoring sources](/sources/) used by The Standing's automated news monitoring system. The list includes national news outlets, government sources, civil rights watchdogs, and specialized investigative publications. This transparency ensures readers can verify that the sources meet The Standing's editorial standards and understand where stories come from.
+
 Every source must be linkable and accessible to readers. Sources behind paywalls are permitted — you can't avoid paywalls if you want to cite serious reporting — but the entry should note when a source is paywalled.
 
 ### Citizen-captured evidence
