@@ -223,6 +223,8 @@ sources:
 ---
 ```
 
+> **`status:` is always `published`.** The build accepts four values (`draft`, `published`, `corrected`, `retracted` — see `.eleventy.js`) but this skill is producing live archive entries, so it sets `published` unconditionally. `corrected` and `retracted` are reserved for a future re-evaluation workflow that operates on already-published entries; `draft` is for human-authored work-in-progress and shouldn't appear in agent output. Do not leave the field unset — explicit beats implicit, and an unset status would silently skip the build's draft filter (which is fine today but is the kind of footgun worth pre-empting).
+
 **Body:** 2-3 paragraphs of markdown, factual and neutral tone. Use summary as base and expand with context from sources.
 
 ### Step 6: Verify Build
