@@ -1,4 +1,5 @@
 ---
+id: c6151765-e43c-4dbc-a74d-8c935ceef496
 date: 2026-02-11
 archived: 2026-05-19
 slug: issue-10-federal-voter-suppression

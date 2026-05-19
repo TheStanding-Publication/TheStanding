@@ -1,4 +1,5 @@
 ---
+id: a906adb1-b26f-45c8-9403-112a098cea19
 date: 2026-05-14
 archived: 2026-05-19
 slug: issue-18-federal-monetizing-office

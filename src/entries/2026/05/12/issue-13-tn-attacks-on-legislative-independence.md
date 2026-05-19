@@ -1,4 +1,5 @@
 ---
+id: b71a35f4-0f78-4726-82e2-e492e628f479
 date: 2026-05-12
 archived: 2026-05-19
 slug: issue-13-tn-attacks-on-legislative-independence
