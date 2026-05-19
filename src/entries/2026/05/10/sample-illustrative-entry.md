@@ -1,4 +1,5 @@
 ---
+id: 9c352b42-ad90-4275-a2da-149d75923370
 date: 2026-05-10
 archived: 2026-05-11
 slug: sample-illustrative-entry

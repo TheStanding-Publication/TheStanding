@@ -1,4 +1,5 @@
 ---
+id: daecd161-8a93-422b-95b9-0b5c1176626e
 date: 2026-01-30
 archived: 2026-05-19
 slug: issue-9-federal-prosecution-of-journalists

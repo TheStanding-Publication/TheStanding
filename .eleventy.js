@@ -113,6 +113,7 @@ module.exports = function (eleventyConfig) {
     const ALLOWED_STATUS = ["draft", "published", "corrected", "retracted"];
     const ALLOWED_SOURCE_TIERS = ["primary", "investigative", "secondary"];
     const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
     // Schema validation.
     for (const entry of all) {
@@ -135,6 +136,22 @@ module.exports = function (eleventyConfig) {
       if (typeof entry.data.date === "string" && !DATE_RE.test(entry.data.date)) {
         throw new Error(
           `Entry "${slug}": date "${entry.data.date}" must be in YYYY-MM-DD format.`
+        );
+      }
+
+      // --- id presence + UUID v4 format ---
+      // Every entry MUST carry a stable, globally unique id (a UUID v4) that is
+      // separate from its slug. The slug is for URLs and display; the id is the
+      // canonical identifier used for cross-references and for any future
+      // operations where renames or display drift would otherwise break links.
+      if (!entry.data.id) {
+        throw new Error(
+          `Entry "${slug}": missing required "id" frontmatter (must be a UUID v4 like 550e8400-e29b-41d4-a716-446655440000).`
+        );
+      }
+      if (!UUID_RE.test(entry.data.id)) {
+        throw new Error(
+          `Entry "${slug}": id "${entry.data.id}" is not a valid UUID v4 format. Generate with \`python3 -c "import uuid; print(uuid.uuid4())"\` or \`uuidgen\`.`
         );
       }
 
@@ -201,6 +218,29 @@ module.exports = function (eleventyConfig) {
           );
         }
       }
+    }
+
+    // --- Uniqueness checks across all entries ---
+    // id must be globally unique (the whole point of having an id field).
+    // slug must also be unique — used as a key in collections.entryBySlug and
+    // as a foreign key in relationships/episodes references.
+    const idsSeen = new Map();
+    const slugsSeen = new Map();
+    for (const entry of all) {
+      const entrySlug = entry.data.slug || entry.fileSlug;
+      const entryId = entry.data.id;
+      if (idsSeen.has(entryId)) {
+        throw new Error(
+          `Duplicate entry id "${entryId}" in "${entry.inputPath}" — also used by "${idsSeen.get(entryId)}". Entry ids must be globally unique.`
+        );
+      }
+      idsSeen.set(entryId, entry.inputPath);
+      if (slugsSeen.has(entrySlug)) {
+        throw new Error(
+          `Duplicate entry slug "${entrySlug}" in "${entry.inputPath}" — also used by "${slugsSeen.get(entrySlug)}". Entry slugs must be globally unique.`
+        );
+      }
+      slugsSeen.set(entrySlug, entry.inputPath);
     }
 
     all.sort((a, b) => new Date(b.data.date) - new Date(a.data.date));

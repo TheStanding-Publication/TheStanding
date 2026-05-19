@@ -1,4 +1,5 @@
 ---
+id: 11904004-05e7-40d1-a8a6-b60f2a98023c
 date: 2026-05-07
 archived: 2026-05-19
 slug: issue-6-tn-gerrymandering

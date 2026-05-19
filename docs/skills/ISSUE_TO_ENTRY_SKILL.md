@@ -205,6 +205,7 @@ This rule is load-bearing: it satisfies Key Principle #3 ("deterministic slugs")
 **File format:**
 ```yaml
 ---
+id: [generated UUID v4]
 date: YYYY-MM-DD
 archived: [TODAY in YYYY-MM-DD]
 slug: [generated slug]
@@ -235,6 +236,8 @@ sources:
     accessed: [TODAY in YYYY-MM-DD]
 ---
 ```
+
+> **`id:` is a freshly generated UUID v4** (e.g. `550e8400-e29b-41d4-a716-446655440000`). Generate one at entry creation with `python3 -c "import uuid; print(uuid.uuid4())"` or `uuidgen`. The id is the entry's canonical identifier — globally unique, never changes — and is enforced by the build (`.eleventy.js`) for both presence and uniqueness. The slug is for URLs and display; the id is what cross-references and future graph operations should rely on. Never reuse an id from another entry, and never change an existing entry's id after publication.
 
 > **`status:` is always `published`.** The build accepts four values (`draft`, `published`, `corrected`, `retracted` — see `.eleventy.js`) but this skill is producing live archive entries, so it sets `published` unconditionally. `corrected` and `retracted` are reserved for a future re-evaluation workflow that operates on already-published entries; `draft` is for human-authored work-in-progress and shouldn't appear in agent output. Do not leave the field unset — explicit beats implicit, and an unset status would silently skip the build's draft filter (which is fine today but is the kind of footgun worth pre-empting).
 

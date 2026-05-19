@@ -1,4 +1,5 @@
 ---
+id: a202df92-f1f6-4f91-b548-171e6d6bd50e
 date: 2026-05-18
 archived: 2026-05-19
 slug: issue-17-federal-self-dealing

@@ -1,4 +1,5 @@
 ---
+id: a66de01e-dd19-4622-a3f2-dc82b6e37ee8
 date: 2026-05-18
 archived: 2026-05-19
 slug: issue-12-federal-obstruction-of-oig-investigations

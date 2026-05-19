@@ -1,4 +1,5 @@
 ---
+id: a2221a9b-dcd8-47b2-8ceb-e0c7a9f8c4e0
 date: 2026-05-18
 archived: 2026-05-19
 slug: issue-11-federal-narrowing-civil-rights-protections
