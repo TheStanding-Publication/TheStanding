@@ -1,90 +1,90 @@
 # The Standing: News Monitoring Skill
 
 ## Purpose
-Automatically monitor major news outlets for events matching The Standing's taxonomy using Claude agent evaluation, create GitHub issues with comprehensive event information, and avoid duplicates.
+Automatically monitor major news outlets for events matching The Standing's taxonomy of ideals and abuses, create GitHub issues with comprehensive event information, and avoid duplicates. Runs four times daily on a schedule.
 
 ## Key Principle: Agent-Based Evaluation
 **This system uses Claude agent analysis instead of pattern matching.** Each story is evaluated for relevance by understanding context and nuance, not just matching keywords.
 
-## Ideals & Abuses Reference
-Available via taxonomy: 12 ideals with 77 specific abuses. The agent evaluates stories semantically against these ideals.
+## How This Skill Is Used
 
-## Sources Reference
-The curated list of monitoring sources is defined in `taxonomy/sources.yaml`. This includes national news outlets, government sources, civil rights watchdogs, and press freedom organizations. Each source includes RSS feed URLs where available.
+**This document is the operational source of truth.** It is fetched and executed directly by four scheduled tasks (`standing-monitor-morning`, `standing-monitor-midday`, `standing-monitor-afternoon`, `standing-monitor-evening`). Each scheduled task is a thin wrapper that passes scan-specific parameters and otherwise defers entirely to the workflow defined here.
+
+Changes to this file propagate to all four scheduled scans on their next run. **Do not duplicate this workflow into the scheduled-task prompts** — that creates drift and historically has.
+
+## Inputs Provided by the Scheduled Task
+
+- `time_window` — how far back from now to scan (e.g. "last 24 hours", "last 6 hours"). The scheduled task chooses this.
+- `scan_label` — which scheduled scan this is (morning / midday / afternoon / evening). For the run report.
 
 ## Workflow
 
-### 1. Search for Relevant News
-- Monitor from the curated sources list in `taxonomy/sources.yaml`
-- Sources include national news outlets, government documents, civil rights organizations, and specialized investigative publications
-- Use broad news searches across all topics related to US governance and democracy
-- Focus on recent news (last 24 hours for daily scans)
-- Fetch via RSS feeds where available, or web scraping for sources without feeds
+### Step 1: Load the current taxonomy
 
-### 2. Evaluate Relevance (Claude Agent)
-**For each story, Claude evaluates:**
-- Does this describe an anti-democratic action or abuse?
-- Which ideals/abuses from The Standing's taxonomy does this relate to?
-- Is this a credible source?
+The Standing's taxonomy is versioned in the public repo. Fetch the current versions at the start of every run — do **not** work from memory or a hardcoded subset:
 
-**Claude determines:** Relevant or not relevant, and if relevant, which abuses apply.
+- **Sources to scan:** https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/taxonomy/sources.yaml — curated outlets across five categories (`national_news`, `government_sources`, `watchdog_sources`, `press_freedom_sources`, `specialized_sources`). Scan the **full** list, not just the well-known national outlets. Watchdog and specialized sources (Brennan Center, Democracy Docket, ProPublica, ACLU, SCOTUSblog, Documented NY, etc.) often break democracy stories before the wire services do — their inclusion in the list is deliberate.
+- **Abuses to evaluate against:** https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/taxonomy/abuses.yaml — every abuse slug currently in the taxonomy, each with a `title` and `description`. Use this list when classifying stories. The full taxonomy is broader than any short summary; do not work from memory.
 
-Key advantage: Claude understands that "Voting Rights Act enforcement weakened" = voter-suppression without needing exact keyword match.
+### Step 2: Search recent news
 
-### 3. Comprehensive Event Research (Claude Agent)
-**If relevant, Claude gathers ALL of the following before creating an issue:**
+Use the curated sources you just loaded. Fetch RSS feeds where `sources.yaml` provides them; web-scrape otherwise. Focus on the `time_window` provided by the scheduled task, scoped to US governance, democracy, voting, elections, law enforcement, press freedom, separation of powers, civil rights, due process, public service, and institutional accountability.
 
-- **Event description**: What happened? Concise 2-3 sentence summary
-- **Event date**: When did this occur? (YYYY-MM-DD if known, or approximate)
-- **Jurisdiction**: Federal / State / Local / International / Private actor (using the decision rules)
-- **Location**: City, county, state (where applicable). Required for local/state events, optional for federal
-- **Actors**: Named officials, agencies, candidates, organizations with roles/titles
-- **Primary evidence**: Links to news article, official statement, court filing, video
-- **Secondary sources**: Additional reporting or official documentation
-- **Mapped abuses**: 1-5 abuse slugs that MUST exist in `taxonomy/abuses.yaml` *at the time the issue is created*. Read the taxonomy file before emitting an issue and verify each proposed slug is in the file. If unsure which slug fits, pick the closest valid slug and explain the uncertainty in the **Analysis** section — never invent a slug. (Invented slugs are the single most common cause of downstream entry failures.) Use as many slugs as genuinely apply — don't trim valid abuses to hit a number — but don't pad either. Most events will map to 1-3 in practice.
-- **Context**: Any background needed to understand significance
+### Step 3: Evaluate each story semantically
 
-**Claude conducts thorough research upfront:**
-- Search for original reporting (not just one outlet's coverage)
-- Identify official statements from involved parties
-- Note related court filings or public records
-- Check for follow-up reporting or additional context
+For each story you find, ask:
 
-This prevents wasting editorial time re-investigating if the issue is accepted.
+- Is this describing an anti-democratic action or abuse of power?
+- Which abuse slugs from the loaded `abuses.yaml` does it map to? (1-5 slugs; only emit slugs that exist in the current taxonomy.)
+- Is the source credible?
+- What's your confidence level?
 
-### 4. Check for Duplicates
-**Before creating an issue:**
-1. Search open AND closed issues in the repo for related keywords
-2. Check issue titles and bodies for similar events
-3. If a duplicate exists (same event, same date, same actors), don't create a new issue
-4. If unclear if it's a duplicate, note in research but proceed with caution
+Use semantic understanding, not pattern matching. You understand that "weakening Voting Rights Act enforcement" maps to `voter-suppression` (or one of the more specific election slugs) without needing keyword overlap.
 
-### 5. Create GitHub Issue
-Create an issue with:
+### Step 4: For relevant stories, conduct comprehensive research
+
+Before creating an issue, gather all of:
+
+- **Event description** — 2-3 sentences.
+- **Event date** — `YYYY-MM-DD` if known, or the most defensible approximation.
+- **Jurisdiction** — `federal` / `state` / `local` / `international` / `private-actor`.
+- **Location** — city, county, state where applicable.
+- **Actors** — named officials, agencies, candidates, organizations with roles/titles, **filtered to those who took the action**. Contextual parties (a court whose prior ruling enabled the action; an opposition party that protested it; the targets of the action) are not actors of the abuse — describe them in the body if relevant, but do not list them as actors.
+- **Primary evidence** — links to news articles, official statements, court filings, video. Verify each loads.
+- **Secondary sources** — additional reporting or official documentation.
+- **Mapped abuses** — 1-5 abuse slugs that MUST exist in the `abuses.yaml` you loaded in Step 1. **Never invent a slug.** If no slug fits cleanly, pick the closest valid one and explain the uncertainty in **Analysis** — the downstream skill will correct in flight. Use as many slugs as genuinely apply; don't trim, don't pad. Most events map to 1-3 in practice.
+- **Context / Analysis** — significance, related events, downstream effects.
+
+### Step 5: Check for duplicates
+
+Before creating an issue, search the repo `TheStanding-Publication/TheStanding` for **open AND closed** issues whose title or body references the same event, date, and actors. If a duplicate exists, skip. If unclear, note in research and proceed with caution.
+
+### Step 6: Create the GitHub issue
+
+For each new relevant story, create an issue with this template:
 
 ```
-Title: [Brief headline or event description]
+Title: [Monitoring] [Brief headline]
 
 Body:
 ## Automated News Monitoring
 
 **Source:** [Primary news outlet]
-**Scan date:** [When the monitoring scan ran]
-**Event date:** [When the event occurred]
+**Date:** [YYYY-MM-DD scan date]
+**Event date:** [YYYY-MM-DD]
 
 ### What happened
-[2-3 sentence description of the event]
+[2-3 sentences]
 
 ### Jurisdiction
-[Federal / State / Local / International / Private actor]
+[federal / state / local / international / private-actor]
 
 ### Location
-[City, County, State — e.g., "Douglas County, Colorado" or "Federal (nationwide)" or "N/A"]
+[City, County, State — or "federal" / "nationwide" / "N/A"]
 
 ### Actors involved
 - [Name] ([Title/Role])
 - [Organization/Agency]
-- [Other relevant actors]
 
 ### Mapped abuses
 - [abuse-slug-1] (Abuse Title)
@@ -96,36 +96,38 @@ Body:
 
 **Secondary:**
 - [Additional reporting](URL)
-- [Official statement](URL)
 
 ### Analysis
-[Any relevant context about why this maps to these abuses, significance, related events]
+[Context, significance, related events]
 
 ---
-*Created by The Standing's automated news monitoring system.*
+*Created by The Standing's automated news monitoring system (scan: [scan_label]).*
 ```
 
-**Labels:**
+**Apply labels:**
 - `monitoring-intake` (always)
 - `needs-research` (always)
-- [abuse-slug] for primary mapped abuse (e.g., `voter-suppression`)
+- Each abuse slug emitted in "Mapped abuses" as a label
 
-### 6. Report Results
-For each scan, report:
-- How many stories were evaluated
-- How many were marked as relevant
-- How many duplicates were found and skipped
-- How many new issues were created
-- Any stories that were borderline/uncertain
+### Step 7: Report the run
+
+Return a summary to the conversation:
+
+- Stories evaluated
+- Stories marked relevant
+- Duplicates skipped
+- New issues created (with issue numbers)
+- Any borderline / uncertain cases worth surfacing
 
 ## Key Principles
 
-1. **Single point of truth**: All monitoring scans use this skill
-2. **Upfront research**: Complete research before issue creation, not after
-3. **Comprehensive data**: Gather everything needed to record the event if accepted
-4. **Duplicate avoidance**: Check open and closed issues before creating
-5. **Taxonomy-driven**: Search and categorize strictly against The Standing's ideals/abuses; abuse slugs MUST exist in `taxonomy/abuses.yaml` at emission time
-6. **Evidence-based**: Primary sources only; citizen documentation acceptable if verifiable
+1. **Single point of truth** — this file. All four scheduled scans execute the workflow described here.
+2. **Upfront research** — complete research before issue creation, not after.
+3. **Comprehensive data** — gather everything the downstream entry-recording skill needs.
+4. **Duplicate avoidance** — check open and closed issues before creating.
+5. **Taxonomy-driven** — abuse slugs MUST exist in the live `abuses.yaml`. Inventing slugs is the single most common cause of downstream entry failures.
+6. **Evidence-based** — primary sources only; citizen documentation acceptable if verifiable.
+7. **Scan the full source list** — many of The Standing's strongest entries originate in watchdog and specialized outlets that wire services pick up only later, or not at all.
 
 ## Validation Responsibility
 
@@ -137,9 +139,28 @@ What that means for this skill:
 - **Don't** treat issue creation as the final word. Articles get retracted; the taxonomy evolves; headlines change between emission and recording. Some friction at the downstream step is expected and healthy.
 - **Don't** invent abuse slugs to fit a story. If nothing in the taxonomy maps cleanly, that's a signal the taxonomy may need a new abuse — flag in **Analysis** rather than papering over with a wrong slug.
 
-## Scheduled Tasks
-This skill is referenced by 4 daily scheduled tasks:
+## Scheduled Tasks (Thin Wrappers)
+
+This skill is invoked by four daily scheduled tasks:
+
 - `standing-monitor-morning` (8am)
 - `standing-monitor-midday` (12pm)
 - `standing-monitor-afternoon` (4pm)
 - `standing-monitor-evening` (8pm)
+
+Each scheduled task is a thin wrapper of the form:
+
+```
+You are The Standing's automated news monitoring system.
+
+Fetch and execute the workflow defined in:
+https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/skills/STANDING_MONITOR_SKILL.md
+
+This is the canonical operational spec. Follow it exactly.
+
+Scan parameters for this run:
+- time_window: [varies per task]
+- scan_label: [morning / midday / afternoon / evening]
+```
+
+The scheduled task prompt should be no more than ~15 lines. If a behavior change needs to land in the scheduled scans, change it **here**, not in the scheduled-task prompts.
