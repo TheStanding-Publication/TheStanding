@@ -61,4 +61,41 @@
 
 ## Someday
 
+- [ ] **State-level collections / archive pages** — Per-state browse pages (e.g. `/states/TN/`) listing all entries whose `jurisdiction` is `state` or `local` and whose `location` resolves to that state. Mirrors the existing `/ideals/{slug}/` pattern.
+  - **Trigger:** revisit when any single state has ≥10 entries, OR when total state-level entries across the archive reach ≥50 — whichever comes first. (These are placeholders; tighten when we have a feel for the data.)
+  - Requires deriving state from the `location` string, or adding an explicit normalized `state` field to entry frontmatter
+  - Open question: stop at state level, or also county/city collection pages?
+
+- [ ] **Manual invocation for STANDING_MONITOR_SKILL** — Allow on-demand monitor runs against a specific input rather than only the scheduled news scan: `/standing-monitor --issue N` to research an existing issue (e.g. a human-submitted tip), and `/standing-monitor --url URL` to research a specific article. Output reuses the same comprehensive-research flow as scheduled scans.
+  - Use case: a human spots a story before the scheduled scan does, or wants the monitor to enhance a tip-issue with full research
+  - Parallels `--issue N` in ISSUE_TO_ENTRY_SKILL
+  - Open questions: for `--url` — create a new issue or just emit research as output? For `--issue N` — edit body in place or post research as a comment? (Default suggestion: new issue / comment, to preserve the original.)
+
+- [ ] **Re-evaluation workflow for already-published entries** — Periodically re-scan the source URLs of recently-published entries to catch retractions, corrections, or substantive updates that arrive after publication. Surfaces the unused `corrected` and `retracted` status values, plus the `relationships.retracts:` and `corrections:` fields.
+  - Trigger: probably weekly, against entries published in the last 90 days
+  - Source retracted → entry gets `status: retracted`; populate `relationships.retracts:`
+  - Source substantively corrected → entry gets `status: corrected`; append an item to `corrections:` with date + note
+  - Decisions needed: lookback window, what counts as a "substantive" correction, whether the agent acts unilaterally or only proposes via PR
+
+- [ ] **Retire or rationalize legacy GitHub labels** — Several labels exist in the repo but no longer serve a purpose after the eligibility-by-author and validate-and-correct refactors.
+  - `url-validation-hold` — fully dead after PR #20 (the 24h-recheck loop was removed). Delete from the repo.
+  - `monitoring-intake` — still applied by STANDING_MONITOR but no skill filters on it anymore (PR #16 switched to author-based eligibility). Keep for human grouping in the GitHub UI, or stop applying?
+  - `needs-research` — same situation. Decide and act.
+
+- [ ] **STANDING_MONITOR pre-flight taxonomy validation** — Today the monitor "should" only emit abuse slugs that exist in `taxonomy/abuses.yaml` (per PR #20 guidance), but nothing enforces it — issues #6–#13 all used invented slugs (`voter-dilution`, `electoral-manipulation`, etc.). Before issue creation, the monitor should validate every proposed slug against the live taxonomy and refuse to emit if any are invalid. Would eliminate most of the in-flight corrections ISSUE_TO_ENTRY currently makes.
+
+- [ ] **Episodes editorial workflow** — Entries support an `episodes:` field, the template renders the Part-of line, and a sample episode exists in `src/content/episodes/`. But there's no documented guidance on when an editor creates an episode, how ISSUE_TO_ENTRY should suggest one, or how episodes get retroactively linked when later entries arrive.
+  - First obvious case: post-Callais state gerrymanders. The Tennessee entry (issue #6) is one node; once Louisiana v. Callais and other states get entries, they should share an episode like `post-callais-state-gerrymanders`.
+  - Decision needed: who creates episodes — editor by hand, or agent suggests at PR time and editor confirms?
+
+- [ ] **Formalize or remove the source-level `note:` field** — On the issue-6 entry, ISSUE_TO_ENTRY added ad-hoc `note:` fields to source items (e.g. *"Returned 403 to default-UA HTTP clients; article verified live"*). The field isn't in the documented schema or in `.eleventy.js` validation. Either:
+  - Add to the schema (ISSUE_TO_ENTRY_SKILL Step 5 + `.eleventy.js`) as an allowed-optional field, OR
+  - Move that information into the PR body and stop emitting it on the entry.
+
+- [ ] **Define "actor" precisely** — On the issue-6 entry the agent pruned SCOTUS (contextual cause) and Rep. Steve Cohen (target) from the actor list, keeping only entities that *took* the action. The principle isn't documented anywhere. Worth codifying in STANDING_MONITOR (so the monitor produces tighter actor lists upfront) and in editorial guidance, especially for borderline cases — enablers, accomplices, signatories vs. drafters, agencies vs. specific officials, etc.
+
+- [ ] **Distinguish transient from real build failures** — Step 6 of ISSUE_TO_ENTRY currently treats every `npm run build` failure as bad input and skip-flags the issue. But flaky `npm install`, network failures during dependency resolution, or transient CI/infra issues should retry rather than punish a perfectly good entry. Define what counts as transient and add a retry-once policy. Low priority — wait until it actually bites.
+
+- [ ] **PR label discipline** — When the agent applied `gerrymandering` as a label on PR #21, GitHub auto-created the label (it didn't previously exist). There's no defined set of valid PR labels, no policy on whether new abuse-slug labels should be auto-created on first use, and no audit of what labels currently exist vs. what they're used for. Define the canonical label set and the rules for adding new ones. Low priority — wait until it actually bites.
+
 ## Done
