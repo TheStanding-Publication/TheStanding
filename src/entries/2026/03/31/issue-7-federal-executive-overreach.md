@@ -59,13 +59,6 @@ sources:
     title: "Attorney General Rayfield Moves to Permanently Block President Trump's Executive Order Restricting Mail Voting, Exerting Control over Elections"
     accessed: 2026-05-19
     note: "Primary source for the multi-state legal response: Oregon AG plus 23 other attorneys general and the Governor of Pennsylvania filing for summary judgment."
-  - url: "https://www.americanprogress.org/article/the-trump-administration-has-no-legal-authority-to-invoke-national-security-and-take-over-elections/"
-    publisher: "Center for American Progress"
-    tier: secondary
-    title: "The Trump Administration Has No Legal Authority To Invoke National Security and Take Over Elections"
-    accessed: 2026-05-19
-    note: "Returned 403 to default-UA HTTP clients (publisher WAF); not confirmed live in this run. Human review of the URL is recommended before publication."
-
 quote:
   text: "President Trump wants to turn letter carriers into election gatekeepers."
   source-index: 4
