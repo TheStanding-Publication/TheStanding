@@ -131,6 +131,11 @@
   title: "Attacks on judicial independence"
   description: "Threats, court-packing schemes, or campaigns to pressure judges over rulings."
 
+- slug: attacks-on-legislative-independence
+  ideal: separation-of-powers
+  title: "Attacks on legislative independence"
+  description: "Use of office-power — DOJ action, federal-funding leverage, executive authority — to punish legislators for lawful votes or oversight. Excludes ordinary political opposition (endorsements, primary challenges, public criticism); the marker is the use of governmental authority rather than political influence."
+
 - slug: lying-to-congress
   ideal: separation-of-powers
   title: "Lying to Congress"
