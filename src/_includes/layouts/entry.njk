@@ -90,17 +90,17 @@ layout: layouts/base.njk
     <section class="entry-relationships">
       {% if relationships.follows and relationships.follows.length %}
         <p><strong>Follows:</strong>
-          {% for s in relationships.follows %}<a href="/entries/{{ s }}/">{{ s }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+          {% for s in relationships.follows %}{% set ref = collections.entryBySlug[s] %}{% if ref %}<a href="{{ ref.url }}">{{ ref.data.headline }}</a>{% else %}{{ s }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
         </p>
       {% endif %}
       {% if relationships.corrects and relationships.corrects.length %}
         <p><strong>Corrects:</strong>
-          {% for s in relationships.corrects %}<a href="/entries/{{ s }}/">{{ s }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+          {% for s in relationships.corrects %}{% set ref = collections.entryBySlug[s] %}{% if ref %}<a href="{{ ref.url }}">{{ ref.data.headline }}</a>{% else %}{{ s }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
         </p>
       {% endif %}
       {% if relationships.retracts and relationships.retracts.length %}
         <p><strong>Retracts:</strong>
-          {% for s in relationships.retracts %}<a href="/entries/{{ s }}/">{{ s }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+          {% for s in relationships.retracts %}{% set ref = collections.entryBySlug[s] %}{% if ref %}<a href="{{ ref.url }}">{{ ref.data.headline }}</a>{% else %}{{ s }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
         </p>
       {% endif %}
     </section>
