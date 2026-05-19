@@ -20,12 +20,31 @@ Claude agent that converts open GitHub issues opened by the `thestanding` bot ac
 
 This skill is a Claude agent that orchestrates the full workflow:
 1. Fetch open issues authored by `thestanding` from GitHub
-2. For each issue: parse, validate, create entry, verify build, add comment
+2. For each issue: re-read sources, validate-and-correct, create entry, verify build
 3. Create branch, commit, push to GitHub
 4. Create PR with appropriate labels
-5. Report summary of what was processed
+5. Report summary of what was processed (entries recorded, issues discarded, corrections made)
 
-**Key principle:** Each validation failure adds a comment and skips to the next issue. No stopping on errors.
+**Key principle:** This agent is responsible for **validity**, not just transcription. Each step is a chance to detect and correct drift between what the monitor saw and what's actually true now. An invalid issue is either corrected by the agent or skip-flagged with the `invalid` label and an explanatory comment.
+
+## Validation Philosophy
+
+The upstream monitor produces issues in good faith based on what it saw at scan time. By the time this skill runs, things may have changed: the taxonomy may have evolved, articles may have been retracted or corrected, headlines may have been revised, the bot may have made an honest taxonomy mistake. **This skill exists to bridge that gap.**
+
+What the agent will correct in flight (no human intervention, just a note in the PR body):
+
+- **Invalid or stale taxonomy slugs** — re-derive correct abuse slugs from the issue body and current source content, mapped against the live `taxonomy/abuses.yaml`. Do not fail because the monitor used an out-of-date or invented slug.
+- **Field normalization** — jurisdiction free-text like "State (Tennessee)" → `jurisdiction: state` and `tn` in the slug; location parentheticals stripped; actor list filtered to those who took the action (not contextual or target parties); etc. Use judgment; don't write a parser.
+- **Headline / summary drift** — if the article's current headline or framing has shifted from the issue's claim, the entry reflects the current truth, not the snapshot.
+
+What the agent will skip-flag (skip + comment + `invalid` label, leave issue open for human review):
+
+- **Body is incomprehensible** as a news event description.
+- **All primary sources have been retracted** or the live article content contradicts the issue's claim about what happened.
+- **No abuse in `taxonomy/abuses.yaml` cleanly applies** to what the sources actually describe (and the agent is confident, not just unsure — uncertainty defaults to correction, not discard).
+- **The "event" is debunked** by subsequent reporting between scan time and process time.
+
+The agent does NOT close issues, even when flagging them invalid. Closure is a human call.
 
 ---
 
@@ -38,7 +57,7 @@ This skill is a Claude agent that orchestrates the full workflow:
 **What the agent does:**
 - Call GitHub API to search for issues
 - Query: `is:issue state:open author:thestanding sort:number-asc`
-- Skip issues with the `url-validation-hold` label if the last comment is < 24 hours old (this label is a runtime signal this skill itself applies — see Step 4 — not an eligibility prerequisite)
+- Skip issues that already carry the `invalid` label (those are skip-flagged from a prior run; a human needs to remove the label to make them eligible again).
 - Build list of issues to process
 
 **GitHub API call:**
@@ -100,49 +119,51 @@ GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:ope
 
 > **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream STANDING_MONITOR_SKILL currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
 
-### Step 3: Validate Data
+### Step 3: Validate and Correct
 
-**Check all required fields:**
-- `headline` — non-empty, <100 chars
-- `summary` — non-empty, 2-3 sentences
-- `date` — YYYY-MM-DD format
-- `jurisdiction` — one of: federal, state, local, international, private-actor
-- `location` — meets jurisdiction requirements (state for state, city/county/state for local, etc.)
-- `actors` — at least 1, all non-empty
-- `abuses` — at least 1, all must exist in `/taxonomy/abuses.yaml`
-- `sources` — at least 1, all have url/publisher/tier
+For each field, ensure it can produce a valid entry. The agent reads the issue body, applies judgment, and produces a clean working dictionary. **Most "validation failures" are correctable in place — don't skip-flag on things the agent can clearly fix.**
 
-**If validation fails at this stage:**
-→ Go to **Step 8: Failure Handling**
+Required fields and what counts as "valid enough":
 
-### Step 4: URL Validation & Normalization
+- `headline` — non-empty, <100 chars. Correct from the issue title or first sentence of "What happened" if missing.
+- `summary` — 2-3 sentences. Compress from "What happened" + "Analysis" if needed. If sources have updated the framing since the issue was written, write the summary to current reality, not the snapshot.
+- `date` (event date) — YYYY-MM-DD. Parse out of the issue body's `**Event date:**` line. If the body has approximate dates ("early May 2026"), agent picks the most defensible specific date and notes the imprecision in the entry body.
+- `jurisdiction` — must end up as exactly `federal`, `state`, `local`, `international`, or `private-actor`. The issue body may say "State (Tennessee)" or "Federal (nationwide)" — strip parentheticals and normalize. Capture any state code into the slug-generation context.
+- `location` — free-text string. Strip helpful-but-noisy parentheticals like "(9th Congressional District)" from the location string itself; if that context matters for the entry, it goes in the body, not the metadata.
+- `actors` — at least 1. Filter to entities who *took the action*: a court whose ruling created the legal context is not an actor in the gerrymandering; a targeted incumbent is not an actor in the gerrymandering. Use judgment, don't blindly transcribe the issue's list.
+- `abuses` — at least 1; **every slug must exist in the current `/taxonomy/abuses.yaml`**. If the issue uses slugs that aren't in the taxonomy (or aren't in it anymore), the agent re-derives the right slugs by reading the issue body and source articles against the taxonomy's `slug + title + description` fields. Note any re-derivation in the PR body. Do **not** fail just because the upstream monitor used a stale or invented slug.
+- `sources` — at least 1 primary OR 2 investigative, each with url/publisher/tier/title. Step 4 will do the heavy work of source verification.
 
-**For each source URL:**
+**When correction isn't enough:** if the agent cannot in good conscience produce a valid entry from this issue (the event isn't real, the body is incoherent, the taxonomy genuinely has no place for it), → **Step 11: Discarding Issues**.
 
-1. **Make GET request** to verify status
-   - **Send a browser-like User-Agent header** (e.g. `Mozilla/5.0 (compatible; TheStandingBot/1.0; +https://thestanding.us)`). Many publisher WAFs return 403/406 to default HTTP-client User-Agents on otherwise-live articles. Without this, healthy news sites get falsely flagged dead.
-   - Follow redirects automatically
-   - Capture final URL if redirected (301/302)
-   - **Accept (live):** 200 OK
-   - **Dead** (drop from sources): 404, 410, DNS failure, connection refused, TLS failure, hard timeout
-   - **Needs review** (keep the source in the entry; add `url-needs-review` label to the issue): 403, 406, 451, 5xx. These are usually bot-blocking or transient publisher issues, not actually-gone content. Do **not** treat these as dead — dropping live primary sources because of a WAF is a worse failure mode than keeping an occasional zombie URL.
-   - Treat anything else not listed above as dead.
+### Step 4: Source Re-verification (URL + Content)
 
-2. **Update URL** if redirected (301/302)
+This is more than a 200-OK check. For each source URL, the agent **fetches the page and reads the article content**, then judges whether the article still supports the entry the way the issue claims it does. The agent makes this call; no fixed status-code table.
 
-3. **Remove dead URLs** from sources list (do not remove "needs review" URLs — keep them and surface for human check)
+For each source URL:
 
-4. **After cleaning:**
-   - Count remaining primary sources
-   - Count remaining investigative sources
-   
-   **If all primary sources are dead:**
-   → Add `url-validation-hold` label and comment, skip this issue
-   
-   **Else if sourcing floor not met** (need 1 primary OR 2 investigative after cleaning):
-   → Go to **Step 8: Failure Handling**
-   
-   **Else:** Continue with remaining sources
+1. **Fetch the page** using a browser-like User-Agent (e.g. `Mozilla/5.0 (compatible; TheStandingBot/1.0; +https://thestanding.us)`) and follow redirects. Capture the final URL if redirected.
+
+2. **Interpret the response with judgment**, not a status-code table:
+   - **Page loads and the article is present** → live source, continue to content check.
+   - **404 / 410 / page replaced with a "this article is no longer available" notice** → the article is gone. This is a dead source.
+   - **403 / 406 / 451 / 5xx with a known reputable publisher** → almost always bot-blocking by the publisher's WAF, not actually missing content. Keep the source in the entry. Note in the PR body that human review of the URL is appropriate. Do not drop the source.
+   - **TLS / DNS / connection failure on a known domain** → most likely transient. Retry once with backoff; if still failing, keep the source but flag for review.
+
+3. **Read the article content** and verify it still supports the entry:
+   - **Does the article confirm the event happened as the issue describes?** If the live article says something materially different — different date, different actors, different outcome — update the entry to reflect the article. The article is the source of truth, not the issue's snapshot.
+   - **Look for explicit correction or retraction notices** in the article: "Correction:", "Update:", "Retracted:", "This article has been updated to reflect…", "[Editor's note]". If present:
+     - **Correction** that doesn't change the core event → reflect in the entry body, note the correction in the PR.
+     - **Substantive update** that changes the framing → rewrite the entry summary to match current state.
+     - **Retraction** → treat this source as effectively dead for this event.
+   - **Compare current headline to the issue's claimed headline.** If the headline has been revised substantively (not just typo fixes), use the current headline in the entry's source list, and note the change in the PR.
+
+4. **After re-verification, evaluate sourcing floor:**
+   - **All primary sources retracted or contradict the issue** → the event itself is in doubt. Skip-flag via Step 11 with a comment summarizing what the sources now say.
+   - **Sourcing floor not met** (need 1 primary OR 2 investigative remaining) → Step 11.
+   - **Otherwise** → continue with the verified, possibly-updated source list.
+
+5. **Record per-source notes** in the entry's `sources:` list when re-verification surfaces something useful: `note: "Article updated 2026-05-15 to add quote from Senate spokesperson"`, `note: "WAF returns 403 to automated checks; article verified live"`, etc.
 
 ### Step 5: Create Entry File
 
@@ -213,7 +234,7 @@ sources:
 4. Check if build succeeds
 
 **If build fails:**
-→ Go to **Step 8: Failure Handling** (note: build error in comment)
+→ Go to **Step 11: Discarding Issues** with the build output in the comment. (Build failures here usually mean bad input — invalid YAML, malformed source URL, etc. — so the issue is skip-flagged for human review.)
 
 **If build succeeds:**
 → Continue to Step 7
@@ -312,65 +333,44 @@ Closes #[issue-number]
 1. Switch back to main: `git checkout main`
 2. Delete local branch: `git branch -d entry/[slug]`
 
-### Step 11: Failure Handling
+### Step 11: Discarding Issues (Skip-Flag)
 
-**If any validation fails:**
+Most problems are corrected in Step 3 or Step 4 and never reach here. Step 11 only fires when the agent has concluded the issue cannot be turned into a valid entry — and even then, the agent does **not** close the issue. Closure is a human call. The agent:
 
-1. **Determine error type and message**
-2. **Check what failed:**
-   - URL validation: All primary sources dead?
-   - Other validation: Which field(s) failed?
-   - Build error: What does build output say?
-3. **Format appropriate comment for issue**
+1. **Adds a comment** explaining what's wrong and what the agent concluded.
+2. **Applies the `invalid` label.**
+3. **Skips to the next issue.**
 
-**If all primary sources are dead:**
+The issue stays open. A human can decide whether to fix the underlying problem (update the body, restore a source, update the taxonomy) and remove the `invalid` label to make it eligible again on the next run.
+
+**When to skip-flag (not exhaustive — use judgment):**
+
+- The body cannot be read as a news event description at all.
+- All primary sources are gone OR retracted OR substantively contradict the issue's claim about what happened.
+- After reading source content, the agent concludes the "event" was a misunderstanding, hoax, or was debunked by subsequent reporting.
+- No abuse in `taxonomy/abuses.yaml` cleanly applies, even after re-reading the body and sources against the full taxonomy. (If the agent is uncertain rather than confident-no, that's a correction case, not a discard case.)
+- Build verification (Step 6) fails in a way that points to bad input rather than a build-system bug.
+
+**Comment template:**
+
 ```markdown
-⏸️ **URL validation hold**
+⚠️ **Marked invalid** (skip-flagged by ISSUE_TO_ENTRY)
 
-All primary sources for this event are currently unreachable:
-- [URL] → 404
-- [URL] → timeout
+The agent reviewed this issue and was not able to record it as a valid entry. Reason:
 
-This issue will be re-evaluated in 24 hours. If primary sources come back online, entry will be recorded automatically.
+**[One-line summary of why]**
 
-**Sources to check:**
-[List dead primary URLs]
-```
-Add label: `url-validation-hold`
+Details:
+[2-4 sentences explaining what the agent saw — which sources were checked, what they said now vs. what the issue claimed, why no taxonomy slug applies, etc.]
 
-**For other validation failures:**
-```markdown
-❌ **Entry recording failed**
+What to do:
+- If you can fix the underlying problem (update the body, restore a source, etc.), remove the `invalid` label and the agent will re-evaluate on the next run.
+- If this issue genuinely shouldn't be recorded, close it manually.
 
-Entry could not be recorded due to:
-
-**[Error type]:** [Specific error]
-
-**Details:**
-[What went wrong, which field(s), why]
-
-**To fix:**
-[Specific, actionable steps]
-
-Comment here when fixed, and it will be re-evaluated.
+The agent did not close this issue. That's intentional — discarding events is a human call.
 ```
 
-**Special case — invalid abuse slug(s):** When one or more mapped abuses are not in `/taxonomy/abuses.yaml`, the failure comment **must** include the closest valid slugs as suggestions, not just "not in taxonomy". Compute closeness with (a) substring containment against slug AND title, (b) Levenshtein distance ≤ 4 as a fallback. Surface up to 3 candidates per invalid slug. Without this, the upstream monitor can't self-correct on the next pass.
-
-Example:
-```markdown
-❌ **Entry recording failed**
-
-**Invalid abuse slugs:** 2 of 2 mapped abuses are not in the taxonomy.
-
-- `voter-dilution` — not in taxonomy. Closest valid slugs: **`gerrymandering`**, `voter-suppression`, `voter-roll-purges`
-- `electoral-manipulation` — not in taxonomy. Closest valid slugs: **`gerrymandering`**, `post-election-overturning-attempts`, `disinformation-campaigns`
-
-**To fix:** Edit the "Mapped abuses" section of this issue to use slugs that exist in `taxonomy/abuses.yaml`, then comment so the skill re-evaluates.
-```
-
-3. **Add comment to issue with error details**
-4. **Skip to next issue** (don't stop execution)
+**For corrections made in flight (not skip-flag):** the agent does not add a comment on the issue. Instead, the **PR body** describes any corrections made (re-mapped slugs, normalized fields, updated summary from current sources). This keeps issue threads clean and makes correction history reviewable at PR time, which is the right place for it.
 
 ### Step 12: Final Report
 
@@ -386,20 +386,20 @@ Limit: [N or unlimited]
 RESULTS:
 - Total issues processed: N
 - Successful PRs created: N (links to PRs)
-- Failed validations: N (with reasons)
-- URL holds placed: N
+- Issues skip-flagged invalid: N (with reasons)
+- Corrections applied in flight: N (re-mapped slugs, normalized fields, updated summaries from current sources)
 
 SUCCESSFUL ENTRIES:
-- #42: [slug] → PR #XXX
+- #42: [slug] → PR #XXX (notes: re-mapped 1 abuse slug, normalized jurisdiction)
 - #43: [slug] → PR #XXX
 
-FAILURES:
-- #44: All primary sources dead (24h hold)
-- #45: Invalid abuse slug (needs fix)
+SKIP-FLAGGED (invalid label applied, issue left open):
+- #44: All primary sources retracted; live articles contradict the event claim
+- #45: No taxonomy slug applies; event is real but not a Standing-tracked abuse
 
 Next steps:
 - Review open PRs
-- Check url-validation-hold issues in 24 hours
+- Review issues with the `invalid` label and decide whether to fix, close, or update the taxonomy
 ```
 
 ---
@@ -407,7 +407,7 @@ Next steps:
 ## Key Principles
 
 1. **One issue per PR** — No batching across issues
-2. **Fail gracefully** — Validation failure = comment + skip, not stop
+2. **Correct before failing** — Validation drift is corrected in flight when possible; skip-flag only when the agent concludes the issue cannot become a valid entry
 3. **Deterministic slugs** — Same issue data always produces same slug
 4. **Paper trail** — All failures documented in issue comments
 5. **Build validation** — Every entry must pass `npm run build`
@@ -418,14 +418,14 @@ Next steps:
 
 | Scenario | Action |
 |----------|--------|
-| Issue parse fails | Comment: "Could not parse issue body" |
-| Required field missing | Comment: "Missing [field]" |
-| Invalid abuse slug | Comment: "Abuse '[slug]' not in taxonomy" |
-| All primary URLs dead | Add `url-validation-hold` label + comment |
-| Sourcing insufficient (after cleaning) | Comment: "Insufficient sources after URL cleanup" |
-| Build fails | Comment: Show build error + guidance |
-| Git command fails | Comment: "Could not create branch (git error)" |
-| PR creation fails | Comment: "Could not create PR (GitHub error)" |
+| Body unparseable as a news event | Skip-flag (`invalid` label + comment) |
+| Required field genuinely missing | Correct from issue body / sources; if not possible, skip-flag |
+| Invalid abuse slug | **Correct in flight** — re-derive from body+sources against current taxonomy |
+| Stale article (correction / update / retraction) | Reflect in entry; if all primaries retracted or contradicted, skip-flag |
+| All primary sources gone | Skip-flag (event in doubt) |
+| Sourcing insufficient after re-verification | Skip-flag |
+| Build fails on what looks like bad input | Skip-flag with build output in comment |
+| Git command fails / PR creation fails | Stop run, report to operator; do not modify issue |
 
 ---
 
