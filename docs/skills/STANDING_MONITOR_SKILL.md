@@ -41,7 +41,7 @@ Key advantage: Claude understands that "Voting Rights Act enforcement weakened" 
 - **Actors**: Named officials, agencies, candidates, organizations with roles/titles
 - **Primary evidence**: Links to news article, official statement, court filing, video
 - **Secondary sources**: Additional reporting or official documentation
-- **Mapped abuses**: 1-3 abuse slugs that MUST exist in `taxonomy/abuses.yaml` *at the time the issue is created*. Read the taxonomy file before emitting an issue and verify each proposed slug is in the file. If unsure which slug fits, pick the closest valid slug and explain the uncertainty in the **Analysis** section — never invent a slug. (Invented slugs are the single most common cause of downstream entry failures.)
+- **Mapped abuses**: 1-5 abuse slugs that MUST exist in `taxonomy/abuses.yaml` *at the time the issue is created*. Read the taxonomy file before emitting an issue and verify each proposed slug is in the file. If unsure which slug fits, pick the closest valid slug and explain the uncertainty in the **Analysis** section — never invent a slug. (Invented slugs are the single most common cause of downstream entry failures.) Use as many slugs as genuinely apply — don't trim valid abuses to hit a number — but don't pad either. Most events will map to 1-3 in practice.
 - **Context**: Any background needed to understand significance
 
 **Claude conducts thorough research upfront:**
