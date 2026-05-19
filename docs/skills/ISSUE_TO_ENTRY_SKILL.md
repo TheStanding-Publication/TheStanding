@@ -58,6 +58,7 @@ The agent does NOT close issues, even when flagging them invalid. Closure is a h
 - Call GitHub API to search for issues
 - Query: `is:issue state:open author:thestanding sort:number-asc`
 - Skip issues that already carry the `invalid` label (those are skip-flagged from a prior run; a human needs to remove the label to make them eligible again).
+- **Skip issues that already have an open PR referencing them.** This is critical when the skill runs on a schedule — a single in-flight entry PR can sit in review for hours or days, and without this check the next scheduler run would re-process the same issue and open a duplicate PR.
 - Build list of issues to process
 
 **GitHub API call:**
@@ -65,13 +66,25 @@ The agent does NOT close issues, even when flagging them invalid. Closure is a h
 GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+author:thestanding&sort=number&order=asc&per_page=100
 ```
 
+**Checking for an existing open PR (per issue):**
+
+For each candidate issue `N`, fetch the open PRs in the repo and check whether any references the issue via a closing keyword in the PR body:
+
+```
+GET /repos/TheStanding-Publication/TheStanding/pulls?state=open&per_page=100
+```
+
+A PR "references" issue `N` if its body contains any of: `Closes #N`, `Closes: #N`, `Fixes #N`, `Fixes: #N`, `Resolves #N`, `Resolves: #N` (case-insensitive, also accept the fully-qualified `TheStanding-Publication/TheStanding#N` form). If a match is found, skip issue `N` — its entry is already in flight.
+
+> Use judgment, not a brittle regex match: the rule is "is there an open PR whose author intent is to close this issue?" In practice the closing keywords cover every PR this skill itself produces (Step 9 mandates `Closes #N` in the PR body), and a human-authored PR that addresses the issue almost always uses one of these keywords too.
+
 > **Notes:**
 > - `is:issue` is required by GitHub's search API; without it the API returns HTTP 422.
 > - `author:thestanding` is what makes the issue eligible. If the bot account login changes, update this filter (and the corresponding line in `Notes for Implementation`).
-> - PRs opened by `thestanding` are excluded automatically by the `is:issue` qualifier.
+> - PRs opened by `thestanding` are excluded automatically from the issue search by the `is:issue` qualifier.
 
 **Handle:**
-- If `--issue N` flag: fetch only issue #N (and verify author is `thestanding` before processing — refuse with a clear error if it isn't, to prevent accidental runs against human-opened issues)
+- If `--issue N` flag: fetch only issue #N (and verify author is `thestanding` before processing — refuse with a clear error if it isn't, to prevent accidental runs against human-opened issues). The open-PR check above still applies — if `--issue N` is passed for an issue that already has an open PR, refuse with a clear error rather than opening a duplicate.
 - If `--all` flag: fetch all eligible (respecting `--limit` if provided)
 - Authentication: Use `GITHUB_TOKEN` environment variable
 
