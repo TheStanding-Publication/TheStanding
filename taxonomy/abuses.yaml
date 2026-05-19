@@ -307,6 +307,11 @@
   title: "Religious favoritism in policy"
   description: "Government policy that establishes, prefers, or burdens specific religions."
 
+- slug: narrowing-civil-rights-protections
+  ideal: civil-rights
+  title: "Narrowing civil-rights protections"
+  description: "Actions — typically by courts or agencies — that materially weaken an existing civil-rights protection without formally repealing it: narrowing the substantive standard, limiting who may bring a claim, or eliminating an available remedy."
+
 # --- Due process ---
 - slug: denial-of-counsel
   ideal: due-process
