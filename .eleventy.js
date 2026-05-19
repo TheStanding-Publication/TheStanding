@@ -264,6 +264,21 @@ module.exports = function (eleventyConfig) {
     return map;
   });
 
+  // Map: entry slug -> entry object (for entry templates to look up
+  // cross-referenced entries by slug in relationships.follows / corrects /
+  // retracts and resolve them to their actual permalink + headline).
+  eleventyConfig.addCollection("entryBySlug", function (collectionApi) {
+    const items = collectionApi
+      .getFilteredByGlob("src/entries/**/*.md")
+      .filter((e) => e.data.status !== "draft");
+    const map = {};
+    for (const item of items) {
+      const slug = item.data.slug || item.fileSlug;
+      map[slug] = item;
+    }
+    return map;
+  });
+
   // Feed entries: sorted by archived (publication) date descending — different from
   // the main `entries` collection which sorts by event date. Capped at 30 most
   // recent so the feed stays reasonably sized. Used by /feed.xml for RSS-to-email
