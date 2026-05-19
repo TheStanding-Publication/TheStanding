@@ -66,10 +66,15 @@
   - Requires deriving state from the `location` string, or adding an explicit normalized `state` field to entry frontmatter
   - Open question: stop at state level, or also county/city collection pages?
 
-- [ ] **Manual invocation for STANDING_MONITOR_SKILL** — Allow on-demand monitor runs against a specific input rather than only the scheduled news scan: `/standing-monitor --issue N` to research an existing issue (e.g. a human-submitted tip), and `/standing-monitor --url URL` to research a specific article. Output reuses the same comprehensive-research flow as scheduled scans.
-  - Use case: a human spots a story before the scheduled scan does, or wants the monitor to enhance a tip-issue with full research
-  - Parallels `--issue N` in ISSUE_TO_ENTRY_SKILL
-  - Open questions: for `--url` — create a new issue or just emit research as output? For `--issue N` — edit body in place or post research as a comment? (Default suggestion: new issue / comment, to preserve the original.)
+- [x] ~~**Manual-URL mode for STANDING_MONITOR_SKILL**~~ — Operator provides a single URL; agent fetches it, searches for supporting coverage, and produces the same intake as a scheduled scan. Documented in STANDING_MONITOR_SKILL.md alongside the scheduled-scan mode. Refuses with reasoning when out of scope; surfaces duplicates to the operator rather than auto-appending. Chat-first invocation. (Implemented.)
+
+- [ ] **Manual-issue-research mode for STANDING_MONITOR_SKILL** — `--issue N` to research an existing GitHub issue (e.g. a human-submitted tip not produced by the monitor itself) and enrich it with comprehensive intake. Less urgent than `--url` because the existing chat workflow can handle tip-issues directly when they come in.
+  - Open question: edit issue body in place, or post research as a comment? (Probably comment, to preserve the original.)
+
+- [ ] **Phone / off-desktop submission path** — Submit a URL from a phone or anywhere off the Cowork desktop, and have the workflow run on the desktop's next opportunity. Two candidate designs:
+  - **Email intake** to `tips@thestanding.us` — a scheduled task polls the inbox and processes URLs from new emails.
+  - **Tip-issue conversion** — submitter files a GitHub issue with a `tip` label via the mobile GitHub app; a scheduled task watches for `tip`-labeled issues and runs the URL workflow against them.
+  - Open question: which one fits the editorial flow better? Tip-issue is self-archiving (public timestamp + audit trail); email is faster to submit but disappears from the public record. Likely the tip-issue path wins.
 
 - [ ] **Re-evaluation workflow for already-published entries** — Periodically re-scan the source URLs of recently-published entries to catch retractions, corrections, or substantive updates that arrive after publication. Surfaces the unused `corrected` and `retracted` status values, plus the `relationships.retracts:` and `corrections:` fields.
   - Trigger: probably weekly, against entries published in the last 90 days

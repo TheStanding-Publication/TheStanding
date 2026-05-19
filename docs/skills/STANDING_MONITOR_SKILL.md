@@ -12,10 +12,25 @@ Automatically monitor major news outlets for events matching The Standing's taxo
 
 Changes to this file propagate to all four scheduled scans on their next run. **Do not duplicate this workflow into the scheduled-task prompts** — that creates drift and historically has.
 
-## Inputs Provided by the Scheduled Task
+## Modes and Inputs
 
-- `time_window` — how far back from now to scan (e.g. "last 24 hours", "last 6 hours"). The scheduled task chooses this.
-- `scan_label` — which scheduled scan this is (morning / midday / afternoon / evening). For the run report.
+This skill supports two modes, distinguished by the `mode` input. The workflow steps are largely shared; the differences are isolated to source acquisition (Step 2), refusal handling (Step 3), and duplicate handling (Step 5).
+
+### Scheduled-scan mode (default)
+
+Invoked by the four cron tasks (morning/midday/afternoon/evening). Scans the curated source list looking for new events.
+
+- `mode` — `scheduled-scan` (default if unspecified)
+- `time_window` — how far back from now to scan (e.g. "last 24 hours", "last 5 hours")
+- `scan_label` — which scheduled scan this is (morning / midday / afternoon / evening)
+
+### Manual-URL mode
+
+Invoked on-demand by an operator (editor) providing a single URL. The agent uses that URL as the starting point and conducts a full event-research run from there.
+
+- `mode` — `manual-url`
+- `source_url` — a single URL (news article, court filing, agency press release, social-media post, primary document — anything on the open web). Editors do preliminary vetting before submitting; the agent still applies all editorial standards downstream.
+- `scan_label` — `manual-url` (or operator-supplied identifier for the report)
 
 ## Workflow
 
@@ -26,13 +41,20 @@ The Standing's taxonomy is versioned in the public repo. Fetch the current versi
 - **Sources to scan:** https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/taxonomy/sources.yaml — curated outlets across five categories (`national_news`, `government_sources`, `watchdog_sources`, `press_freedom_sources`, `specialized_sources`). Scan the **full** list, not just the well-known national outlets. Watchdog and specialized sources (Brennan Center, Democracy Docket, ProPublica, ACLU, SCOTUSblog, Documented NY, etc.) often break democracy stories before the wire services do — their inclusion in the list is deliberate.
 - **Abuses to evaluate against:** https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/taxonomy/abuses.yaml — every abuse slug currently in the taxonomy, each with a `title` and `description`. Use this list when classifying stories. The full taxonomy is broader than any short summary; do not work from memory.
 
-### Step 2: Search recent news
+### Step 2: Acquire source material
 
-Use the curated sources you just loaded. Fetch RSS feeds where `sources.yaml` provides them; web-scrape otherwise. Focus on the `time_window` provided by the scheduled task, scoped to US governance, democracy, voting, elections, law enforcement, press freedom, separation of powers, civil rights, due process, public service, and institutional accountability.
+**Scheduled-scan mode:** Use the curated sources you just loaded. Fetch RSS feeds where `sources.yaml` provides them; web-scrape otherwise. Focus on the `time_window` provided by the scheduled task, scoped to US governance, democracy, voting, elections, law enforcement, press freedom, separation of powers, civil rights, due process, public service, and institutional accountability.
+
+**Manual-URL mode:**
+
+1. Fetch the `source_url`. Read the article (or document) content. Send a browser-style User-Agent header — many publisher WAFs return 403 to default HTTP clients.
+2. If the URL doesn't resolve or returns a substantive paywall/login wall that prevents reading the underlying content, retry once. If still inaccessible, report the failure to the operator and stop — do not create an issue with an unverifiable primary source.
+3. **Search for supporting coverage.** The provided URL is the *starting point*, not the final source list. Find additional primary and investigative sources covering the same event — prefer sources from `taxonomy/sources.yaml`, but search beyond it as well. The goal is the same kind of comprehensive intake a scheduled scan produces: multiple sources, primary and investigative, with the original URL among them.
+4. **Verify the original URL's claims** against your supporting coverage. If sources contradict the original URL's central claims, surface that to the operator and stop — the URL may be inaccurate or non-canonical.
 
 ### Step 3: Evaluate each story semantically
 
-For each story you find, ask:
+For each story you found in Step 2, ask:
 
 - Is this describing an anti-democratic action or abuse of power?
 - Which abuse slugs from the loaded `abuses.yaml` does it map to? (1-5 slugs; only emit slugs that exist in the current taxonomy.)
@@ -40,6 +62,17 @@ For each story you find, ask:
 - What's your confidence level?
 
 Use semantic understanding, not pattern matching. You understand that "weakening Voting Rights Act enforcement" maps to `voter-suppression` (or one of the more specific election slugs) without needing keyword overlap.
+
+**Manual-URL mode — explicit in-scope check before proceeding:**
+
+After evaluation, if you conclude the story does *not* fall within The Standing's scope — i.e. it doesn't describe an abuse of power affecting one of the 12 ideals, or it's political conduct/criticism rather than abuse (parallel to the editorial reasoning applied to backlog issue #8) — **refuse and stop**. Report to the operator:
+
+- Which URL was submitted
+- The agent's read on what the story is actually about
+- Why it falls outside The Standing's scope
+- The closest abuse slugs considered and why none cleanly apply
+
+Do not create an issue. The operator can override by re-submitting with an explicit "file anyway" instruction; otherwise the URL is logged as discussed and not archived.
 
 ### Step 4: For relevant stories, conduct comprehensive research
 
@@ -57,7 +90,17 @@ Before creating an issue, gather all of:
 
 ### Step 5: Check for duplicates
 
-Before creating an issue, search the repo `TheStanding-Publication/TheStanding` for **open AND closed** issues whose title or body references the same event, date, and actors. If a duplicate exists, skip. If unclear, note in research and proceed with caution.
+Before creating an issue, search the repo `TheStanding-Publication/TheStanding` for **open AND closed** issues whose title or body references the same event, date, and actors.
+
+**Scheduled-scan mode:** If a duplicate exists, skip silently — the event is already in the archive's intake queue. If unclear whether it's a duplicate, note in research and proceed with caution.
+
+**Manual-URL mode:** If a duplicate exists, **do NOT auto-act**. Surface the apparent duplicate to the operator: report the existing issue number, title, and which fields suggest the match. Then stop. The operator decides whether to:
+
+- File as new (rare — usually means a related but distinct event)
+- Add the URL as a source comment on the existing issue
+- Skip entirely
+
+The agent never silently appends to or duplicates an existing issue in manual-URL mode.
 
 ### Step 6: Create the GitHub issue
 
