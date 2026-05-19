@@ -61,4 +61,9 @@
 
 ## Someday
 
+- [ ] **State-level collections / archive pages** — Per-state browse pages (e.g. `/states/TN/`) listing all entries whose `jurisdiction` is `state` or `local` and whose `location` resolves to that state. Mirrors the existing `/ideals/{slug}/` pattern.
+  - **Trigger:** revisit when any single state has ≥10 entries, OR when total state-level entries across the archive reach ≥50 — whichever comes first. (These are placeholders; tighten when we have a feel for the data.)
+  - Requires deriving state from the `location` string, or adding an explicit normalized `state` field to entry frontmatter
+  - Open question: stop at state level, or also county/city collection pages?
+
 ## Done
