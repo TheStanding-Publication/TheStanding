@@ -66,4 +66,9 @@
   - Requires deriving state from the `location` string, or adding an explicit normalized `state` field to entry frontmatter
   - Open question: stop at state level, or also county/city collection pages?
 
+- [ ] **Manual invocation for STANDING_MONITOR_SKILL** — Allow on-demand monitor runs against a specific input rather than only the scheduled news scan: `/standing-monitor --issue N` to research an existing issue (e.g. a human-submitted tip), and `/standing-monitor --url URL` to research a specific article. Output reuses the same comprehensive-research flow as scheduled scans.
+  - Use case: a human spots a story before the scheduled scan does, or wants the monitor to enhance a tip-issue with full research
+  - Parallels `--issue N` in ISSUE_TO_ENTRY_SKILL
+  - Open questions: for `--url` — create a new issue or just emit research as output? For `--issue N` — edit body in place or post research as a comment? (Default suggestion: new issue / comment, to preserve the original.)
+
 ## Done
