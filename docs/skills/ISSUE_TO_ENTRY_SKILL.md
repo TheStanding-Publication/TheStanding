@@ -1,7 +1,7 @@
 # The Standing: Issue to Entry Skill (Claude Agent)
 
 ## Purpose
-Claude agent that converts GitHub monitoring-intake issues into fully recorded entry files, feature branches, and pull requests. Runs on schedule or on-demand.
+Claude agent that converts open GitHub issues opened by the `thestanding` bot account into fully recorded entry files, feature branches, and pull requests. Runs on schedule or on-demand.
 
 ## Invocation
 
@@ -19,7 +19,7 @@ Claude agent that converts GitHub monitoring-intake issues into fully recorded e
 ## Implementation Overview
 
 This skill is a Claude agent that orchestrates the full workflow:
-1. Fetch monitoring-intake issues from GitHub
+1. Fetch open issues authored by `thestanding` from GitHub
 2. For each issue: parse, validate, create entry, verify build, add comment
 3. Create branch, commit, push to GitHub
 4. Create PR with appropriate labels
@@ -33,21 +33,26 @@ This skill is a Claude agent that orchestrates the full workflow:
 
 ### Step 1: Fetch Eligible Issues
 
+**Eligibility criterion:** the issue is open and was opened by the `thestanding` bot account. That is the **only** eligibility criterion. Labels, title prefixes, and naming conventions are intentionally **not** part of the filter — they're brittle (require upstream coordination, drift over time) and the bot's authorship is the canonical signal that this is a monitor-produced issue intended for entry recording.
+
 **What the agent does:**
 - Call GitHub API to search for issues
-- Query: `is:issue state:open label:monitoring-intake sort:number-asc`
-- Skip issues with `url-validation-hold` label if last comment is < 24 hours old
+- Query: `is:issue state:open author:thestanding sort:number-asc`
+- Skip issues with the `url-validation-hold` label if the last comment is < 24 hours old (this label is a runtime signal this skill itself applies — see Step 4 — not an eligibility prerequisite)
 - Build list of issues to process
 
 **GitHub API call:**
 ```
-GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+label:monitoring-intake&sort=number&order=asc&per_page=100
+GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+author:thestanding&sort=number&order=asc&per_page=100
 ```
 
-> **Note:** the `is:issue` qualifier is required. GitHub's search API rejects the query with HTTP 422 (`"Query must include 'is:issue' or 'is:pull-request'"`) if it's omitted.
+> **Notes:**
+> - `is:issue` is required by GitHub's search API; without it the API returns HTTP 422.
+> - `author:thestanding` is what makes the issue eligible. If the bot account login changes, update this filter (and the corresponding line in `Notes for Implementation`).
+> - PRs opened by `thestanding` are excluded automatically by the `is:issue` qualifier.
 
 **Handle:**
-- If `--issue N` flag: fetch only issue #N
+- If `--issue N` flag: fetch only issue #N (and verify author is `thestanding` before processing — refuse with a clear error if it isn't, to prevent accidental runs against human-opened issues)
 - If `--all` flag: fetch all eligible (respecting `--limit` if provided)
 - Authentication: Use `GITHUB_TOKEN` environment variable
 
@@ -426,12 +431,13 @@ Next steps:
 
 ## Testing
 
-**Dry-run equivalent:** Use `--issue N` with a known good issue to test end-to-end without affecting multiple issues.
+**Dry-run equivalent:** Use `--issue N` with a known good issue (authored by `thestanding`) to test end-to-end without affecting multiple issues. The agent verifies authorship before processing, so passing an issue opened by a human will refuse rather than proceed.
 
 **Common test scenarios:**
 1. Test with issue that has all dead primary URLs (should go on hold)
 2. Test with issue that has redirect (should update URL)
 3. Test with issue that's missing a required field (should comment with error)
+4. Test with `--issue N` against an issue **not** authored by `thestanding` (should refuse cleanly)
 
 ---
 
@@ -445,10 +451,14 @@ Next steps:
 
 ## Upstream Contract (STANDING_MONITOR_SKILL)
 
-This skill assumes the upstream monitor produces issues that meet the following preconditions:
+The **only** hard precondition is that monitoring issues are opened by the `thestanding` bot account. Anything `thestanding` opens is in scope; anything opened by a human or different bot is out of scope. No labels or title prefixes are required.
 
-1. The issue carries the `monitoring-intake` label. (Without this, the Step 1 search filter returns zero results and the agent has no work to do.)
-2. The body uses `**Date:**` (or `**Scan date:**`) and `**Event date:**` headers in the format shown in Step 2.
-3. Every slug in "Mapped abuses" exists in `taxonomy/abuses.yaml` at the time the issue is opened.
+That said, the upstream monitor *should* still produce bodies in the format shown in Step 2 — that's what makes parsing reliable. If a body deviates, this skill reports the parse/validation failure via Step 11 and skips the issue; it does not silently process broken issues. The right place to fix systematic format problems is in STANDING_MONITOR_SKILL, not by adding parser exceptions here.
 
-If any of these preconditions are violated, this skill reports the issue in its failure-handling flow and skips it — it does **not** silently process broken issues. Fix STANDING_MONITOR_SKILL upstream rather than papering over broken intake here.
+**Soft expectations** (not enforced, but worth maintaining):
+
+- Body uses `**Date:**` (or `**Scan date:**`) and `**Event date:**` headers.
+- Every slug in "Mapped abuses" exists in `taxonomy/abuses.yaml` at the time the issue is opened.
+- Sections appear in the order shown in Step 2.
+
+When these expectations are violated, the failure comment posted by Step 11 tells the upstream monitor (or a human editor) what to fix.
