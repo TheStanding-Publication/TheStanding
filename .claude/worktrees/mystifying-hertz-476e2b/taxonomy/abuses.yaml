@@ -1,0 +1,401 @@
+# Specific abuses, each tied to one of the 12 ideals in ideals.yaml.
+# Entries reference abuses by slug. Adding a new abuse requires a PR
+# updating this file. The build fails if an entry references an abuse
+# that doesn't appear here.
+
+# --- Free and fair elections ---
+- slug: voter-suppression
+  ideal: free-and-fair-elections
+  title: "Voter suppression"
+  description: "Laws, policies, or actions designed to make voting harder for specific populations."
+
+- slug: gerrymandering
+  ideal: free-and-fair-elections
+  title: "Gerrymandering"
+  description: "Drawing district lines to predetermine outcomes beyond routine political-line redistricting."
+
+- slug: election-denial
+  ideal: free-and-fair-elections
+  title: "Election denial"
+  description: "Officeholders or candidates publicly denying legitimate election results."
+
+- slug: certification-refusal
+  ideal: free-and-fair-elections
+  title: "Refusal to certify"
+  description: "Certifying officials refusing to perform their ministerial duty to certify valid results."
+
+- slug: voter-intimidation
+  ideal: free-and-fair-elections
+  title: "Voter intimidation"
+  description: "Tactics intended to deter eligible voters from voting."
+
+- slug: election-worker-intimidation
+  ideal: free-and-fair-elections
+  title: "Election worker intimidation"
+  description: "Threats, harassment, or coercion directed at people who administer elections."
+
+- slug: disinformation-campaigns
+  ideal: free-and-fair-elections
+  title: "Coordinated election disinformation"
+  description: "Organized campaigns to spread false information about voting or election outcomes."
+
+- slug: post-election-overturning-attempts
+  ideal: free-and-fair-elections
+  title: "Attempts to overturn results post-election"
+  description: "Efforts to reverse legitimate election outcomes after the vote."
+
+- slug: alternate-electors
+  ideal: free-and-fair-elections
+  title: "Alternate-elector schemes"
+  description: "Submitting unauthorized slates of electors or related fraudulent schemes."
+
+- slug: refusal-to-concede
+  ideal: free-and-fair-elections
+  title: "Refusal to concede a legitimate loss"
+  description: "Sustained refusal by losing candidates or their backers to accept legitimate election outcomes."
+
+# --- Rule of law and equal application ---
+- slug: defying-court-orders
+  ideal: rule-of-law
+  title: "Defying court orders"
+  description: "Officials or agencies refusing to comply with binding court orders."
+
+- slug: selective-prosecution
+  ideal: rule-of-law
+  title: "Selective prosecution"
+  description: "Bringing or declining cases based on political alignment rather than the law and evidence."
+
+- slug: pardons-for-allies-or-self
+  ideal: rule-of-law
+  title: "Pardons for allies or self"
+  description: "Using pardon power to shield political allies, family members, or oneself from accountability."
+
+- slug: politicized-investigations
+  ideal: rule-of-law
+  title: "Politicized investigations"
+  description: "Opening, suppressing, or steering investigations on political grounds."
+
+- slug: ignoring-statutory-requirements
+  ideal: rule-of-law
+  title: "Ignoring statutory requirements"
+  description: "Refusing to follow procedures, reporting requirements, or limits that the law imposes."
+
+- slug: selective-non-enforcement
+  ideal: rule-of-law
+  title: "Selective non-enforcement"
+  description: "Declining to enforce duly enacted law for political reasons."
+
+# --- Separation of powers and independent oversight ---
+- slug: executive-overreach
+  ideal: separation-of-powers
+  title: "Executive overreach"
+  description: "Executive actions exceeding constitutional or statutory authority."
+
+- slug: bypassing-congress
+  ideal: separation-of-powers
+  title: "Bypassing Congress"
+  description: "Substantive lawmaking via executive action where Congress is the proper actor."
+
+- slug: defying-subpoenas
+  ideal: separation-of-powers
+  title: "Defying subpoenas"
+  description: "Refusing to comply with lawful legislative or judicial subpoenas."
+
+- slug: weaponizing-doj
+  ideal: separation-of-powers
+  title: "Weaponizing the Justice Department"
+  description: "Using DOJ resources to target political opponents or shield allies."
+
+- slug: ig-firings
+  ideal: separation-of-powers
+  title: "Inspector General firings"
+  description: "Removing inspectors general to obstruct oversight."
+
+- slug: watchdog-defunding
+  ideal: separation-of-powers
+  title: "Watchdog defunding"
+  description: "Stripping resources from oversight bodies to neutralize them."
+
+- slug: obstruction-of-oig-investigations
+  ideal: separation-of-powers
+  title: "Obstruction of OIG investigations"
+  description: "Interfering with active inspector-general inquiries."
+
+- slug: retaliation-against-whistleblowers
+  ideal: separation-of-powers
+  title: "Retaliation against whistleblowers"
+  description: "Punishing those who report wrongdoing through lawful channels."
+
+- slug: attacks-on-judicial-independence
+  ideal: separation-of-powers
+  title: "Attacks on judicial independence"
+  description: "Threats, court-packing schemes, or campaigns to pressure judges over rulings."
+
+- slug: lying-to-congress
+  ideal: separation-of-powers
+  title: "Lying to Congress"
+  description: "Knowingly false statements in sworn or unsworn testimony to congressional bodies."
+
+# --- Free press ---
+- slug: press-retaliation
+  ideal: free-press
+  title: "Press retaliation"
+  description: "Retaliatory action against journalists or outlets for their reporting."
+
+- slug: prosecution-of-journalists
+  ideal: free-press
+  title: "Prosecution of journalists"
+  description: "Criminal charges brought against journalists for newsgathering activities."
+
+- slug: expulsion-from-public-proceedings
+  ideal: free-press
+  title: "Expulsion of press from public proceedings"
+  description: "Excluding journalists from briefings, hearings, or coverage of public business."
+
+- slug: access-restrictions-for-critical-outlets
+  ideal: free-press
+  title: "Access restrictions targeting critical outlets"
+  description: "Selectively limiting press access based on coverage."
+
+- slug: legal-threats-against-publishers
+  ideal: free-press
+  title: "Legal threats against publishers"
+  description: "Government-backed defamation suits, injunctions, or prior-restraint efforts."
+
+- slug: licensing-as-leverage
+  ideal: free-press
+  title: "Licensing or regulatory power as leverage"
+  description: "Using FCC, SEC, antitrust, or similar authority to punish coverage."
+
+# --- Speech and assembly ---
+- slug: protester-surveillance
+  ideal: speech-and-assembly
+  title: "Protester surveillance"
+  description: "State surveillance of lawful protesters or organizers."
+
+- slug: prosecution-of-protected-speech
+  ideal: speech-and-assembly
+  title: "Prosecution of protected speech"
+  description: "Criminal charges against constitutionally protected expression."
+
+- slug: viewpoint-based-permit-denials
+  ideal: speech-and-assembly
+  title: "Viewpoint-based permit denials"
+  description: "Denying assembly or speech permits based on viewpoint."
+
+- slug: targeting-critics-with-government-power
+  ideal: speech-and-assembly
+  title: "Targeting critics with government power"
+  description: "Tax audits, investigations, or licensing actions deployed against critics."
+
+- slug: blacklisting
+  ideal: speech-and-assembly
+  title: "Blacklisting"
+  description: "Excluding individuals or groups from government participation based on speech or association."
+
+# --- Public service over self-dealing ---
+- slug: self-dealing
+  ideal: public-service
+  title: "Self-dealing"
+  description: "Officials using public power to enrich themselves or close associates."
+
+- slug: bribery
+  ideal: public-service
+  title: "Bribery"
+  description: "Exchange of value for official action."
+
+- slug: undisclosed-financial-conflicts
+  ideal: public-service
+  title: "Undisclosed financial conflicts of interest"
+  description: "Officials acting on matters affecting undisclosed financial interests."
+
+- slug: nepotism
+  ideal: public-service
+  title: "Nepotism"
+  description: "Appointing or favoring family members in violation of anti-nepotism rules."
+
+- slug: emoluments-violations
+  ideal: public-service
+  title: "Emoluments violations"
+  description: "Accepting foreign or domestic emoluments forbidden by the Constitution."
+
+- slug: pay-to-play
+  ideal: public-service
+  title: "Pay-to-play"
+  description: "Government access, contracts, or favors conditioned on political contributions."
+
+- slug: monetizing-office
+  ideal: public-service
+  title: "Monetizing office"
+  description: "Using official position to generate private revenue."
+
+- slug: procurement-irregularities
+  ideal: public-service
+  title: "Procurement irregularities"
+  description: "No-bid contracts steered to allies, suspending competitive bidding, or related procurement abuse."
+
+# --- Civilian control ---
+- slug: politicization-of-uniformed-services
+  ideal: civilian-control
+  title: "Politicization of uniformed services"
+  description: "Treating military or federal law enforcement as a political asset."
+
+- slug: domestic-deployment-overreach
+  ideal: civilian-control
+  title: "Domestic deployment overreach"
+  description: "Deploying federal armed forces against US persons outside lawful bounds."
+
+- slug: pardons-for-uniformed-misconduct
+  ideal: civilian-control
+  title: "Pardons for uniformed misconduct"
+  description: "Pardoning service members or officers convicted of war crimes or serious misconduct."
+
+- slug: retaliation-against-officers-following-law
+  ideal: civilian-control
+  title: "Retaliation against officers following the law"
+  description: "Punishing military or law-enforcement officers for refusing unlawful orders."
+
+# --- Government data integrity ---
+- slug: suppression-of-government-data
+  ideal: government-data-integrity
+  title: "Suppression of government data"
+  description: "Removing, hiding, or delaying public release of agency data on political grounds."
+
+- slug: politicized-science-appointments
+  ideal: government-data-integrity
+  title: "Politicized science appointments"
+  description: "Appointing unqualified loyalists to scientific or statistical roles."
+
+- slug: retaliation-against-government-scientists
+  ideal: government-data-integrity
+  title: "Retaliation against government scientists"
+  description: "Punishing agency scientists for findings inconvenient to political leadership."
+
+- slug: alteration-of-official-records
+  ideal: government-data-integrity
+  title: "Alteration of official records"
+  description: "Changing the substance of official documents, reports, or data after the fact."
+
+- slug: censoring-agency-research
+  ideal: government-data-integrity
+  title: "Censoring agency research"
+  description: "Blocking publication or distribution of agency research."
+
+# --- Civil rights and equal protection ---
+- slug: discriminatory-policy
+  ideal: civil-rights
+  title: "Discriminatory policy"
+  description: "Government policy that targets or disadvantages people based on protected characteristics."
+
+- slug: targeting-marginalized-communities
+  ideal: civil-rights
+  title: "Targeting marginalized communities"
+  description: "Enforcement, surveillance, or policy aimed at vulnerable groups beyond a lawful basis."
+
+- slug: voter-roll-purges
+  ideal: civil-rights
+  title: "Improper voter-roll purges"
+  description: "Voter-roll maintenance that disenfranchises eligible voters."
+
+- slug: religious-favoritism-in-policy
+  ideal: civil-rights
+  title: "Religious favoritism in policy"
+  description: "Government policy that establishes, prefers, or burdens specific religions."
+
+# --- Due process ---
+- slug: denial-of-counsel
+  ideal: due-process
+  title: "Denial of counsel"
+  description: "Refusing access to legal representation where it is required."
+
+- slug: unlawful-detention
+  ideal: due-process
+  title: "Unlawful detention"
+  description: "Detention without lawful authority or beyond authorized duration."
+
+- slug: denial-of-hearing
+  ideal: due-process
+  title: "Denial of hearing"
+  description: "Depriving a person of liberty, property, or status without an adequate hearing."
+
+- slug: ignoring-habeas
+  ideal: due-process
+  title: "Ignoring habeas corpus"
+  description: "Refusing to honor habeas petitions or detention review."
+
+- slug: denial-of-due-process-in-immigration-enforcement
+  ideal: due-process
+  title: "Denial of due process in immigration enforcement"
+  description: "Removal or detention proceedings that bypass required procedural protections."
+
+- slug: extrajudicial-actions
+  ideal: due-process
+  title: "Extrajudicial actions"
+  description: "State action that punishes or sanctions without lawful adjudication."
+
+# --- National sovereignty and foreign influence ---
+- slug: undisclosed-foreign-payments-to-officials
+  ideal: national-sovereignty
+  title: "Undisclosed foreign payments to officials"
+  description: "Officials receiving payments, gifts, or business value from foreign sources without disclosure."
+
+- slug: foreign-influence-on-policy
+  ideal: national-sovereignty
+  title: "Foreign influence on policy"
+  description: "US policy shaped by undisclosed foreign relationships or coercion."
+
+- slug: intelligence-irregularities
+  ideal: national-sovereignty
+  title: "Intelligence irregularities"
+  description: "Unauthorized intelligence sharing, classification abuses, or improper foreign-intelligence contacts."
+
+- slug: accepting-foreign-electoral-help
+  ideal: national-sovereignty
+  title: "Accepting foreign electoral help"
+  description: "Campaigns or officials soliciting or accepting prohibited foreign assistance."
+
+# --- Accountable use of state force ---
+- slug: excessive-force-by-law-enforcement
+  ideal: accountable-force
+  title: "Excessive force by law enforcement"
+  description: "Force exceeding what is necessary and proportional under the circumstances."
+
+- slug: deaths-in-custody
+  ideal: accountable-force
+  title: "Deaths in custody"
+  description: "Deaths of detained, arrested, or incarcerated persons in state custody."
+
+- slug: no-knock-raid-misuse
+  ideal: accountable-force
+  title: "No-knock raid misuse"
+  description: "No-knock raids used outside narrow legal warrants, especially with fatal results."
+
+- slug: militarization-of-policing
+  ideal: accountable-force
+  title: "Militarization of policing"
+  description: "Domestic deployment of military-grade equipment or tactics in routine policing."
+
+- slug: shielding-officers-from-prosecution
+  ideal: accountable-force
+  title: "Shielding officers from prosecution"
+  description: "Prosecutorial or legislative action that shields officers from accountability for misconduct."
+
+- slug: failure-to-discipline-misconduct
+  ideal: accountable-force
+  title: "Failure to discipline misconduct"
+  description: "Departmental refusal to discipline established misconduct."
+
+- slug: corrections-abuse
+  ideal: accountable-force
+  title: "Corrections abuse"
+  description: "Abuse, neglect, or excessive force against incarcerated persons."
+
+- slug: violence-in-immigration-enforcement
+  ideal: accountable-force
+  title: "Violence in immigration enforcement"
+  description: "Excessive force or abusive conditions in immigration enforcement operations."
+
+- slug: federal-deployment-against-civilians
+  ideal: accountable-force
+  title: "Federal deployment against civilians"
+  description: "Federal armed forces or federalized National Guard deployed in coercive roles against US civilians."

@@ -1,0 +1,59 @@
+---
+layout: layouts/base.njk
+title: Corrections
+permalink: /corrections/index.html
+---
+
+<h1>Corrections and retractions</h1>
+<p>
+  Every correction or retraction the publication has issued. We do not silently
+  edit the historical record: minor edits are logged in the entry's correction
+  log; substantive corrections are issued as new entries that reference the
+  original, with both kept live forever.
+</p>
+
+{% set correctedEntries = collections.entries | selectattr("data.relationships.corrects") %}
+{% set retractedEntries = collections.entries | selectattr("data.relationships.retracts") %}
+
+<section>
+  <h2>Substantive corrections</h2>
+  {% set hasCorrections = false %}
+  {% for entry in collections.entries %}
+    {% if entry.data.relationships and entry.data.relationships.corrects and entry.data.relationships.corrects.length %}
+      {% set hasCorrections = true %}
+      {% include "partials/entry-card.njk" %}
+    {% endif %}
+  {% endfor %}
+  {% if not hasCorrections %}<p><em>None to date.</em></p>{% endif %}
+</section>
+
+<section>
+  <h2>Retractions</h2>
+  {% set hasRetractions = false %}
+  {% for entry in collections.entries %}
+    {% if entry.data.relationships and entry.data.relationships.retracts and entry.data.relationships.retracts.length %}
+      {% set hasRetractions = true %}
+      {% include "partials/entry-card.njk" %}
+    {% endif %}
+  {% endfor %}
+  {% if not hasRetractions %}<p><em>None to date.</em></p>{% endif %}
+</section>
+
+<section>
+  <h2>In-place edits (correction log)</h2>
+  {% set hasEdits = false %}
+  {% for entry in collections.entries %}
+    {% if entry.data.corrections and entry.data.corrections.length %}
+      {% set hasEdits = true %}
+      <article>
+        <h3><a href="{{ entry.url }}">{{ entry.data.headline }}</a></h3>
+        <ul>
+          {% for c in entry.data.corrections %}
+            <li><time>{{ c.date | formatDate }}</time>: {{ c.note }}</li>
+          {% endfor %}
+        </ul>
+      </article>
+    {% endif %}
+  {% endfor %}
+  {% if not hasEdits %}<p><em>None to date.</em></p>{% endif %}
+</section>

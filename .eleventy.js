@@ -110,7 +110,6 @@ module.exports = function (eleventyConfig) {
     );
 
     // Allowed values for enumerated fields, declared once for reuse + error messages.
-    const ALLOWED_CONFIDENCE = ["confirmed", "well-reported", "developing", "alleged"];
     const ALLOWED_STATUS = ["draft", "published", "corrected", "retracted"];
     const ALLOWED_SOURCE_TIERS = ["primary", "investigative", "secondary"];
     const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -136,13 +135,6 @@ module.exports = function (eleventyConfig) {
       if (typeof entry.data.date === "string" && !DATE_RE.test(entry.data.date)) {
         throw new Error(
           `Entry "${slug}": date "${entry.data.date}" must be in YYYY-MM-DD format.`
-        );
-      }
-
-      // --- Confidence enum ---
-      if (entry.data.confidence && !ALLOWED_CONFIDENCE.includes(entry.data.confidence)) {
-        throw new Error(
-          `Entry "${slug}": confidence "${entry.data.confidence}" must be one of: ${ALLOWED_CONFIDENCE.join(", ")}.`
         );
       }
 

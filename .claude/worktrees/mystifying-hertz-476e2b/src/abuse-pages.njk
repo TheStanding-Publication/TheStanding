@@ -1,0 +1,41 @@
+---
+pagination:
+  data: collections.abusesWithEntries
+  size: 1
+  alias: abuse
+permalink: "/ideals/{{ abuse.ideal.slug }}/{{ abuse.slug }}/index.html"
+eleventyComputed:
+  title: "{{ abuse.title }}"
+layout: layouts/base.njk
+---
+
+{% set explainer = collections.abuseExplainersBySlug[abuse.slug] %}
+
+<article class="abuse">
+  <header>
+    <p class="breadcrumb">
+      <a href="/ideals/">Ideals</a> &rsaquo;
+      <a href="/ideals/{{ abuse.ideal.slug }}/">{{ abuse.ideal.title }}</a> &rsaquo;
+      <span>{{ abuse.title }}</span>
+    </p>
+    <h1>{{ abuse.title }}</h1>
+    {% if not explainer %}<p class="abuse-description">{{ abuse.description }}</p>{% endif %}
+  </header>
+
+  {% if explainer %}
+    <section class="abuse-explainer">
+      {{ explainer.templateContent | safe }}
+    </section>
+  {% endif %}
+
+  <section class="abuse-entries">
+    <h2>Documented entries ({{ abuse.entries.length }})</h2>
+    {% if abuse.entries.length %}
+      {% for entry in abuse.entries %}
+        {% include "partials/entry-card.njk" %}
+      {% endfor %}
+    {% else %}
+      <p><em>No entries yet documenting this specific abuse.</em></p>
+    {% endif %}
+  </section>
+</article>

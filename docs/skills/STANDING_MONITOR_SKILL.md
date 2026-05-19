@@ -26,7 +26,6 @@ The curated list of monitoring sources is defined in `taxonomy/sources.yaml`. Th
 - Does this describe an anti-democratic action or abuse?
 - Which ideals/abuses from The Standing's taxonomy does this relate to?
 - Is this a credible source?
-- What is the confidence level in the relevance assessment?
 
 **Claude determines:** Relevant or not relevant, and if relevant, which abuses apply.
 
@@ -43,7 +42,6 @@ Key advantage: Claude understands that "Voting Rights Act enforcement weakened" 
 - **Primary evidence**: Links to news article, official statement, court filing, video
 - **Secondary sources**: Additional reporting or official documentation
 - **Mapped abuses**: Which specific abuses from the taxonomy (may be 1-3)
-- **Confidence level**: How confident is this assessment? (High/Medium/Low)
 - **Context**: Any background needed to understand significance
 
 **Claude conducts thorough research upfront:**
@@ -65,13 +63,13 @@ This prevents wasting editorial time re-investigating if the issue is accepted.
 Create an issue with:
 
 ```
-Title: [Monitoring] [Brief headline or event description]
+Title: [Brief headline or event description]
 
 Body:
 ## Automated News Monitoring
 
 **Source:** [Primary news outlet]
-**Date:** [Scan date]
+**Scan date:** [When the monitoring scan ran]
 **Event date:** [When the event occurred]
 
 ### What happened

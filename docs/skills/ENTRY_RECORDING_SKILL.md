@@ -64,12 +64,12 @@ For each abuse slug listed:
 Ensure present and non-empty:
 - `headline` (non-empty string)
 - `summary` (non-empty string, 2-3 sentences)
-- `event_date` (valid YYYY-MM-DD or approximate)
+- `date` (valid YYYY-MM-DD)
 - `jurisdiction` (valid value)
 - `location` (meets requirements above)
 - `actors` (at least one, all verified)
 - `abuses` (at least one valid slug)
-- `sources` (at least one live URL)
+- `sources` (at least one live URL, meets sourcing floor)
 
 ### 3. Slug Generation
 
@@ -120,8 +120,6 @@ actors:
 
 jurisdiction: [federal|state|local|international|private-actor]
 location: "[City, State or State or Country as appropriate]"
-
-confidence: [monitoring|preliminary|well-reported|primary-source]
 
 sources:
   - url: "[Source URL 1]"

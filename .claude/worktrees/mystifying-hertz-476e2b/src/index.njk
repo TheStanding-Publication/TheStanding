@@ -1,0 +1,43 @@
+---
+layout: layouts/base.njk
+title: Latest entries
+permalink: /index.html
+---
+
+<section class="hero">
+  <h1>The historical record of US democratic norms<br /><i>kept in public.</i></h1>
+  <p>
+    The Standing documents events involving authoritarianism, anti-democratic
+    behavior, and corruption in US governance, applied to all actors regardless of
+    party. No anti-democratic action is too small to record: a precinct-level
+    incident is filed with the same care as a national one. Every entry is anchored
+    to a primary source — a court filing, an agency record, a citizen-captured
+    recording — or to two independent investigative outlets. See our
+    <a href="/standards/">editorial standards</a>.
+  </p>
+</section>
+
+<section class="latest">
+  <h2>Latest</h2>
+  {% if collections.entries.length %}
+    {% for entry in collections.entries | head(20) %}
+      {% include "partials/entry-card.njk" %}
+    {% endfor %}
+  {% else %}
+    <p><em>No entries yet. The first issue is in preparation.</em></p>
+  {% endif %}
+</section>
+
+<section class="explore">
+  <h2>Explore by ideal</h2>
+  <ul class="ideal-grid">
+    {% for ideal in taxonomy.ideals %}
+      <li>
+        <a href="/ideals/{{ ideal.slug }}/">
+          <strong>{{ ideal.title }}</strong>
+          <span>{{ ideal.short_description }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
