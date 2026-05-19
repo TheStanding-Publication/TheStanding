@@ -1,0 +1,58 @@
+# Actor name normalization.
+#
+# The publication does NOT require actors to be pre-registered. Most actors
+# are simply named in entries. This file exists only to merge obvious
+# duplicates so that "DOJ" and "Department of Justice" don't generate
+# separate actor pages.
+#
+# Entries are added to this file reactively, when sprawl is observed —
+# usually flagged by the build's duplicate-detection warnings.
+#
+# Schema for each entry:
+#   slug:           URL-safe identifier used for the actor page
+#   canonical:      the canonical display name
+#   aliases:        list of alternate spellings/forms that should resolve here
+#   type (optional): person | agency | court | legislature | party | company |
+#                    ngo | foreign-state | individual
+#   notes (optional): editorial notes about the actor
+#
+# Below: a small seed set. Expand as the archive grows.
+
+- slug: us-doj
+  canonical: "U.S. Department of Justice"
+  type: agency
+  aliases:
+    - "DOJ"
+    - "Department of Justice"
+    - "US DOJ"
+    - "USDOJ"
+    - "Justice Department"
+
+- slug: us-fbi
+  canonical: "Federal Bureau of Investigation"
+  type: agency
+  aliases:
+    - "FBI"
+    - "U.S. FBI"
+
+- slug: us-supreme-court
+  canonical: "Supreme Court of the United States"
+  type: court
+  aliases:
+    - "SCOTUS"
+    - "U.S. Supreme Court"
+    - "the Supreme Court"
+
+- slug: us-house-oversight
+  canonical: "House Oversight and Accountability Committee"
+  type: legislature
+  aliases:
+    - "House Oversight"
+    - "House Oversight Committee"
+    - "Oversight Committee"
+
+- slug: us-senate-judiciary
+  canonical: "Senate Judiciary Committee"
+  type: legislature
+  aliases:
+    - "Senate Judiciary"

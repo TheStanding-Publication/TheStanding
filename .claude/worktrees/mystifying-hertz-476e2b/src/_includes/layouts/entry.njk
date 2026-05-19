@@ -1,0 +1,128 @@
+---
+layout: layouts/base.njk
+---
+{% set seeAlsoSlugs = collections.seeAlsoMap[slug] or [] %}
+
+<article class="entry">
+  <header class="entry-header">
+    <p class="entry-date">
+      <time datetime="{{ date | isoDate }}">{{ date | formatDate }}</time>
+    </p>
+    <h1 class="entry-headline">{{ headline }}</h1>
+    <p class="entry-summary">{{ summary }}</p>
+
+    {% if episodes and episodes.length %}
+      <p class="entry-part-of">
+        Part of:
+        {% for epSlug in episodes %}
+          {% set ep = collections.episodeBySlug[epSlug] %}
+          {% if ep %}<a href="/episodes/{{ epSlug }}/">{{ ep.data.title }}</a>{% else %}{{ epSlug }}{% endif %}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+    {% endif %}
+
+    <dl class="entry-meta">
+      {% if jurisdiction %}
+        <dt>Jurisdiction</dt><dd>{{ jurisdiction }}</dd>
+      {% endif %}
+      {% if confidence %}
+        <dt>Confidence</dt><dd>{{ confidence }}</dd>
+      {% endif %}
+    </dl>
+  </header>
+
+  {% if abuses and abuses.length %}
+    <section class="entry-tags">
+      <h2 class="section-label">Abuses documented</h2>
+      <ul class="tag-list">
+        {% for abuseSlug in abuses %}
+          {% set ideal = abuseSlug | idealForAbuse %}
+          <li>
+            <a href="/ideals/{{ ideal.slug }}/{{ abuseSlug }}/">
+              {{ abuseSlug | abuseTitle }}
+            </a>
+            <span class="ideal-context">under <a href="/ideals/{{ ideal.slug }}/">{{ ideal.title }}</a></span>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if actors and actors.length %}
+    <section class="entry-actors">
+      <h2 class="section-label">Actors</h2>
+      <ul>
+        {% for a in actors %}<li>{{ a }}</li>{% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if quote and quote.text %}
+    <blockquote class="entry-quote">
+      <p>"{{ quote.text }}"</p>
+      {% if sources and sources[quote["source-index"]] %}
+        <cite>— {{ sources[quote["source-index"]].publisher }}</cite>
+      {% endif %}
+    </blockquote>
+  {% endif %}
+
+  <div class="entry-body">
+    {{ content | safe }}
+  </div>
+
+  {% if sources and sources.length %}
+    <section class="entry-sources">
+      <h2 class="section-label">Sources</h2>
+      <ol>
+        {% for s in sources %}
+          <li>
+            <a href="{{ s.url }}" rel="noopener">{{ s.title or s.url }}</a>
+            — <em>{{ s.publisher }}</em>
+            <span class="source-tier source-tier-{{ s.tier }}">{{ s.tier }}</span>
+            {% if s.accessed %}<span class="source-accessed">accessed {{ s.accessed | formatDate }}</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    </section>
+  {% endif %}
+
+  {% if relationships %}
+    <section class="entry-relationships">
+      {% if relationships.follows and relationships.follows.length %}
+        <p><strong>Follows:</strong>
+          {% for s in relationships.follows %}<a href="/entries/{{ s }}/">{{ s }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
+      {% if relationships.corrects and relationships.corrects.length %}
+        <p><strong>Corrects:</strong>
+          {% for s in relationships.corrects %}<a href="/entries/{{ s }}/">{{ s }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
+      {% if relationships.retracts and relationships.retracts.length %}
+        <p><strong>Retracts:</strong>
+          {% for s in relationships.retracts %}<a href="/entries/{{ s }}/">{{ s }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  {% if seeAlsoSlugs.length %}
+    <section class="entry-see-also">
+      <h2 class="section-label">See also</h2>
+      <ul>
+        {% for s in seeAlsoSlugs %}<li><a href="/entries/{{ s }}/">{{ s }}</a></li>{% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if corrections and corrections.length %}
+    <section class="entry-corrections">
+      <h2 class="section-label">Correction log</h2>
+      <ul>
+        {% for c in corrections %}
+          <li><time>{{ c.date | formatDate }}</time>: {{ c.note }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+</article>

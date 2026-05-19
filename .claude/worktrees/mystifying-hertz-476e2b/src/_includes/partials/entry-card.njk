@@ -1,0 +1,15 @@
+{# Reusable entry preview card. Usage: {% include "partials/entry-card.njk" %} with `entry` in context. #}
+<article class="entry-card">
+  <p class="entry-card-date">
+    <time datetime="{{ entry.data.date | isoDate }}">{{ entry.data.date | formatDate }}</time>
+  </p>
+  <h3 class="entry-card-headline">
+    <a href="{{ entry.url }}">{{ entry.data.headline }}</a>
+  </h3>
+  <p class="entry-card-summary">{{ entry.data.summary }}</p>
+  {% if entry.data.abuses and entry.data.abuses.length %}
+    <ul class="entry-card-tags">
+      {% for a in entry.data.abuses %}<li>{{ a | abuseTitle }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</article>

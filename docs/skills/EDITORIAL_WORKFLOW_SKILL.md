@@ -65,7 +65,6 @@ Define the human review and approval process for entries before they are recorde
 - ✓ Abuses are correctly mapped (verify against abuse definitions)?
 - ✓ Actors are correctly identified and normalized?
 - ✓ Location is accurate and complete for the jurisdiction level?
-- ✓ Confidence level is appropriate (`monitoring` for automated intake)?
 - ✓ No missing or suspicious sources?
 
 **Approval criteria:**
@@ -135,7 +134,6 @@ Define the human review and approval process for entries before they are recorde
 **Outcome:**
 - Update issue with research findings
 - Add labels for mapped abuses
-- Set confidence level (not "monitoring" — use `well-reported`, `developing`, or `alleged` per sources)
 
 #### 4. Editorial Review of Issue (Second Gate)
 **Can we confidently record this?**
@@ -145,7 +143,6 @@ Define the human review and approval process for entries before they are recorde
 - Event clearly describes a taxonomy abuse?
 - Actors correctly identified?
 - Jurisdiction and location accurate?
-- Confidence level appropriate?
 
 **Approval criteria:**
 - Passes sourcing floor
@@ -169,7 +166,6 @@ Define the human review and approval process for entries before they are recorde
 
 #### 6. Editorial Review of PR (Final Gate)
 - **Same as monitoring intake (step 4)**
-- **Difference:** Confidence field reflects source quality, not "monitoring"
 
 ---
 
@@ -263,7 +259,6 @@ Define the human review and approval process for entries before they are recorde
 - [ ] Primary abuse is appropriate (first abuse listed)
 - [ ] Sources meet floor (primary OR 2+ investigative)
 - [ ] All URLs are live and content-verified
-- [ ] Confidence level is appropriate to sources
 - [ ] No factual errors in summary or analysis
 - [ ] Breaks no sources (quoted material never exceeds 15 words)
 - [ ] Follows broken-windows principle (recorded because credible + relevant, not because "significant")

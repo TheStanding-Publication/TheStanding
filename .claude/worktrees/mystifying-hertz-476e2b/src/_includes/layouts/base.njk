@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="{{ site.language }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% if title %}{{ title }} — {% endif %}{{ site.name }}</title>
+    <meta name="description" content="{{ description or site.description }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">{{ site.name }}</a>
+        <p class="site-tagline">{{ site.tagline }}</p>
+        <nav class="site-nav">
+          <a href="/">Latest</a>
+          <a href="/ideals/">Ideals</a>
+          <a href="/timeline/">Timeline</a>
+          <a href="/standards/">Standards</a>
+          <a href="/corrections/">Corrections</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {{ content | safe }}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          {{ site.name }}. Non-partisan. The historical record is maintained in
+          <a href="#">a public GitHub repository</a>.
+        </p>
+        <p>
+          Corrections: <a href="mailto:{{ site.editorEmail }}">{{ site.editorEmail }}</a>
+          &nbsp;·&nbsp;
+          Tips and citizen documentation: <a href="mailto:{{ site.tipsEmail }}">{{ site.tipsEmail }}</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

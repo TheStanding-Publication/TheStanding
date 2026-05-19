@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"C:/Users/welud/Projects/Wiki/src/sources.md\" \"C:/Users/welud/Projects/Wiki/src/_data/sources.yaml\" 2>&1)"
+    ]
+  }
+}

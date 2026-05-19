@@ -24,7 +24,7 @@ actors:
   - "Jane Q. Sample (Assistant Attorney General, Office of Legal Counsel)"
 
 jurisdiction: federal
-location: federal
+confidence: well-reported
 
 sources:
   - url: "https://example.gov/oversight/sample-subpoena.pdf"
