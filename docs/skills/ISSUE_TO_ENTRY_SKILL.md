@@ -35,14 +35,16 @@ This skill is a Claude agent that orchestrates the full workflow:
 
 **What the agent does:**
 - Call GitHub API to search for issues
-- Query: `state:open label:monitoring-intake sort:number-asc`
+- Query: `is:issue state:open label:monitoring-intake sort:number-asc`
 - Skip issues with `url-validation-hold` label if last comment is < 24 hours old
 - Build list of issues to process
 
 **GitHub API call:**
 ```
-GET /search/issues?q=repo:TheStanding-Publication/TheStanding%20state:open%20label:monitoring-intake&sort=number&order=asc&per_page=100
+GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+label:monitoring-intake&sort=number&order=asc&per_page=100
 ```
+
+> **Note:** the `is:issue` qualifier is required. GitHub's search API rejects the query with HTTP 422 (`"Query must include 'is:issue' or 'is:pull-request'"`) if it's omitted.
 
 **Handle:**
 - If `--issue N` flag: fetch only issue #N
@@ -56,7 +58,7 @@ GET /search/issues?q=repo:TheStanding-Publication/TheStanding%20state:open%20lab
 ## Automated News Monitoring
 
 **Source:** [Primary news outlet]
-**Scan date:** [Date]
+**Date:** [YYYY-MM-DD]              # scan/report date — also accepted as `**Scan date:**`
 **Event date:** [YYYY-MM-DD]
 
 ### What happened
@@ -91,6 +93,8 @@ GET /search/issues?q=repo:TheStanding-Publication/TheStanding%20state:open%20lab
 - Abuses: extract slugs from bulleted list
 - Sources: extract URL, publisher, tier (primary/investigative/secondary), title
 
+> **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream STANDING_MONITOR_SKILL currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
+
 ### Step 3: Validate Data
 
 **Check all required fields:**
@@ -111,14 +115,17 @@ GET /search/issues?q=repo:TheStanding-Publication/TheStanding%20state:open%20lab
 **For each source URL:**
 
 1. **Make GET request** to verify status
+   - **Send a browser-like User-Agent header** (e.g. `Mozilla/5.0 (compatible; TheStandingBot/1.0; +https://thestanding.us)`). Many publisher WAFs return 403/406 to default HTTP-client User-Agents on otherwise-live articles. Without this, healthy news sites get falsely flagged dead.
    - Follow redirects automatically
    - Capture final URL if redirected (301/302)
-   - Accept: 200 OK
-   - Reject: 404, 410, timeout, other errors
+   - **Accept (live):** 200 OK
+   - **Dead** (drop from sources): 404, 410, DNS failure, connection refused, TLS failure, hard timeout
+   - **Needs review** (keep the source in the entry; add `url-needs-review` label to the issue): 403, 406, 451, 5xx. These are usually bot-blocking or transient publisher issues, not actually-gone content. Do **not** treat these as dead — dropping live primary sources because of a WAF is a worse failure mode than keeping an occasional zombie URL.
+   - Treat anything else not listed above as dead.
 
 2. **Update URL** if redirected (301/302)
 
-3. **Remove dead URLs** from sources list
+3. **Remove dead URLs** from sources list (do not remove "needs review" URLs — keep them and surface for human check)
 
 4. **After cleaning:**
    - Count remaining primary sources
@@ -140,13 +147,21 @@ Where slug is: `issue-{number}-{jurisdiction}-{primary-abuse}`
 
 **Slug generation rules:**
 - `{number}` = GitHub issue number
-- `{jurisdiction}` = federal / state / local / intl / private (based on where abuse occurs)
+- `{jurisdiction}` =
+  - `federal` — federal action
+  - `<2-letter-state-code>` — state action (e.g. `tn`, `co`, `tx`). **Use the 2-letter postal code, NOT the literal word "state"** — this keeps Tennessee distinguishable from Texas in the slug.
+  - `local` — city/county/local action (state code is captured in the `location` field, not the slug)
+  - `intl` — international
+  - `private` — private actor
 - `{primary-abuse}` = first abuse in list (kebab-case)
 
 Examples:
 - `issue-42-federal-defying-subpoenas`
-- `issue-15-co-excessive-force` (state: Colorado)
+- `issue-15-co-excessive-force` (Colorado state action)
+- `issue-6-tn-gerrymandering` (Tennessee state action)
 - `issue-28-private-press-retaliation`
+
+This rule is load-bearing: it satisfies Key Principle #3 ("deterministic slugs"). Two runs against the same issue must produce the same slug.
 
 **File format:**
 ```yaml
@@ -335,6 +350,20 @@ Entry could not be recorded due to:
 Comment here when fixed, and it will be re-evaluated.
 ```
 
+**Special case — invalid abuse slug(s):** When one or more mapped abuses are not in `/taxonomy/abuses.yaml`, the failure comment **must** include the closest valid slugs as suggestions, not just "not in taxonomy". Compute closeness with (a) substring containment against slug AND title, (b) Levenshtein distance ≤ 4 as a fallback. Surface up to 3 candidates per invalid slug. Without this, the upstream monitor can't self-correct on the next pass.
+
+Example:
+```markdown
+❌ **Entry recording failed**
+
+**Invalid abuse slugs:** 2 of 2 mapped abuses are not in the taxonomy.
+
+- `voter-dilution` — not in taxonomy. Closest valid slugs: **`gerrymandering`**, `voter-suppression`, `voter-roll-purges`
+- `electoral-manipulation` — not in taxonomy. Closest valid slugs: **`gerrymandering`**, `post-election-overturning-attempts`, `disinformation-campaigns`
+
+**To fix:** Edit the "Mapped abuses" section of this issue to use slugs that exist in `taxonomy/abuses.yaml`, then comment so the skill re-evaluates.
+```
+
 3. **Add comment to issue with error details**
 4. **Skip to next issue** (don't stop execution)
 
@@ -411,5 +440,15 @@ Next steps:
 - GITHUB_TOKEN must be set in environment
 - npm must be installed with dependencies (npm install runs once)
 - Git must be configured (user.name, user.email for commits)
-- Repo must be clean before starting (or agent should handle stale state)
+- **Always clone into a fresh, agent-owned working directory** (e.g. `mktemp -d`). Do **not** operate on a user's existing local checkout — local checkouts may have stale state, uncommitted changes, divergent branches, or filesystem mounts that corrupt git's binary index files. A fresh clone makes the run reproducible and removes the "agent should handle stale state" caveat entirely.
 - All timestamps should be in YYYY-MM-DD format or ISO 8601 with timezone
+
+## Upstream Contract (STANDING_MONITOR_SKILL)
+
+This skill assumes the upstream monitor produces issues that meet the following preconditions:
+
+1. The issue carries the `monitoring-intake` label. (Without this, the Step 1 search filter returns zero results and the agent has no work to do.)
+2. The body uses `**Date:**` (or `**Scan date:**`) and `**Event date:**` headers in the format shown in Step 2.
+3. Every slug in "Mapped abuses" exists in `taxonomy/abuses.yaml` at the time the issue is opened.
+
+If any of these preconditions are violated, this skill reports the issue in its failure-handling flow and skips it — it does **not** silently process broken issues. Fix STANDING_MONITOR_SKILL upstream rather than papering over broken intake here.
