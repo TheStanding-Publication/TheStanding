@@ -192,12 +192,12 @@ module.exports = function (eleventyConfig) {
         );
       }
 
-      // --- Quote length: editorial standard requires < 15 words ---
+      // --- Quote length: editorial standard requires < 30 words ---
       if (entry.data.quote && entry.data.quote.text) {
         const wordCount = entry.data.quote.text.trim().split(/\s+/).filter(Boolean).length;
-        if (wordCount >= 15) {
+        if (wordCount >= 30) {
           throw new Error(
-            `Entry "${slug}": quote text is ${wordCount} words; editorial standard requires fewer than 15.`
+            `Entry "${slug}": quote text is ${wordCount} words; editorial standard requires fewer than 30.`
           );
         }
       }

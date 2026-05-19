@@ -66,7 +66,7 @@ sources:
     note: "Returned 403 to default-UA HTTP clients (congress.gov WAF); the bill text and status are the canonical primary record but could not be content-verified in this run. Human review of the URL is recommended."
 
 quote:
-  text: "The SAVE Act would stop millions of American citizens from voting."
+  text: "The SAVE Act would stop millions of American citizens from voting. It would be the most restrictive voting bill ever passed by Congress."
   source-index: 1
 
 relationships:
