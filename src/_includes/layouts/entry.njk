@@ -110,7 +110,7 @@ layout: layouts/base.njk
     <section class="entry-see-also">
       <h2 class="section-label">See also</h2>
       <ul>
-        {% for s in seeAlsoSlugs %}<li><a href="/entries/{{ s }}/">{{ s }}</a></li>{% endfor %}
+        {% for s in seeAlsoSlugs %}{% set ref = collections.entryBySlug[s] %}<li>{% if ref %}<a href="{{ ref.url }}">{{ ref.data.headline }}</a>{% else %}{{ s }}{% endif %}</li>{% endfor %}
       </ul>
     </section>
   {% endif %}
