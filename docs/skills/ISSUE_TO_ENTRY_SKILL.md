@@ -238,6 +238,8 @@ sources:
 
 > **`status:` is always `published`.** The build accepts four values (`draft`, `published`, `corrected`, `retracted` — see `.eleventy.js`) but this skill is producing live archive entries, so it sets `published` unconditionally. `corrected` and `retracted` are reserved for a future re-evaluation workflow that operates on already-published entries; `draft` is for human-authored work-in-progress and shouldn't appear in agent output. Do not leave the field unset — explicit beats implicit, and an unset status would silently skip the build's draft filter (which is fine today but is the kind of footgun worth pre-empting).
 
+> **`quote:` is optional but recommended.** When present, structure as `quote: { text: "...", source-index: N }` where `source-index` is the 0-indexed position of the source the quote came from in the `sources:` list. **`quote.text` must be fewer than 30 words** — the build (`.eleventy.js`) throws an error if the quote is 30 words or more. Pick a tight, single-sentence quote that lands; if no source has a quote that compresses to <30 words cleanly, omit the field rather than pad. Re-check the source index after adding/removing sources during validate-and-correct (Step 3-4), since the list ordering can shift.
+
 **Body:** 2-3 paragraphs of markdown, factual and neutral tone. Use summary as base and expand with context from sources.
 
 ### Step 6: Verify Build
