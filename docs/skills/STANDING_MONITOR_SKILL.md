@@ -41,7 +41,7 @@ Key advantage: Claude understands that "Voting Rights Act enforcement weakened" 
 - **Actors**: Named officials, agencies, candidates, organizations with roles/titles
 - **Primary evidence**: Links to news article, official statement, court filing, video
 - **Secondary sources**: Additional reporting or official documentation
-- **Mapped abuses**: Which specific abuses from the taxonomy (may be 1-3)
+- **Mapped abuses**: 1-3 abuse slugs that MUST exist in `taxonomy/abuses.yaml` *at the time the issue is created*. Read the taxonomy file before emitting an issue and verify each proposed slug is in the file. If unsure which slug fits, pick the closest valid slug and explain the uncertainty in the **Analysis** section — never invent a slug. (Invented slugs are the single most common cause of downstream entry failures.)
 - **Context**: Any background needed to understand significance
 
 **Claude conducts thorough research upfront:**
@@ -124,8 +124,18 @@ For each scan, report:
 2. **Upfront research**: Complete research before issue creation, not after
 3. **Comprehensive data**: Gather everything needed to record the event if accepted
 4. **Duplicate avoidance**: Check open and closed issues before creating
-5. **Taxonomy-driven**: Search and categorize strictly against The Standing's ideals/abuses
+5. **Taxonomy-driven**: Search and categorize strictly against The Standing's ideals/abuses; abuse slugs MUST exist in `taxonomy/abuses.yaml` at emission time
 6. **Evidence-based**: Primary sources only; citizen documentation acceptable if verifiable
+
+## Validation Responsibility
+
+Final validity of an issue is the **downstream** ISSUE_TO_ENTRY_SKILL's responsibility, not this one. That skill re-reads source content at process time, corrects taxonomy mismatches using current `taxonomy/abuses.yaml`, normalizes fields, and discards issues it judges unsalvageable.
+
+What that means for this skill:
+
+- **Do** be reasonably thorough on first emission — comprehensive research, valid slugs, primary sources verified loadable.
+- **Don't** treat issue creation as the final word. Articles get retracted; the taxonomy evolves; headlines change between emission and recording. Some friction at the downstream step is expected and healthy.
+- **Don't** invent abuse slugs to fit a story. If nothing in the taxonomy maps cleanly, that's a signal the taxonomy may need a new abuse — flag in **Analysis** rather than papering over with a wrong slug.
 
 ## Scheduled Tasks
 This skill is referenced by 4 daily scheduled tasks:
