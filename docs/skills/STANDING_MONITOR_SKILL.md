@@ -186,10 +186,12 @@ What that means for this skill:
 
 This skill is invoked by four daily scheduled tasks:
 
-- `standing-monitor-morning` (8am) — deep-scan safety net (24-hour window)
-- `standing-monitor-midday` (1pm) — delta scan (5-hour window); moved from 12pm to avoid scheduling during peak working hours (9am-12pm local)
-- `standing-monitor-afternoon` (4pm) — delta scan
-- `standing-monitor-evening` (8pm) — delta scan
+- `standing-monitor-morning` (5am) — deep-scan safety net (24-hour window); scheduled early so the heaviest scan completes well before peak working hours (9am-12pm local)
+- `standing-monitor-midday` (1pm) — delta scan (8-hour window, covering 5am-1pm); 1pm avoids peak working hours
+- `standing-monitor-afternoon` (4pm) — delta scan (5-hour window)
+- `standing-monitor-evening` (8pm) — delta scan (5-hour window)
+
+No scheduled monitor or entry-recorder run fires between 9am and 12:59pm local — that window is kept clear of automated jobs.
 
 Each scheduled task is a thin wrapper of the form:
 
