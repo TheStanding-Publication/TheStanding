@@ -89,9 +89,10 @@
 
 - [ ] **STANDING_MONITOR pre-flight taxonomy validation** — Today the monitor "should" only emit abuse slugs that exist in `taxonomy/abuses.yaml` (per PR #20 guidance), but nothing enforces it — issues #6–#13 all used invented slugs (`voter-dilution`, `electoral-manipulation`, etc.). Before issue creation, the monitor should validate every proposed slug against the live taxonomy and refuse to emit if any are invalid. Would eliminate most of the in-flight corrections ISSUE_TO_ENTRY currently makes.
 
-- [ ] **Episodes editorial workflow** — Entries support an `episodes:` field, the template renders the Part-of line, and a sample episode exists in `src/content/episodes/`. But there's no documented guidance on when an editor creates an episode, how ISSUE_TO_ENTRY should suggest one, or how episodes get retroactively linked when later entries arrive.
+- [ ] **Episodes editorial workflow** — Entries support an `episodes:` field and the template renders the Part-of line, but no episodes currently exist (the sample episode was removed in PR #45). There's no documented guidance on when an editor creates an episode, how ISSUE_TO_ENTRY should suggest one, or how episodes get retroactively linked when later entries arrive.
   - First obvious case: post-Callais state gerrymanders. The Tennessee entry (issue #6) is one node; once Louisiana v. Callais and other states get entries, they should share an episode like `post-callais-state-gerrymanders`.
   - Decision needed: who creates episodes — editor by hand, or agent suggests at PR time and editor confirms?
+  - **Includes episode UUIDs:** when episode support is built out, episodes get a stable `id` (UUID v4) the same way entries do (PR #40), with the same build-time presence/format/uniqueness validation. Deferred from PR #40 because there are zero episodes to apply it to right now — fold it into this work rather than building speculative validation.
 
 - [ ] **Formalize or remove the source-level `note:` field** — On the issue-6 entry, ISSUE_TO_ENTRY added ad-hoc `note:` fields to source items (e.g. *"Returned 403 to default-UA HTTP clients; article verified live"*). The field isn't in the documented schema or in `.eleventy.js` validation. Either:
   - Add to the schema (ISSUE_TO_ENTRY_SKILL Step 5 + `.eleventy.js`) as an allowed-optional field, OR
@@ -102,5 +103,7 @@
 - [ ] **Distinguish transient from real build failures** — Step 6 of ISSUE_TO_ENTRY currently treats every `npm run build` failure as bad input and skip-flags the issue. But flaky `npm install`, network failures during dependency resolution, or transient CI/infra issues should retry rather than punish a perfectly good entry. Define what counts as transient and add a retry-once policy. Low priority — wait until it actually bites.
 
 - [ ] **PR label discipline** — When the agent applied `gerrymandering` as a label on PR #21, GitHub auto-created the label (it didn't previously exist). There's no defined set of valid PR labels, no policy on whether new abuse-slug labels should be auto-created on first use, and no audit of what labels currently exist vs. what they're used for. Define the canonical label set and the rules for adding new ones. Low priority — wait until it actually bites.
+
+- [x] ~~**Migrate cross-references from slug to id**~~ — Considered 2026-05-19 and **declined**. With build-time validation of relationship slugs in place and slugs already enforced-unique (PR #40), slug-based cross-references in `relationships.*` and `episodes:` are both safe (broken refs fail the build) and human-readable. Migrating them to opaque UUIDs would trade readability for rename-safety we no longer need. The `id` field stays as the canonical identifier; cross-references stay slug-based. Recorded so the decision isn't re-litigated.
 
 ## Done
