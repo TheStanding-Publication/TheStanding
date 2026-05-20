@@ -13,7 +13,7 @@ The Standing.
 
 Fetch and execute the canonical workflow spec:
 
-https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/STANDING_MONITOR_SPEC.md
+https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/NEWS_RESEARCH_SPEC.md
 
 Run it in **URL-to-issue mode** (see the spec's "Modes and Inputs"
 section, and the URL-to-issue-mode behavior within Steps 2, 3, and 5).

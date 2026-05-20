@@ -6,7 +6,7 @@ Turning an operator-submitted URL into a monitoring issue is handled by
 **URL-to-issue mode** of the news monitoring spec. The full workflow lives
 in one place:
 
-→ **[`STANDING_MONITOR_SPEC.md`](./STANDING_MONITOR_SPEC.md)** — see the
+→ **[`NEWS_RESEARCH_SPEC.md`](./NEWS_RESEARCH_SPEC.md)** — see the
 **"Modes and Inputs"** section and the **"URL-to-issue mode"** entries
 within Steps 2, 3, and 5.
 
