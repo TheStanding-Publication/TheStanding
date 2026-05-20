@@ -192,7 +192,7 @@ This skill is invoked by four daily scheduled tasks:
 - `standing-monitor-afternoon` (4pm) — delta scan (5-hour window)
 - `standing-monitor-evening` (8pm) — delta scan (5-hour window)
 
-No scheduled monitor or entry-recorder run fires between 9am and 12:59pm local — that window is kept clear of automated jobs.
+Scheduled-job quiet windows (local time): no monitor scan runs between 9am and 12:59pm; the separate `standing-entry-recorder` task is quiet over a wider window, 6am-12:59pm. Both resume at 1pm.
 
 Each scheduled task is a thin wrapper of the form:
 
