@@ -243,6 +243,26 @@ module.exports = function (eleventyConfig) {
       slugsSeen.set(entrySlug, entry.inputPath);
     }
 
+    // --- Relationship reference validation ---
+    // Every slug referenced in relationships.{follows,corrects,retracts} must
+    // point at an entry that actually exists. Without this, a typo'd or stale
+    // reference renders as plain text (the entry.njk template falls back
+    // gracefully) and the broken link goes unnoticed. Fail the build instead.
+    for (const entry of all) {
+      const entrySlug = entry.data.slug || entry.fileSlug;
+      const rel = entry.data.relationships || {};
+      for (const kind of ["follows", "corrects", "retracts"]) {
+        const refs = rel[kind] || [];
+        for (const ref of refs) {
+          if (!slugsSeen.has(ref)) {
+            throw new Error(
+              `Entry "${entrySlug}": relationships.${kind} references "${ref}", which is not an existing entry slug. Fix the reference or add the entry.`
+            );
+          }
+        }
+      }
+    }
+
     all.sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
     return all;
   });
