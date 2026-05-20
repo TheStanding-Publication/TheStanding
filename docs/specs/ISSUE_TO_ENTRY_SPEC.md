@@ -83,9 +83,9 @@ The agent does NOT close issues, even when flagging them invalid. Closure is a h
 GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+author:thestanding&sort=number&order=asc&per_page=100
 ```
 
-**Checking for an existing open PR (per issue):**
+**Checking for an existing open PR:**
 
-For each candidate issue `N`, fetch the open PRs in the repo and check whether any references the issue via a closing keyword in the PR body:
+Fetch the repo's open PRs **once per run**, then for each candidate issue `N` check whether any of them references the issue via a closing keyword in the PR body:
 
 ```
 GET /repos/TheStanding-Publication/TheStanding/pulls?state=open&per_page=100
@@ -168,9 +168,13 @@ Required fields and what counts as "valid enough":
 
 ### Step 4: Source Re-verification (URL + Content)
 
-This is more than a 200-OK check. For each source URL, the agent **fetches the page and reads the article content**, then judges whether the article still supports the entry the way the issue claims it does. The agent makes this call; no fixed status-code table.
+This is more than a 200-OK check — but it is also not an exhaustive re-read of every link. The agent fully re-verifies the **primary source(s)** and corroborates the entry's key details against **one genuinely independent source**; remaining sources get only a lightweight liveness check. The agent makes these calls with judgment; no fixed status-code table.
 
-For each source URL:
+**Verification standard — two independent sources agree.** A detail — the event, its date, the actors, the outcome — counts as confirmed when the primary source supports it *and* a second, independent source agrees. This is the newsroom two-source rule, and it is what "the details are correct" means here: confirmation comes from primary-source documents the entry can cite, not from an AI-generated search summary and not from "it sounds plausible." If the primary and the corroborator disagree on a material detail, that disagreement is itself a finding — resolve it against the source record, or surface it via Step 11 if it cannot be resolved. Where the primary source is itself the authoritative record of the event — a court opinion, an agency statement, the Federal Register — it stands on its own; a second source is welcome corroboration but not required.
+
+**Prioritization and stopping point.** Re-verify in priority order — primary source(s) first, then the strongest independent corroborator. Once the primary is verified and one independent source corroborates the key details, the event is confirmed; stop there. Do not full-read every remaining link for completeness — give the rest a lightweight liveness check (does the URL still resolve; is it not a 404 or a retraction notice). Promote one of them to a full content read only if a primary fails re-verification and a secondary has to carry the event instead.
+
+For each source you fully re-verify:
 
 1. **Fetch the page** using a browser-like User-Agent (e.g. `Mozilla/5.0 (compatible; TheStandingBot/1.0; +https://thestanding.us)`) and follow redirects. Capture the final URL if redirected.
 
@@ -180,6 +184,7 @@ For each source URL:
    - **403 / 406 / 451 / 5xx with a known reputable publisher** → almost always bot-blocking by the publisher's WAF, not actually missing content. Keep the source in the entry. Note in the PR body that human review of the URL is appropriate. Do not drop the source.
    - **TLS / DNS / connection failure on a known domain** → most likely transient. Retry once with backoff; if still failing, keep the source but flag for review.
    - **Known-hard publishers** → some outlets (notably the Washington Post) run aggressive anti-bot / WAF systems that produce repeated timeouts or 403s even on healthy, current articles. When the source is one of these, use a longer initial timeout and treat a repeat failure as "keep with note" immediately — do not burn multiple retry cycles. A repeated timeout from a known-hard publisher is evidence the publisher blocks automated clients, not evidence the article is gone.
+   - **The fetch tooling refuses the domain (blocklisted / blocked)** → a tooling-level restriction, not a fact about the article. Keep the source in the entry, note that it could not be machine-verified this run, and move on — do not burn retries, and do not route around the block (caches, archives, mirrors). Retrying will not change a blocklist outcome.
 
 3. **Read the article content** and verify it still supports the entry:
    - **Does the article confirm the event happened as the issue describes?** If the live article says something materially different — different date, different actors, different outcome — update the entry to reflect the article. The article is the source of truth, not the issue's snapshot.
@@ -270,6 +275,8 @@ sources:
 2. Run: `npm install` (once, if not already done in this run)
 3. Run: `npm run build`
 4. Check if build succeeds
+
+> **Output handling:** `npm install` and `npm run build` are verbose on success. Keep only the tail of their output; retain fuller output only on failure, where Step 11's comment needs it. A clean build log should not be carried forward.
 
 **If build fails:**
 → Go to **Step 11: Discarding Issues** with the build output in the comment. (Build failures here usually mean bad input — invalid YAML, malformed source URL, etc. — so the issue is skip-flagged for human review.)
