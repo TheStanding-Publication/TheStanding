@@ -707,3 +707,46 @@ p, ul, ol { margin: 0.8em 0 1.1em; }
   html { font-size: 11pt; }
   a { color: var(--ink); text-decoration: none; }
 }
+
+/* --- Tabbed disclosure (native <details>, no JS) --- */
+
+.latest-tabs-container {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: repeat(2, auto);
+}
+.latest-tabs-container > details {
+  display: contents;
+}
+.latest-tabs-container > details > summary {
+  grid-row: 1;
+  padding: 0.85rem;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  background-color: var(--soft);
+}
+.latest-tabs-container > details .tab-panel {
+  grid-column: 1/ -1;
+}
+.latest-tabs-container .tab-panel {
+  padding: 0.85rem;
+  border: 1px solid var(--rule);
+  border-width: 0 1px 1px 1px;
+}
+
+/* Open tab */
+.latest-tabs-container > details[open] > summary { color: var(--accent); background-color: var(--paper); border-bottom: 0; }
+.latest-tabs-container > details[open]::details-content {
+  display: contents;
+}
+
+
+
+.tab-panel { padding-bottom: 1.5rem; }

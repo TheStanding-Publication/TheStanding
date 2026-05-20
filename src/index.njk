@@ -20,11 +20,26 @@ permalink: /index.html
 {% include "partials/subscribe.njk" %}
 
 <section class="latest">
-  <h2>Latest</h2>
-  {% if collections.feedEntries.length %}
-    {% for entry in collections.feedEntries | head(20) %}
-      {% include "partials/entry-card.njk" %}
-    {% endfor %}
+  <h2>Latest Events</h2>
+  {% if collections.entries.length %}
+    <div class="latest-tabs-container">
+      <details name="latest-tabs" open>
+        <summary>By event date</summary>
+        <div class="tab-panel">
+          {% for entry in collections.entries | head(20) %}
+            {% include "partials/entry-card.njk" %}
+          {% endfor %}
+        </div>
+      </details>
+      <details name="latest-tabs">
+        <summary>By publication date</summary>
+        <div class="tab-panel">
+          {% for entry in collections.feedEntries | head(20) %}
+            {% include "partials/entry-card.njk" %}
+          {% endfor %}
+        </div>
+      </details>
+    </div>
   {% else %}
     <p><em>No entries yet. The first issue is in preparation.</em></p>
   {% endif %}
