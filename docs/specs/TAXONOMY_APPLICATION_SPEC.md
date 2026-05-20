@@ -299,6 +299,6 @@ If you tag an entry with `voter-suppression`, the build system:
 ---
 
 ## Related Skills & Workflows
-- EDITORIAL_WORKFLOW_SKILL.md — How editors review and approve entries
+- EDITORIAL_WORKFLOW_SPEC.md — How editors review and approve entries
 - PROJECT_PLAN.md → Taxonomy section — Full taxonomy and inclusion criteria
 - `/taxonomy/abuses.yaml` — Source of truth for abuse definitions

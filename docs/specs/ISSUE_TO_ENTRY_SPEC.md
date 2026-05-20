@@ -107,7 +107,7 @@ A PR "references" issue `N` if its body contains any of: `Closes #N`, `Closes: #
 
 ### Step 2: For Each Issue - Parse Issue Body
 
-**Expected format** (from STANDING_MONITOR_SKILL output):
+**Expected format** (from STANDING_MONITOR_SPEC output):
 ```
 ## Automated News Monitoring
 
@@ -147,7 +147,7 @@ A PR "references" issue `N` if its body contains any of: `Closes #N`, `Closes: #
 - Abuses: extract slugs from bulleted list
 - Sources: extract URL, publisher, tier (primary/investigative/secondary), title
 
-> **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream STANDING_MONITOR_SKILL currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
+> **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream STANDING_MONITOR_SPEC currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
 
 ### Step 3: Validate and Correct
 
@@ -487,11 +487,11 @@ Next steps:
 - **Always clone into a fresh, agent-owned working directory** (e.g. `mktemp -d`). Do **not** operate on a user's existing local checkout — local checkouts may have stale state, uncommitted changes, divergent branches, or filesystem mounts that corrupt git's binary index files. A fresh clone makes the run reproducible and removes the "agent should handle stale state" caveat entirely.
 - All timestamps should be in YYYY-MM-DD format or ISO 8601 with timezone
 
-## Upstream Contract (STANDING_MONITOR_SKILL)
+## Upstream Contract (STANDING_MONITOR_SPEC)
 
 The **only** hard precondition is that monitoring issues are opened by the `thestanding` bot account. Anything `thestanding` opens is in scope; anything opened by a human or different bot is out of scope. No labels or title prefixes are required.
 
-That said, the upstream monitor *should* still produce bodies in the format shown in Step 2 — that's what makes parsing reliable. If a body deviates, this skill reports the parse/validation failure via Step 11 and skips the issue; it does not silently process broken issues. The right place to fix systematic format problems is in STANDING_MONITOR_SKILL, not by adding parser exceptions here.
+That said, the upstream monitor *should* still produce bodies in the format shown in Step 2 — that's what makes parsing reliable. If a body deviates, this skill reports the parse/validation failure via Step 11 and skips the issue; it does not silently process broken issues. The right place to fix systematic format problems is in STANDING_MONITOR_SPEC, not by adding parser exceptions here.
 
 **Soft expectations** (not enforced, but worth maintaining):
 

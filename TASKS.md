@@ -10,7 +10,7 @@
   - [x] ~~**Review/update GitHub issue template**~~ - Already in place
 
 - [x] ~~**Internal sourcing workflow**~~ - Automated news monitoring (2026-05-18)
-  - Single skill: docs/skills/STANDING_MONITOR_SKILL.md (single point of truth)
+  - Single skill: docs/specs/STANDING_MONITOR_SPEC.md (single point of truth)
   - 4x daily scans: 8am, 12pm, 4pm, 8pm (all reference same skill)
   - Monitors: NYT, WaPo, NPR, AP, Reuters, BBC
   - Comprehensive research upfront: event date, actors, jurisdiction, evidence, mapped abuses
@@ -19,7 +19,7 @@
   - Labels: monitoring-intake, needs-research, [abuse slug]
 
 - [x] ~~**Entry recording workflow**~~ - Automated checks + PR creation (2026-05-18)
-  - Single skill: docs/skills/ENTRY_RECORDING_SKILL.md
+  - Single skill: docs/specs/ENTRY_RECORDING_SPEC.md
   - URL validation (live + content integrity via hashing)
   - Actors validation (verified against sources, normalized if in actors.yaml)
   - Location validation (required per jurisdiction)
@@ -66,9 +66,9 @@
   - Requires deriving state from the `location` string, or adding an explicit normalized `state` field to entry frontmatter
   - Open question: stop at state level, or also county/city collection pages?
 
-- [x] ~~**Manual-URL mode for STANDING_MONITOR_SKILL**~~ — Operator provides a single URL; agent fetches it, searches for supporting coverage, and produces the same intake as a scheduled scan. Documented in STANDING_MONITOR_SKILL.md alongside the scheduled-scan mode. Refuses with reasoning when out of scope; surfaces duplicates to the operator rather than auto-appending. Chat-first invocation. (Implemented.)
+- [x] ~~**URL-to-issue mode for STANDING_MONITOR_SPEC**~~ — Operator provides a single URL; agent fetches it, searches for supporting coverage, and produces the same intake as a scheduled scan. Documented in STANDING_MONITOR_SPEC.md alongside the scheduled-scan mode. Refuses with reasoning when out of scope; surfaces duplicates to the operator rather than auto-appending. Chat-first invocation. (Implemented.)
 
-- [ ] **Manual-issue-research mode for STANDING_MONITOR_SKILL** — `--issue N` to research an existing GitHub issue (e.g. a human-submitted tip not produced by the monitor itself) and enrich it with comprehensive intake. Less urgent than `--url` because the existing chat workflow can handle tip-issues directly when they come in.
+- [ ] **Manual-issue-research mode for STANDING_MONITOR_SPEC** — `--issue N` to research an existing GitHub issue (e.g. a human-submitted tip not produced by the monitor itself) and enrich it with comprehensive intake. Less urgent than `--url` because the existing chat workflow can handle tip-issues directly when they come in.
   - Open question: edit issue body in place, or post research as a comment? (Probably comment, to preserve the original.)
 
 - [ ] **Phone / off-desktop submission path** — Submit a URL from a phone or anywhere off the Cowork desktop, and have the workflow run on the desktop's next opportunity. Two candidate designs:
@@ -95,7 +95,7 @@
   - **Includes episode UUIDs:** when episode support is built out, episodes get a stable `id` (UUID v4) the same way entries do (PR #40), with the same build-time presence/format/uniqueness validation. Deferred from PR #40 because there are zero episodes to apply it to right now — fold it into this work rather than building speculative validation.
 
 - [ ] **Formalize or remove the source-level `note:` field** — On the issue-6 entry, ISSUE_TO_ENTRY added ad-hoc `note:` fields to source items (e.g. *"Returned 403 to default-UA HTTP clients; article verified live"*). The field isn't in the documented schema or in `.eleventy.js` validation. Either:
-  - Add to the schema (ISSUE_TO_ENTRY_SKILL Step 5 + `.eleventy.js`) as an allowed-optional field, OR
+  - Add to the schema (ISSUE_TO_ENTRY_SPEC Step 5 + `.eleventy.js`) as an allowed-optional field, OR
   - Move that information into the PR body and stop emitting it on the entry.
 
 - [ ] **Define "actor" precisely** — On the issue-6 entry the agent pruned SCOTUS (contextual cause) and Rep. Steve Cohen (target) from the actor list, keeping only entities that *took* the action. The principle isn't documented anywhere. Worth codifying in STANDING_MONITOR (so the monitor produces tighter actor lists upfront) and in editorial guidance, especially for borderline cases — enablers, accomplices, signatories vs. drafters, agencies vs. specific officials, etc.

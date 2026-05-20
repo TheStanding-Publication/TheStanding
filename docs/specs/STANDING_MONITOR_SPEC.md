@@ -24,13 +24,13 @@ Invoked by the four cron tasks (morning/midday/afternoon/evening). Scans the cur
 - `time_window` — how far back from now to scan (e.g. "last 24 hours", "last 5 hours")
 - `scan_label` — which scheduled scan this is (morning / midday / afternoon / evening)
 
-### Manual-URL mode
+### URL-to-issue mode
 
 Invoked on-demand by an operator (editor) providing a single URL. The agent uses that URL as the starting point and conducts a full event-research run from there.
 
-- `mode` — `manual-url`
+- `mode` — `url-to-issue`
 - `source_url` — a single URL (news article, court filing, agency press release, social-media post, primary document — anything on the open web). Editors do preliminary vetting before submitting; the agent still applies all editorial standards downstream.
-- `scan_label` — `manual-url` (or operator-supplied identifier for the report)
+- `scan_label` — `url-to-issue` (or operator-supplied identifier for the report)
 
 ## Workflow
 
@@ -45,7 +45,7 @@ The Standing's taxonomy is versioned in the public repo. Fetch the current versi
 
 **Scheduled-scan mode:** Use the curated sources you just loaded. Fetch RSS feeds where `sources.yaml` provides them; web-scrape otherwise. Focus on the `time_window` provided by the scheduled task, scoped to US governance, democracy, voting, elections, law enforcement, press freedom, separation of powers, civil rights, due process, public service, and institutional accountability.
 
-**Manual-URL mode:**
+**URL-to-issue mode:**
 
 1. Fetch the `source_url`. Read the article (or document) content. Send a browser-style User-Agent header — many publisher WAFs return 403 to default HTTP clients.
 2. If the URL doesn't resolve or returns a substantive paywall/login wall that prevents reading the underlying content, retry once. If still inaccessible, report the failure to the operator and stop — do not create an issue with an unverifiable primary source.
@@ -64,7 +64,7 @@ For each story you found in Step 2, ask:
 
 Use semantic understanding, not pattern matching. You understand that "weakening Voting Rights Act enforcement" maps to `voter-suppression` (or one of the more specific election slugs) without needing keyword overlap.
 
-**Manual-URL mode — explicit in-scope check before proceeding:**
+**URL-to-issue mode — explicit in-scope check before proceeding:**
 
 After evaluation, if you conclude the story does *not* fall within The Standing's scope — i.e. it doesn't describe an abuse of power affecting one of the 12 ideals, or it's political conduct/criticism rather than abuse (parallel to the editorial reasoning applied to backlog issue #8) — **refuse and stop**. Report to the operator:
 
@@ -95,7 +95,7 @@ Before creating an issue, search the repo `TheStanding-Publication/TheStanding` 
 
 **Scheduled-scan mode:** If a duplicate exists, skip silently — the event is already in the archive's intake queue. If unclear whether it's a duplicate, note in research and proceed with caution.
 
-**Manual-URL mode:** If a duplicate exists, **do NOT auto-act**. Surface the apparent duplicate to the operator: report the existing issue number, title, and which fields suggest the match. Then stop. The operator decides whether to:
+**URL-to-issue mode:** If a duplicate exists, **do NOT auto-act**. Surface the apparent duplicate to the operator: report the existing issue number, title, and which fields suggest the match. Then stop. The operator decides whether to:
 
 - File as new (rare — usually means a related but distinct event)
 - Add the URL as a source comment on the existing issue
@@ -175,7 +175,7 @@ Return a summary to the conversation:
 
 ## Validation Responsibility
 
-Final validity of an issue is the **downstream** ISSUE_TO_ENTRY_SKILL's responsibility, not this one. That skill re-reads source content at process time, corrects taxonomy mismatches using current `taxonomy/abuses.yaml`, normalizes fields, and discards issues it judges unsalvageable.
+Final validity of an issue is the **downstream** ISSUE_TO_ENTRY_SPEC's responsibility, not this one. That skill re-reads source content at process time, corrects taxonomy mismatches using current `taxonomy/abuses.yaml`, normalizes fields, and discards issues it judges unsalvageable.
 
 What that means for this skill:
 
@@ -200,7 +200,7 @@ Each scheduled task is a thin wrapper of the form:
 You are The Standing's automated news monitoring system.
 
 Fetch and execute the workflow defined in:
-https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/skills/STANDING_MONITOR_SKILL.md
+https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/STANDING_MONITOR_SPEC.md
 
 This is the canonical operational spec. Follow it exactly.
 
