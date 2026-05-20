@@ -28,10 +28,10 @@ document.
 
 ## Output
 
-A `[Monitoring]` issue in `TheStanding-Publication/TheStanding`, labelled
-`monitoring-intake`, `needs-research`, and the mapped abuse slug(s) — or
-a reasoned refusal if the URL is out of scope, or a surfaced duplicate
-for the operator to decide on. See the spec for the exact behavior.
+A `[Monitoring]` issue in `TheStanding-Publication/TheStanding`, tagged
+`ready-for-entry` — or a reasoned refusal if the URL is out of scope, or
+a surfaced duplicate for the operator to decide on. See the spec for the
+exact behavior.
 
 This skill has side effects (it creates a GitHub issue), so it is
 user-invoked only — it does not auto-trigger.

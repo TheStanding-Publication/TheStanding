@@ -54,6 +54,7 @@ docs/
   WORKFLOWS_COMPLETED.md    # workflow status and architecture summary
   skills/                   # workflow skill documentation
     NEWS_RESEARCH_SPEC.md
+    NEWS_TRIAGE_SPEC.md
     ENTRY_RECORDING_SPEC.md
     EDITORIAL_WORKFLOW_SPEC.md
     TAXONOMY_APPLICATION_SPEC.md
