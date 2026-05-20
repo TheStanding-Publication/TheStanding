@@ -707,3 +707,56 @@ p, ul, ol { margin: 0.8em 0 1.1em; }
   html { font-size: 11pt; }
   a { color: var(--ink); text-decoration: none; }
 }
+
+/* --- Tabbed disclosure (native <details>, no JS) --- */
+/* Home-page Latest list. The two <details> share name="latest-tabs",
+   which makes them an exclusive accordion — opening one closes the
+   other. Fully native: keyboard, screen-reader, and open/close state
+   are handled by the browser. No script, no CSS state hacks. */
+
+.tabs { margin-top: 0.75rem; }
+
+.tabs > details {
+  border-top: 1px solid var(--rule);
+}
+.tabs > details:last-of-type {
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Summary is the toggle. Laid out as a flex row — label left, an
+   open/closed indicator right — matching the flex pattern used by
+   .subscribe-row elsewhere in the stylesheet. */
+.tabs > details > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0.85rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+/* Remove the default disclosure triangle (standards + WebKit). */
+.tabs > details > summary::-webkit-details-marker { display: none; }
+
+/* Custom open/closed indicator. */
+.tabs > details > summary::after {
+  content: "+";
+  font-family: var(--sans);
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 400;
+}
+.tabs > details[open] > summary::after { content: "\2212"; }
+
+.tabs > details > summary:hover { color: var(--ink); }
+
+/* Open tab takes the accent treatment. */
+.tabs > details[open] > summary { color: var(--accent); }
+
+.tab-panel { padding-bottom: 1.5rem; }
