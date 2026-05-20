@@ -20,11 +20,11 @@ permalink: /index.html
 {% include "partials/subscribe.njk" %}
 
 <section class="latest">
-  <h2>Latest</h2>
+  <h2>Latest Events</h2>
   {% if collections.entries.length %}
-    <div class="tabs">
+    <div class="latest-tabs-container">
       <details name="latest-tabs" open>
-        <summary>Latest by event date</summary>
+        <summary>By event date</summary>
         <div class="tab-panel">
           {% for entry in collections.entries | head(20) %}
             {% include "partials/entry-card.njk" %}
@@ -32,7 +32,7 @@ permalink: /index.html
         </div>
       </details>
       <details name="latest-tabs">
-        <summary>Newest by publication date</summary>
+        <summary>By publication date</summary>
         <div class="tab-panel">
           {% for entry in collections.feedEntries | head(20) %}
             {% include "partials/entry-card.njk" %}
