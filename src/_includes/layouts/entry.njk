@@ -106,6 +106,27 @@ layout: layouts/base.njk
     </section>
   {% endif %}
 
+  {% set backrefs = collections.entryBackrefs[slug] %}
+  {% if backrefs and (backrefs.followedBy.length or backrefs.correctedBy.length or backrefs.retractedBy.length) %}
+    <section class="entry-relationships entry-backrefs">
+      {% if backrefs.followedBy.length %}
+        <p><strong>Followed by:</strong>
+          {% for e in backrefs.followedBy %}<a href="{{ e.url }}">{{ e.data.headline }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
+      {% if backrefs.correctedBy.length %}
+        <p><strong>Corrected by:</strong>
+          {% for e in backrefs.correctedBy %}<a href="{{ e.url }}">{{ e.data.headline }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
+      {% if backrefs.retractedBy.length %}
+        <p><strong>Retracted by:</strong>
+          {% for e in backrefs.retractedBy %}<a href="{{ e.url }}">{{ e.data.headline }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
+    </section>
+  {% endif %}
+
   {% if seeAlsoSlugs.length %}
     <section class="entry-see-also">
       <h2 class="section-label">See also</h2>
