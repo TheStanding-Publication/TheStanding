@@ -168,9 +168,13 @@ Required fields and what counts as "valid enough":
 
 ### Step 4: Source Re-verification (URL + Content)
 
-This is more than a 200-OK check. For each source URL, the agent **fetches the page and reads the article content**, then judges whether the article still supports the entry the way the issue claims it does. The agent makes this call; no fixed status-code table.
+This is more than a 200-OK check — but it is also not an exhaustive re-read of every link. The agent fully re-verifies the **primary source(s)** and corroborates the entry's key details against **one genuinely independent source**; remaining sources get only a lightweight liveness check. The agent makes these calls with judgment; no fixed status-code table.
 
-For each source URL:
+**Verification standard — two independent sources agree.** A detail — the event, its date, the actors, the outcome — counts as confirmed when the primary source supports it *and* a second, independent source agrees. This is the newsroom two-source rule, and it is what "the details are correct" means here: confirmation comes from primary-source documents the entry can cite, not from an AI-generated search summary and not from "it sounds plausible." If the primary and the corroborator disagree on a material detail, that disagreement is itself a finding — resolve it against the source record, or surface it via Step 11 if it cannot be resolved. Where the primary source is itself the authoritative record of the event — a court opinion, an agency statement, the Federal Register — it stands on its own; a second source is welcome corroboration but not required.
+
+**Prioritization and stopping point.** Re-verify in priority order — primary source(s) first, then the strongest independent corroborator. Once the primary is verified and one independent source corroborates the key details, the event is confirmed; stop there. Do not full-read every remaining link for completeness — give the rest a lightweight liveness check (does the URL still resolve; is it not a 404 or a retraction notice). Promote one of them to a full content read only if a primary fails re-verification and a secondary has to carry the event instead.
+
+For each source you fully re-verify:
 
 1. **Fetch the page** using a browser-like User-Agent (e.g. `Mozilla/5.0 (compatible; TheStandingBot/1.0; +https://thestanding.us)`) and follow redirects. Capture the final URL if redirected.
 
