@@ -186,10 +186,10 @@ What that means for this skill:
 
 This skill is invoked by four daily scheduled tasks:
 
-- `standing-monitor-morning` (8am)
-- `standing-monitor-midday` (12pm)
-- `standing-monitor-afternoon` (4pm)
-- `standing-monitor-evening` (8pm)
+- `standing-monitor-morning` (8am) — deep-scan safety net (24-hour window)
+- `standing-monitor-midday` (1pm) — delta scan (5-hour window); moved from 12pm to avoid scheduling during peak working hours (9am-12pm local)
+- `standing-monitor-afternoon` (4pm) — delta scan
+- `standing-monitor-evening` (8pm) — delta scan
 
 Each scheduled task is a thin wrapper of the form:
 
