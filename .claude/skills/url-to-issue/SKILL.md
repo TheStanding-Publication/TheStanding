@@ -13,7 +13,7 @@ The Standing.
 
 Fetch and execute the canonical workflow spec:
 
-https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/STANDING_MONITOR_SPEC.md
+https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/NEWS_RESEARCH_SPEC.md
 
 Run it in **URL-to-issue mode** (see the spec's "Modes and Inputs"
 section, and the URL-to-issue-mode behavior within Steps 2, 3, and 5).
@@ -28,10 +28,10 @@ document.
 
 ## Output
 
-A `[Monitoring]` issue in `TheStanding-Publication/TheStanding`, labelled
-`monitoring-intake`, `needs-research`, and the mapped abuse slug(s) — or
-a reasoned refusal if the URL is out of scope, or a surfaced duplicate
-for the operator to decide on. See the spec for the exact behavior.
+A `[Monitoring]` issue in `TheStanding-Publication/TheStanding`, tagged
+`ready-for-entry` — or a reasoned refusal if the URL is out of scope, or
+a surfaced duplicate for the operator to decide on. See the spec for the
+exact behavior.
 
 This skill has side effects (it creates a GitHub issue), so it is
 user-invoked only — it does not auto-trigger.

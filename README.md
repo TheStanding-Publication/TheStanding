@@ -53,13 +53,14 @@ docs/
   PROJECT_PLAN.md           # full design document
   WORKFLOWS_COMPLETED.md    # workflow status and architecture summary
   skills/                   # workflow skill documentation
-    STANDING_MONITOR_SPEC.md
+    NEWS_RESEARCH_SPEC.md
+    NEWS_TRIAGE_SPEC.md
     ENTRY_RECORDING_SPEC.md
     EDITORIAL_WORKFLOW_SPEC.md
     TAXONOMY_APPLICATION_SPEC.md
     DAILY_DIGEST_SPEC.md
     ACTOR_NORMALIZATION_SPEC.md
-    STANDING_MONITOR_TEST_SPEC.md
+    NEWS_RESEARCH_TEST_SPEC.md
 ```
 
 ## Contributing
