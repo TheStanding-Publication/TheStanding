@@ -339,6 +339,36 @@ module.exports = function (eleventyConfig) {
     return map;
   });
 
+  // Map: entry slug -> entries that reference it (the reverse of the
+  // relationships.{follows,corrects,retracts} an entry declares about itself).
+  // Lets an entry page show "Followed by / Corrected by / Retracted by".
+  eleventyConfig.addCollection("entryBackrefs", function (collectionApi) {
+    const items = collectionApi
+      .getFilteredByGlob("src/entries/**/*.md")
+      .filter((e) => e.data.status !== "draft");
+    const map = {};
+    const ensure = (slug) => {
+      if (!map[slug]) {
+        map[slug] = { followedBy: [], correctedBy: [], retractedBy: [] };
+      }
+      return map[slug];
+    };
+    for (const entry of items) {
+      const rel = entry.data.relationships || {};
+      const pairs = [
+        ["follows", "followedBy"],
+        ["corrects", "correctedBy"],
+        ["retracts", "retractedBy"],
+      ];
+      for (const [kind, backKey] of pairs) {
+        for (const ref of rel[kind] || []) {
+          ensure(ref)[backKey].push(entry);
+        }
+      }
+    }
+    return map;
+  });
+
   // Feed entries: sorted by archived (publication) date descending — different from
   // the main `entries` collection which sorts by event date. Capped at 30 most
   // recent so the feed stays reasonably sized. Used by /feed.xml for RSS-to-email

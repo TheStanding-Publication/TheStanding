@@ -16,6 +16,23 @@ Claude agent that converts open GitHub issues opened by the `thestanding` bot ac
 /issue-to-entry --all --limit 5
 ```
 
+## Modes
+
+This skill runs in one of two modes. Both execute the identical Step 1-12 workflow below; the mode only affects which issues enter the queue.
+
+### Scheduled-batch mode (default)
+
+Invoked by the `standing-entry-recorder` scheduled task. Processes eligible issues from the repository queue.
+
+- `--all` — process every eligible issue.
+- `--limit N` — cap the number processed per run. The scheduled task uses `--limit 1` (one issue per run, lowest-numbered first), so entry PRs arrive at a steady, reviewable pace rather than in a large batch.
+
+### Manual mode
+
+Invoked on-demand by an operator.
+
+- `--issue N` — process exactly issue #N. The agent still runs the full Step 1 eligibility check on #N (open, authored by `thestanding`, no `invalid` label, no open PR referencing it) and refuses with a clear error if #N is not eligible, rather than processing it anyway.
+
 ## Implementation Overview
 
 This skill is a Claude agent that orchestrates the full workflow:
@@ -162,6 +179,7 @@ For each source URL:
    - **404 / 410 / page replaced with a "this article is no longer available" notice** → the article is gone. This is a dead source.
    - **403 / 406 / 451 / 5xx with a known reputable publisher** → almost always bot-blocking by the publisher's WAF, not actually missing content. Keep the source in the entry. Note in the PR body that human review of the URL is appropriate. Do not drop the source.
    - **TLS / DNS / connection failure on a known domain** → most likely transient. Retry once with backoff; if still failing, keep the source but flag for review.
+   - **Known-hard publishers** → some outlets (notably the Washington Post) run aggressive anti-bot / WAF systems that produce repeated timeouts or 403s even on healthy, current articles. When the source is one of these, use a longer initial timeout and treat a repeat failure as "keep with note" immediately — do not burn multiple retry cycles. A repeated timeout from a known-hard publisher is evidence the publisher blocks automated clients, not evidence the article is gone.
 
 3. **Read the article content** and verify it still supports the entry:
    - **Does the article confirm the event happened as the issue describes?** If the live article says something materially different — different date, different actors, different outcome — update the entry to reflect the article. The article is the source of truth, not the issue's snapshot.
