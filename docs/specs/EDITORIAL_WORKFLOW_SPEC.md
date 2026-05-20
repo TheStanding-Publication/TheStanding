@@ -9,7 +9,7 @@ Define the human review and approval process for entries before they are recorde
 ## Two Intake Channels
 
 ### Channel 1: Monitoring Intake (`monitoring-intake` label)
-**Source:** Automated news monitoring (STANDING_MONITOR_SKILL.md)
+**Source:** Automated news monitoring (STANDING_MONITOR_SPEC.md)
 **Review stages:** Issue creation (automated, human-viewable) → PR review (editorial approval gate)
 
 ### Channel 2: Tip Submissions (`tip` label)
@@ -45,7 +45,7 @@ Define the human review and approval process for entries before they are recorde
 - Do NOT require editorial approval at this stage for monitoring intake — the PR review is the gate
 
 #### 3. Entry Recording & PR Creation
-- **Actor:** Automated entry recording system (ENTRY_RECORDING_SKILL.md)
+- **Actor:** Automated entry recording system (ENTRY_RECORDING_SPEC.md)
 - **Trigger:** Issue review complete, no blockers
 - **Process:** Run automated validation checks (URL validation, actors verification, location verification, taxonomy validation)
 - **Output:** 
@@ -129,7 +129,7 @@ Define the human review and approval process for entries before they are recorde
 - Conduct comprehensive research (event date, jurisdiction, location, actors, evidence)
 - Find primary sources or 2+ investigative sources
 - Map to specific abuses in taxonomy
-- Follow same comprehensive research process as STANDING_MONITOR_SKILL.md
+- Follow same comprehensive research process as STANDING_MONITOR_SPEC.md
 
 **Outcome:**
 - Update issue with research findings
@@ -320,6 +320,6 @@ Editorial PR Review (Approval Gate) → Approve/Reject/Revise
 ---
 
 ## Related Skills & Workflows
-- STANDING_MONITOR_SKILL.md — Sourcing (internal monitoring)
-- ENTRY_RECORDING_SKILL.md — Automated validation & PR creation
+- STANDING_MONITOR_SPEC.md — Sourcing (internal monitoring)
+- ENTRY_RECORDING_SPEC.md — Automated validation & PR creation
 - PROJECT_PLAN.md → Editorial Standards — Full standards document

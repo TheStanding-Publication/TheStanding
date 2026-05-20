@@ -8,7 +8,7 @@ Completed the full suite of workflow skills for The Standing's sourcing, entry r
 ## Completed Workflows
 
 ### 1. ✓ Internal Sourcing (Automated News Monitoring)
-**Skill:** `STANDING_MONITOR_SKILL.md`
+**Skill:** `STANDING_MONITOR_SPEC.md`
 **Status:** UPDATED to agent-based evaluation (semantic understanding, not keyword matching)
 
 **Key features:**
@@ -31,7 +31,7 @@ Claude understands that "weakening Voting Rights Act enforcement" = voter suppre
 ---
 
 ### 2. ✓ External Sourcing (Tips/Submissions)
-**Status:** Existed; referenced by EDITORIAL_WORKFLOW_SKILL.md
+**Status:** Existed; referenced by EDITORIAL_WORKFLOW_SPEC.md
 
 **Channels:**
 - Email: tips@thestanding.us
@@ -42,7 +42,7 @@ Claude understands that "weakening Voting Rights Act enforcement" = voter suppre
 ---
 
 ### 3. ✓ Entry Recording (Automated Validation & PR Creation)
-**Skill:** `ENTRY_RECORDING_SKILL.md`
+**Skill:** `ENTRY_RECORDING_SPEC.md`
 **Status:** Comprehensive, referenced by editorial workflow
 
 **Validation checks:**
@@ -60,7 +60,7 @@ Claude understands that "weakening Voting Rights Act enforcement" = voter suppre
 ---
 
 ### 4. ✓ Editorial Workflow (Review & Approval)
-**Skill:** `EDITORIAL_WORKFLOW_SKILL.md` — NEW
+**Skill:** `EDITORIAL_WORKFLOW_SPEC.md` — NEW
 
 **Two channels with different workflows:**
 
@@ -93,7 +93,7 @@ Claude understands that "weakening Voting Rights Act enforcement" = voter suppre
 ---
 
 ### 5. ✓ Taxonomy Application (Abuse Mapping)
-**Skill:** `TAXONOMY_APPLICATION_SKILL.md` — NEW
+**Skill:** `TAXONOMY_APPLICATION_SPEC.md` — NEW
 
 **Decision trees provided for:**
 - Election-related events (voter-suppression, election-denial, etc.)
@@ -115,7 +115,7 @@ Claude understands that "weakening Voting Rights Act enforcement" = voter suppre
 ---
 
 ### 6. ✓ Daily Newsletter (Buttondown Distribution)
-**Skill:** `DAILY_DIGEST_SKILL.md` — NEW
+**Skill:** `DAILY_DIGEST_SPEC.md` — NEW
 
 **Process:**
 - Fetch all entries published today (archived: TODAY)
@@ -138,7 +138,7 @@ Claude understands that "weakening Voting Rights Act enforcement" = voter suppre
 ---
 
 ### 7. ✓ Actor Normalization (Alias Management)
-**Skill:** `ACTOR_NORMALIZATION_SKILL.md` — NEW
+**Skill:** `ACTOR_NORMALIZATION_SPEC.md` — NEW
 
 **When to add alias:**
 - Actor appears in ≥3 entries with different name variations
@@ -213,19 +213,19 @@ Claude understands that "weakening Voting Rights Act enforcement" = voter suppre
 ## Files Created/Updated
 
 **New workflow skills:**
-- `EDITORIAL_WORKFLOW_SKILL.md` (2026-05-18)
-- `TAXONOMY_APPLICATION_SKILL.md` (2026-05-18)
-- `DAILY_DIGEST_SKILL.md` (2026-05-18)
-- `ACTOR_NORMALIZATION_SKILL.md` (2026-05-18)
+- `EDITORIAL_WORKFLOW_SPEC.md` (2026-05-18)
+- `TAXONOMY_APPLICATION_SPEC.md` (2026-05-18)
+- `DAILY_DIGEST_SPEC.md` (2026-05-18)
+- `ACTOR_NORMALIZATION_SPEC.md` (2026-05-18)
 
 **Updated:**
-- `STANDING_MONITOR_SKILL.md` (agent-based evaluation, 2026-05-18)
+- `STANDING_MONITOR_SPEC.md` (agent-based evaluation, 2026-05-18)
 - Scheduled monitoring tasks x4 (agent-based prompts, 2026-05-18)
 - `TASKS.md` (workflow completion tracking)
 
 **Existing (comprehensive):**
-- `STANDING_MONITOR_SKILL.md` (sourcing)
-- `ENTRY_RECORDING_SKILL.md` (validation & recording)
+- `STANDING_MONITOR_SPEC.md` (sourcing)
+- `ENTRY_RECORDING_SPEC.md` (validation & recording)
 - `PROJECT_PLAN.md` (full design document)
 
 ---
@@ -284,12 +284,12 @@ Automated Entry Recording
 ## Single Points of Truth
 
 Each workflow has one authoritative skill document:
-- **Monitoring:** `STANDING_MONITOR_SKILL.md` (referenced by 4 scheduled tasks)
-- **Entry Recording:** `ENTRY_RECORDING_SKILL.md`
-- **Editorial:** `EDITORIAL_WORKFLOW_SKILL.md`
-- **Taxonomy:** `TAXONOMY_APPLICATION_SKILL.md`
-- **Newsletter:** `DAILY_DIGEST_SKILL.md`
-- **Actors:** `ACTOR_NORMALIZATION_SKILL.md`
+- **Monitoring:** `STANDING_MONITOR_SPEC.md` (referenced by 4 scheduled tasks)
+- **Entry Recording:** `ENTRY_RECORDING_SPEC.md`
+- **Editorial:** `EDITORIAL_WORKFLOW_SPEC.md`
+- **Taxonomy:** `TAXONOMY_APPLICATION_SPEC.md`
+- **Newsletter:** `DAILY_DIGEST_SPEC.md`
+- **Actors:** `ACTOR_NORMALIZATION_SPEC.md`
 
 All scheduled tasks, GitHub Actions, and other automation reference these skills for workflow definition.
 

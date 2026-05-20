@@ -365,8 +365,8 @@ npm run build
 ---
 
 ## Related Skills & Workflows
-- EDITORIAL_WORKFLOW_SKILL.md — Entry review (where actor names are verified)
-- ENTRY_RECORDING_SKILL.md — Entry creation (where actors are normalized)
+- EDITORIAL_WORKFLOW_SPEC.md — Entry review (where actor names are verified)
+- ENTRY_RECORDING_SPEC.md — Entry creation (where actors are normalized)
 - PROJECT_PLAN.md → Data Model section — Actor field definition
 
 ---
