@@ -31,12 +31,12 @@ Invoked by the `standing-entry-recorder` scheduled task. Processes eligible issu
 
 Invoked on-demand by an operator.
 
-- `--issue N` — process exactly issue #N. The agent still runs the full Step 1 eligibility check on #N (open, authored by `thestanding`, no `invalid` label, no open PR referencing it) and refuses with a clear error if #N is not eligible, rather than processing it anyway.
+- `--issue N` — process exactly issue #N. The agent still runs the full Step 1 eligibility check on #N (open, authored by `thestanding`, carries the `ready-for-entry` tag, no `invalid` label, no open PR referencing it) and refuses with a clear error if #N is not eligible, rather than processing it anyway.
 
 ## Implementation Overview
 
 This skill is a Claude agent that orchestrates the full workflow:
-1. Fetch open issues authored by `thestanding` from GitHub
+1. Fetch open, `ready-for-entry`-tagged issues authored by `thestanding` from GitHub
 2. For each issue: re-read sources, validate-and-correct, create entry, verify build
 3. Create branch, commit, push to GitHub
 4. Create PR with appropriate labels
@@ -69,18 +69,20 @@ The agent does NOT close issues, even when flagging them invalid. Closure is a h
 
 ### Step 1: Fetch Eligible Issues
 
-**Eligibility criterion:** the issue is open and was opened by the `thestanding` bot account. That is the **only** eligibility criterion. Labels, title prefixes, and naming conventions are intentionally **not** part of the filter — they're brittle (require upstream coordination, drift over time) and the bot's authorship is the canonical signal that this is a monitor-produced issue intended for entry recording.
+**Eligibility criteria:** the issue is open, was opened by the `thestanding` bot account, **and** carries the `ready-for-entry` tag. Both are required — authorship is the safety check (never process a human-opened issue), and the `ready-for-entry` tag is the pipeline-stage discriminator.
+
+The tag is needed because `thestanding` now opens more than one kind of issue: the news-triage process files lightweight, unvetted `tip` issues under the same account, and those are **not** ready for entry recording. Authorship alone can no longer tell a fully-researched monitoring issue apart from a tip — the `ready-for-entry` tag does. (Earlier versions of this spec filtered on authorship alone and called label-based filters brittle; that held when the bot produced only one kind of issue. The tag is reliable now because it is a hard contract — applied by the bot itself per `NEWS_RESEARCH_SPEC`, or by the vetting step when it promotes a tip — not a hand-maintained convention.)
 
 **What the agent does:**
 - Call GitHub API to search for issues
-- Query: `is:issue state:open author:thestanding sort:number-asc`
+- Query: `is:issue state:open author:thestanding label:ready-for-entry sort:number-asc`
 - Skip issues that already carry the `invalid` label (those are skip-flagged from a prior run; a human needs to remove the label to make them eligible again).
 - **Skip issues that already have an open PR referencing them.** This is critical when the skill runs on a schedule — a single in-flight entry PR can sit in review for hours or days, and without this check the next scheduler run would re-process the same issue and open a duplicate PR.
 - Build list of issues to process
 
 **GitHub API call:**
 ```
-GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+author:thestanding&sort=number&order=asc&per_page=100
+GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+author:thestanding+label:ready-for-entry&sort=number&order=asc&per_page=100
 ```
 
 **Checking for an existing open PR:**
@@ -97,17 +99,17 @@ A PR "references" issue `N` if its body contains any of: `Closes #N`, `Closes: #
 
 > **Notes:**
 > - `is:issue` is required by GitHub's search API; without it the API returns HTTP 422.
-> - `author:thestanding` is what makes the issue eligible. If the bot account login changes, update this filter (and the corresponding line in `Notes for Implementation`).
+> - `author:thestanding` together with `label:ready-for-entry` is what makes an issue eligible. If the bot account login changes, update the author filter (and the corresponding line in `Notes for Implementation`).
 > - PRs opened by `thestanding` are excluded automatically from the issue search by the `is:issue` qualifier.
 
 **Handle:**
-- If `--issue N` flag: fetch only issue #N (and verify author is `thestanding` before processing — refuse with a clear error if it isn't, to prevent accidental runs against human-opened issues). The open-PR check above still applies — if `--issue N` is passed for an issue that already has an open PR, refuse with a clear error rather than opening a duplicate.
+- If `--issue N` flag: fetch only issue #N (and verify it is open, authored by `thestanding`, and carries the `ready-for-entry` tag before processing — refuse with a clear error if any check fails; an unvetted `tip` issue is not eligible). The open-PR check above still applies — if `--issue N` is passed for an issue that already has an open PR, refuse with a clear error rather than opening a duplicate.
 - If `--all` flag: fetch all eligible (respecting `--limit` if provided)
 - Authentication: Use `GITHUB_TOKEN` environment variable
 
 ### Step 2: For Each Issue - Parse Issue Body
 
-**Expected format** (from STANDING_MONITOR_SPEC output):
+**Expected format** (from NEWS_RESEARCH_SPEC output):
 ```
 ## Automated News Monitoring
 
@@ -147,7 +149,7 @@ A PR "references" issue `N` if its body contains any of: `Closes #N`, `Closes: #
 - Abuses: extract slugs from bulleted list
 - Sources: extract URL, publisher, tier (primary/investigative/secondary), title
 
-> **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream STANDING_MONITOR_SPEC currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
+> **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream NEWS_RESEARCH_SPEC currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
 
 ### Step 3: Validate and Correct
 
@@ -370,7 +372,6 @@ Closes #[issue-number]
 
 **Add labels:**
 - `entry-intake` (always)
-- `[primary-abuse]` (abuse slug, e.g., `defying-subpoenas`)
 
 ### Step 10: Clean Up Git
 
@@ -494,11 +495,11 @@ Next steps:
 - **Always clone into a fresh, agent-owned working directory** (e.g. `mktemp -d`). Do **not** operate on a user's existing local checkout — local checkouts may have stale state, uncommitted changes, divergent branches, or filesystem mounts that corrupt git's binary index files. A fresh clone makes the run reproducible and removes the "agent should handle stale state" caveat entirely.
 - All timestamps should be in YYYY-MM-DD format or ISO 8601 with timezone
 
-## Upstream Contract (STANDING_MONITOR_SPEC)
+## Upstream Contract (NEWS_RESEARCH_SPEC)
 
-The **only** hard precondition is that monitoring issues are opened by the `thestanding` bot account. Anything `thestanding` opens is in scope; anything opened by a human or different bot is out of scope. No labels or title prefixes are required.
+The hard precondition is that an issue is opened by the `thestanding` bot account **and** carries the `ready-for-entry` tag. Authorship marks it as bot-produced; the tag marks it as a fully-researched monitoring issue rather than an unvetted `tip`. Anything `thestanding` opens with `ready-for-entry` is in scope; human-opened issues, issues from a different bot, and untagged `tip` issues are out of scope.
 
-That said, the upstream monitor *should* still produce bodies in the format shown in Step 2 — that's what makes parsing reliable. If a body deviates, this skill reports the parse/validation failure via Step 11 and skips the issue; it does not silently process broken issues. The right place to fix systematic format problems is in STANDING_MONITOR_SPEC, not by adding parser exceptions here.
+That said, the upstream monitor *should* still produce bodies in the format shown in Step 2 — that's what makes parsing reliable. If a body deviates, this skill reports the parse/validation failure via Step 11 and skips the issue; it does not silently process broken issues. The right place to fix systematic format problems is in NEWS_RESEARCH_SPEC, not by adding parser exceptions here.
 
 **Soft expectations** (not enforced, but worth maintaining):
 
