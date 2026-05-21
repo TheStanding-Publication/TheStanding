@@ -1,4 +1,4 @@
-# The Standing: News Monitoring Skill
+# The Standing: News Research
 
 ## Purpose
 Automatically monitor major news outlets for events matching The Standing's taxonomy of ideals and abuses, create GitHub issues with comprehensive event information, and avoid duplicates. Runs four times daily on a schedule.
@@ -150,10 +150,10 @@ Body:
 *Created by The Standing's automated news monitoring system (scan: [scan_label]).*
 ```
 
-**Apply labels:**
-- `monitoring-intake` (always)
-- `needs-research` (always)
-- Each abuse slug emitted in "Mapped abuses" as a label
+**Apply the status tag:**
+- `ready-for-entry` (always) — the pipeline-status tag that marks a fully-researched monitoring issue as ready for the entry-recording step (`ISSUE_TO_ENTRY_SPEC`); it is the single tag that step filters on.
+
+Do **not** apply abuse slugs as labels. The mapped abuses already live in the "Mapped abuses" section of the issue body — the canonical place the entry-recording step reads them — and labelling them as well causes unbounded label sprawl and goes stale when slugs are corrected downstream.
 
 ### Step 7: Report the run
 
@@ -202,7 +202,7 @@ Each scheduled task is a thin wrapper of the form:
 You are The Standing's automated news monitoring system.
 
 Fetch and execute the workflow defined in:
-https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/STANDING_MONITOR_SPEC.md
+https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/NEWS_RESEARCH_SPEC.md
 
 This is the canonical operational spec. Follow it exactly.
 
