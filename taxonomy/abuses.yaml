@@ -116,6 +116,11 @@
   title: "Watchdog defunding"
   description: "Stripping resources from oversight bodies to neutralize them."
 
+- slug: dismantling-agency-capacity
+  ideal: separation-of-powers
+  title: "Dismantling agency capacity"
+  description: "Eliminating or hollowing out an agency's staff, offices, or functions by executive action, outside the legislative process, so that the government can no longer carry out duties Congress established. The abuse is the executive nullifying a congressionally-created function without going through Congress — not the policy merits of a smaller government, and not ordinary mismanagement. Excludes reorganizations and staffing decisions within lawful executive authority, reductions Congress itself authorized or directed, ordinary attrition, and incompetence or administrative failure. The marker is a statutorily grounded function disabled by executive fiat; resulting harm is evidence of significance, not itself the abuse."
+
 - slug: obstruction-of-oig-investigations
   ideal: separation-of-powers
   title: "Obstruction of OIG investigations"

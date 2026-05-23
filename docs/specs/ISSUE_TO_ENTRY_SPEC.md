@@ -31,12 +31,12 @@ Invoked by the `standing-entry-recorder` scheduled task. Processes eligible issu
 
 Invoked on-demand by an operator.
 
-- `--issue N` — process exactly issue #N. The agent still runs the full Step 1 eligibility check on #N (open, authored by `thestanding`, no `invalid` label, no open PR referencing it) and refuses with a clear error if #N is not eligible, rather than processing it anyway.
+- `--issue N` — process exactly issue #N. The agent still runs the full Step 1 eligibility check on #N (open, authored by `thestanding`, carries the `ready-for-entry` tag, no `invalid` label, no open PR referencing it) and refuses with a clear error if #N is not eligible, rather than processing it anyway.
 
 ## Implementation Overview
 
 This skill is a Claude agent that orchestrates the full workflow:
-1. Fetch open issues authored by `thestanding` from GitHub
+1. Fetch open, `ready-for-entry`-tagged issues authored by `thestanding` from GitHub
 2. For each issue: re-read sources, validate-and-correct, create entry, verify build
 3. Create branch, commit, push to GitHub
 4. Create PR with appropriate labels
@@ -69,23 +69,25 @@ The agent does NOT close issues, even when flagging them invalid. Closure is a h
 
 ### Step 1: Fetch Eligible Issues
 
-**Eligibility criterion:** the issue is open and was opened by the `thestanding` bot account. That is the **only** eligibility criterion. Labels, title prefixes, and naming conventions are intentionally **not** part of the filter — they're brittle (require upstream coordination, drift over time) and the bot's authorship is the canonical signal that this is a monitor-produced issue intended for entry recording.
+**Eligibility criteria:** the issue is open, was opened by the `thestanding` bot account, **and** carries the `ready-for-entry` tag. Both are required — authorship is the safety check (never process a human-opened issue), and the `ready-for-entry` tag is the pipeline-stage discriminator.
+
+The tag is needed because `thestanding` now opens more than one kind of issue: the news-triage process files lightweight, unvetted `tip` issues under the same account, and those are **not** ready for entry recording. Authorship alone can no longer tell a fully-researched monitoring issue apart from a tip — the `ready-for-entry` tag does. (Earlier versions of this spec filtered on authorship alone and called label-based filters brittle; that held when the bot produced only one kind of issue. The tag is reliable now because it is a hard contract — applied by the bot itself per `NEWS_RESEARCH_SPEC`, or by the vetting step when it promotes a tip — not a hand-maintained convention.)
 
 **What the agent does:**
 - Call GitHub API to search for issues
-- Query: `is:issue state:open author:thestanding sort:number-asc`
+- Query: `is:issue state:open author:thestanding label:ready-for-entry sort:number-asc`
 - Skip issues that already carry the `invalid` label (those are skip-flagged from a prior run; a human needs to remove the label to make them eligible again).
 - **Skip issues that already have an open PR referencing them.** This is critical when the skill runs on a schedule — a single in-flight entry PR can sit in review for hours or days, and without this check the next scheduler run would re-process the same issue and open a duplicate PR.
 - Build list of issues to process
 
 **GitHub API call:**
 ```
-GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+author:thestanding&sort=number&order=asc&per_page=100
+GET /search/issues?q=repo:TheStanding-Publication/TheStanding+is:issue+state:open+author:thestanding+label:ready-for-entry&sort=number&order=asc&per_page=100
 ```
 
-**Checking for an existing open PR (per issue):**
+**Checking for an existing open PR:**
 
-For each candidate issue `N`, fetch the open PRs in the repo and check whether any references the issue via a closing keyword in the PR body:
+Fetch the repo's open PRs **once per run**, then for each candidate issue `N` check whether any of them references the issue via a closing keyword in the PR body:
 
 ```
 GET /repos/TheStanding-Publication/TheStanding/pulls?state=open&per_page=100
@@ -97,17 +99,17 @@ A PR "references" issue `N` if its body contains any of: `Closes #N`, `Closes: #
 
 > **Notes:**
 > - `is:issue` is required by GitHub's search API; without it the API returns HTTP 422.
-> - `author:thestanding` is what makes the issue eligible. If the bot account login changes, update this filter (and the corresponding line in `Notes for Implementation`).
+> - `author:thestanding` together with `label:ready-for-entry` is what makes an issue eligible. If the bot account login changes, update the author filter (and the corresponding line in `Notes for Implementation`).
 > - PRs opened by `thestanding` are excluded automatically from the issue search by the `is:issue` qualifier.
 
 **Handle:**
-- If `--issue N` flag: fetch only issue #N (and verify author is `thestanding` before processing — refuse with a clear error if it isn't, to prevent accidental runs against human-opened issues). The open-PR check above still applies — if `--issue N` is passed for an issue that already has an open PR, refuse with a clear error rather than opening a duplicate.
+- If `--issue N` flag: fetch only issue #N (and verify it is open, authored by `thestanding`, and carries the `ready-for-entry` tag before processing — refuse with a clear error if any check fails; an unvetted `tip` issue is not eligible). The open-PR check above still applies — if `--issue N` is passed for an issue that already has an open PR, refuse with a clear error rather than opening a duplicate.
 - If `--all` flag: fetch all eligible (respecting `--limit` if provided)
 - Authentication: Use `GITHUB_TOKEN` environment variable
 
 ### Step 2: For Each Issue - Parse Issue Body
 
-**Expected format** (from STANDING_MONITOR_SPEC output):
+**Expected format** (from NEWS_RESEARCH_SPEC output):
 ```
 ## Automated News Monitoring
 
@@ -147,7 +149,7 @@ A PR "references" issue `N` if its body contains any of: `Closes #N`, `Closes: #
 - Abuses: extract slugs from bulleted list
 - Sources: extract URL, publisher, tier (primary/investigative/secondary), title
 
-> **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream STANDING_MONITOR_SPEC currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
+> **Parser tolerance:** accept both `**Date:**` and `**Scan date:**` for the scan/report-date field. The upstream NEWS_RESEARCH_SPEC currently emits `**Date:**`; older fixtures used `**Scan date:**`. Either should work without manual cleanup.
 
 ### Step 3: Validate and Correct
 
@@ -168,9 +170,13 @@ Required fields and what counts as "valid enough":
 
 ### Step 4: Source Re-verification (URL + Content)
 
-This is more than a 200-OK check. For each source URL, the agent **fetches the page and reads the article content**, then judges whether the article still supports the entry the way the issue claims it does. The agent makes this call; no fixed status-code table.
+This is more than a 200-OK check — but it is also not an exhaustive re-read of every link. The agent fully re-verifies the **primary source(s)** and corroborates the entry's key details against **one genuinely independent source**; remaining sources get only a lightweight liveness check. The agent makes these calls with judgment; no fixed status-code table.
 
-For each source URL:
+**Verification standard — two independent sources agree.** A detail — the event, its date, the actors, the outcome — counts as confirmed when the primary source supports it *and* a second, independent source agrees. This is the newsroom two-source rule, and it is what "the details are correct" means here: confirmation comes from primary-source documents the entry can cite, not from an AI-generated search summary and not from "it sounds plausible." If the primary and the corroborator disagree on a material detail, that disagreement is itself a finding — resolve it against the source record, or surface it via Step 11 if it cannot be resolved. Where the primary source is itself the authoritative record of the event — a court opinion, an agency statement, the Federal Register — it stands on its own; a second source is welcome corroboration but not required.
+
+**Prioritization and stopping point.** Re-verify in priority order — primary source(s) first, then the strongest independent corroborator. Once the primary is verified and one independent source corroborates the key details, the event is confirmed; stop there. Do not full-read every remaining link for completeness — give the rest a lightweight liveness check (does the URL still resolve; is it not a 404 or a retraction notice). Promote one of them to a full content read only if a primary fails re-verification and a secondary has to carry the event instead.
+
+For each source you fully re-verify:
 
 1. **Fetch the page** using a browser-like User-Agent (e.g. `Mozilla/5.0 (compatible; TheStandingBot/1.0; +https://thestanding.us)`) and follow redirects. Capture the final URL if redirected.
 
@@ -180,6 +186,7 @@ For each source URL:
    - **403 / 406 / 451 / 5xx with a known reputable publisher** → almost always bot-blocking by the publisher's WAF, not actually missing content. Keep the source in the entry. Note in the PR body that human review of the URL is appropriate. Do not drop the source.
    - **TLS / DNS / connection failure on a known domain** → most likely transient. Retry once with backoff; if still failing, keep the source but flag for review.
    - **Known-hard publishers** → some outlets (notably the Washington Post) run aggressive anti-bot / WAF systems that produce repeated timeouts or 403s even on healthy, current articles. When the source is one of these, use a longer initial timeout and treat a repeat failure as "keep with note" immediately — do not burn multiple retry cycles. A repeated timeout from a known-hard publisher is evidence the publisher blocks automated clients, not evidence the article is gone.
+   - **The fetch tooling refuses the domain (blocklisted / blocked)** → a tooling-level restriction, not a fact about the article. Keep the source in the entry, note that it could not be machine-verified this run, and move on — do not burn retries, and do not route around the block (caches, archives, mirrors). Retrying will not change a blocklist outcome.
 
 3. **Read the article content** and verify it still supports the entry:
    - **Does the article confirm the event happened as the issue describes?** If the live article says something materially different — different date, different actors, different outcome — update the entry to reflect the article. The article is the source of truth, not the issue's snapshot.
@@ -270,6 +277,8 @@ sources:
 2. Run: `npm install` (once, if not already done in this run)
 3. Run: `npm run build`
 4. Check if build succeeds
+
+> **Output handling:** `npm install` and `npm run build` are verbose on success. Keep only the tail of their output; retain fuller output only on failure, where Step 11's comment needs it. A clean build log should not be carried forward.
 
 **If build fails:**
 → Go to **Step 11: Discarding Issues** with the build output in the comment. (Build failures here usually mean bad input — invalid YAML, malformed source URL, etc. — so the issue is skip-flagged for human review.)
@@ -363,7 +372,6 @@ Closes #[issue-number]
 
 **Add labels:**
 - `entry-intake` (always)
-- `[primary-abuse]` (abuse slug, e.g., `defying-subpoenas`)
 
 ### Step 10: Clean Up Git
 
@@ -487,11 +495,11 @@ Next steps:
 - **Always clone into a fresh, agent-owned working directory** (e.g. `mktemp -d`). Do **not** operate on a user's existing local checkout — local checkouts may have stale state, uncommitted changes, divergent branches, or filesystem mounts that corrupt git's binary index files. A fresh clone makes the run reproducible and removes the "agent should handle stale state" caveat entirely.
 - All timestamps should be in YYYY-MM-DD format or ISO 8601 with timezone
 
-## Upstream Contract (STANDING_MONITOR_SPEC)
+## Upstream Contract (NEWS_RESEARCH_SPEC)
 
-The **only** hard precondition is that monitoring issues are opened by the `thestanding` bot account. Anything `thestanding` opens is in scope; anything opened by a human or different bot is out of scope. No labels or title prefixes are required.
+The hard precondition is that an issue is opened by the `thestanding` bot account **and** carries the `ready-for-entry` tag. Authorship marks it as bot-produced; the tag marks it as a fully-researched monitoring issue rather than an unvetted `tip`. Anything `thestanding` opens with `ready-for-entry` is in scope; human-opened issues, issues from a different bot, and untagged `tip` issues are out of scope.
 
-That said, the upstream monitor *should* still produce bodies in the format shown in Step 2 — that's what makes parsing reliable. If a body deviates, this skill reports the parse/validation failure via Step 11 and skips the issue; it does not silently process broken issues. The right place to fix systematic format problems is in STANDING_MONITOR_SPEC, not by adding parser exceptions here.
+That said, the upstream monitor *should* still produce bodies in the format shown in Step 2 — that's what makes parsing reliable. If a body deviates, this skill reports the parse/validation failure via Step 11 and skips the issue; it does not silently process broken issues. The right place to fix systematic format problems is in NEWS_RESEARCH_SPEC, not by adding parser exceptions here.
 
 **Soft expectations** (not enforced, but worth maintaining):
 

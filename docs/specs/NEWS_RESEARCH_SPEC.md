@@ -1,4 +1,4 @@
-# The Standing: News Monitoring Skill
+# The Standing: News Research
 
 ## Purpose
 Automatically monitor major news outlets for events matching The Standing's taxonomy of ideals and abuses, create GitHub issues with comprehensive event information, and avoid duplicates. Runs four times daily on a schedule.
@@ -48,10 +48,12 @@ The Standing's taxonomy is versioned in the public repo. Fetch the current versi
 **URL-to-issue mode:**
 
 1. Fetch the `source_url`. Read the article (or document) content. Send a browser-style User-Agent header — many publisher WAFs return 403 to default HTTP clients.
-2. If the URL doesn't resolve or returns a substantive paywall/login wall that prevents reading the underlying content, retry once. If still inaccessible, report the failure to the operator and stop — do not create an issue with an unverifiable primary source.
-3. **Search for supporting coverage.** The provided URL is the *starting point*, not the final source list. Find additional primary and investigative sources covering the same event — prefer sources from `taxonomy/sources.yaml`, but search beyond it as well. The goal is the same kind of comprehensive intake a scheduled scan produces: multiple sources, primary and investigative, with the original URL among them.
+2. **If the fetch tooling refuses the domain outright** — it reports the URL blocked or blocklisted, which is a tooling-level restriction distinct from the publisher's own paywall or a WAF 403 — do not try to work around it (no alternate fetchers, caches, archives, or mirrors; the restriction exists for legal reasons). The URL itself may be perfectly valid; the agent simply cannot read it through its tools. **Reject the URL:** tell the operator the domain cannot be fetched, name it, and ask them to supply an alternative URL covering the same event — a different outlet, a primary document, or an official statement. Stop and wait for that alternative; do not proceed on the blocked URL and do not reconstruct the story from search snippets alone.
+3. If the URL instead doesn't resolve, or returns a substantive paywall/login wall that prevents reading the underlying content, retry once. If still inaccessible, report the failure to the operator and stop — do not create an issue with an unverifiable primary source.
+4. **Search for supporting coverage.** The provided URL is the *starting point*, not the final source list. Find additional primary and investigative sources covering the same event — prefer sources from `taxonomy/sources.yaml`, but search beyond it as well. The goal is the same kind of comprehensive intake a scheduled scan produces: multiple sources, primary and investigative, with the original URL among them.
    - **For older events:** plain searches rank recency and bury the original reporting under newer follow-ups. Use site and date-range filters — e.g. `site:npr.org` scoped to a date window around the event. DuckDuckGo's HTML interface (`html.duckduckgo.com/html/`) handles these filters reliably in headless contexts where Google may block automated requests. Iterate one `site:` per outlet rather than one broad query, and verify each result's actual publish date in the fetched page.
-4. **Verify the original URL's claims** against your supporting coverage. If sources contradict the original URL's central claims, surface that to the operator and stop — the URL may be inaccurate or non-canonical.
+   - **Stop once the story is sufficiently vetted.** The operator has already vetted the submitted URL, so the bar here is corroboration, not exhaustiveness. Once the event, its date, the actors, and the central claims are confirmed by enough independent reporting to stand on their own — in practice the submitted URL plus one or two corroborating sources — stop searching. Further fetches past that point add cost without changing the issue. Comprehensive intake means complete, not maximal.
+5. **Verify the original URL's claims** against your supporting coverage. If sources contradict the original URL's central claims, surface that to the operator and stop — the URL may be inaccurate or non-canonical.
 
 ### Step 3: Evaluate each story semantically
 
@@ -148,10 +150,10 @@ Body:
 *Created by The Standing's automated news monitoring system (scan: [scan_label]).*
 ```
 
-**Apply labels:**
-- `monitoring-intake` (always)
-- `needs-research` (always)
-- Each abuse slug emitted in "Mapped abuses" as a label
+**Apply the status tag:**
+- `ready-for-entry` (always) — the pipeline-status tag that marks a fully-researched monitoring issue as ready for the entry-recording step (`ISSUE_TO_ENTRY_SPEC`); it is the single tag that step filters on.
+
+Do **not** apply abuse slugs as labels. The mapped abuses already live in the "Mapped abuses" section of the issue body — the canonical place the entry-recording step reads them — and labelling them as well causes unbounded label sprawl and goes stale when slugs are corrected downstream.
 
 ### Step 7: Report the run
 
@@ -200,7 +202,7 @@ Each scheduled task is a thin wrapper of the form:
 You are The Standing's automated news monitoring system.
 
 Fetch and execute the workflow defined in:
-https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/STANDING_MONITOR_SPEC.md
+https://raw.githubusercontent.com/TheStanding-Publication/TheStanding/main/docs/specs/NEWS_RESEARCH_SPEC.md
 
 This is the canonical operational spec. Follow it exactly.
 
