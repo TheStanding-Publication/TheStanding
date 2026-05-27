@@ -127,6 +127,24 @@ watchdog_sources:
   coverage: First Amendment, due process, civil rights
   reliability: high
   notes: Broad civil rights coverage
+- name: Project on Government Oversight (POGO)
+  type: Nonpartisan government watchdog
+  url: https://www.pogo.org
+  coverage: Federal agency oversight, IG firings, contractor fraud, executive overreach, whistleblower protection
+  reliability: high
+  notes: Founded 1981; trains Congressional oversight staff from both parties; charity governance benchmarks met. Inheriting Center for Public Integrity's archive after CPI shut down March 2025
+- name: Lawfare
+  type: National security law analysis
+  rss_feed: https://www.lawfaremedia.org/rss.xml
+  coverage: National security law, DOJ analysis, intelligence community, constitutional law, executive power
+  reliability: high
+  notes: Least Biased / Very High factual per MBFC — strongest credibility profile on the list. Cooperated with Brookings; Benjamin Wittes editor-in-chief; bipartisan staff
+- name: SPLC Hatewatch
+  type: Hate group and extremism tracker
+  url: https://www.splcenter.org/hatewatch
+  coverage: Documented hate-group activity, extremist organizing, civil rights litigation
+  reliability: high
+  notes: Left / High factual per MBFC. Cite their factual incident reporting, not their hate-group list designations — methodology has produced documented misclassifications (Maajid Nawaz settlement). FBI scrutiny over use of SPLC data is also relevant context
 press_freedom_sources:
 - name: Reporters Without Borders (RSF)
   type: Press freedom organization
@@ -171,3 +189,130 @@ specialized_sources:
   coverage: Elections, voting rights, redistricting
   reliability: high
   notes: Expert analysis of election law and trends
+- name: Rewire News Group
+  type: Nonprofit investigative news
+  rss_feed: https://rewirenewsgroup.com/feed/
+  coverage: Reproductive and sexual health, rights, and justice; courts coverage; immigration and economic justice
+  reliability: high
+  notes: High factual rating but pro-choice editorial posture — cite the reporting, not the commentary. Strong on reproductive-rights litigation
+- name: Reveal / Center for Investigative Reporting
+  type: Nonprofit investigative newsroom
+  rss_feed: https://revealnews.org/feed/
+  coverage: Threats to democracy, immigration, policing and legal system, gender violence, climate, economic inequality
+  reliability: high
+  notes: Multiple Pulitzers and Peabodys; merged with Mother Jones (Feb 2024) but distinct brand; weekly hour-long PRX radio show
+- name: The 19th News
+  type: Nonprofit newsroom
+  rss_feed: https://19thnews.org/feed/
+  coverage: Gender, politics, policy, and power — voting rights, reproductive policy, women in elected office, LGBTQ+ legal protections
+  reliability: high
+  notes: Self-described nonpartisan through a gender lens; free to republish; built The 19th News Network in 2024
+- name: The Intercept
+  type: Nonprofit investigative news
+  rss_feed: https://theintercept.com/feed/?lang=en
+  coverage: National security, surveillance, digital privacy, civil liberties, government secrets
+  reliability: medium
+  notes: Mostly Factual rating (one tier below the rest of the list) — verify load-bearing claims against primary documents. Fills surveillance and intelligence beat the rest of the list misses
+- name: More Perfect Union
+  type: Nonprofit news / video journalism
+  url: https://perfectunion.us/
+  coverage: Labor, economic policy, corporate accountability
+  reliability: medium
+  notes: Mostly Factual rating; pairs reporting with activism (openly disclosed); Sidney/Hillman/Emmy awards. Founded by Faiz Shakir (former Bernie Sanders campaign manager) — lineage worth flagging
+- name: ICT News (Indian Country Today)
+  type: Nonprofit news / public broadcasting
+  rss_feed: https://ictnews.org/feed
+  coverage: Treaty rights, tribal sovereignty, federal-tribal relations, ICWA, reservation voting access, Indigenous communities
+  reliability: high
+  notes: Largest US Native American news organization; 45-year history; INN-member. Fills Native/Indigenous democracy gap the rest of the list does not cover
+- name: Floodlight News
+  type: Nonprofit investigative news
+  url: https://floodlightnews.org/
+  coverage: Fossil-fuel money in politics, regulatory capture, climate disinformation, corporate ownership of local news
+  reliability: high
+  notes: Explicit nonpartisan framing; co-publishes with The Guardian US; multi-step fact-checking process. Reports republished in ~500 outlets across 47 states in 2025
+- name: The Advocate
+  type: LGBTQ magazine and digital news
+  rss_feed: https://www.advocate.com/feeds/feed.rss
+  coverage: State anti-LGBTQ legislation, federal LGBTQ policy, civil rights court cases, hate-crime prosecution
+  reliability: high
+  notes: Oldest and largest US LGBTQ publication (founded 1967); High factual rating; Ad Fontes "Most Reliable" category
+- name: Just Security
+  type: Academic legal forum
+  rss_feed: https://www.justsecurity.org/feed/
+  coverage: US national security law and policy, constitutional law, intelligence community oversight
+  reliability: high
+  notes: NYU Law / Reiss Center on Law and Security; Left-Center / High factual; complements Lawfare on national security legal analysis
+- name: The Marshall Project
+  type: Nonprofit investigative newsroom
+  rss_feed: https://www.themarshallproject.org/rss/recent.rss
+  coverage: US criminal justice system, DOJ, prosecutorial conduct, federal policing, prison conditions
+  reliability: high
+  notes: Multiple Pulitzers (2016 Explanatory, 2021 National Reporting); founded by Neil Barsky with Bill Keller (former NYT exec editor) as first editor; explicitly not advocacy
+- name: Religion News Service (RNS)
+  type: News wire / nonprofit
+  rss_feed: https://religionnews.com/feed/
+  coverage: Religious liberty, Christian nationalism, religious-right legal strategy, faith communities
+  reliability: high
+  notes: Founded 1934; Left-Center / High factual; syndicated to 170+ outlets (WaPo, NPR, Chicago Tribune). Covers religion beat absent from the rest of the list
+- name: Mother Jones
+  type: Investigative magazine
+  rss_feed: https://www.motherjones.com/feed/
+  coverage: Investigative reporting on politics, money in politics, environment, criminal justice
+  reliability: high
+  notes: Founded 1976; Left-Center to Left / High factual; merged with CIR/Reveal in Feb 2024 but distinct brand and beat
+- name: Stateline / States Newsroom
+  type: Nonprofit state news network
+  url: https://stateline.org/
+  coverage: State-level policy and politics; State Houses, election administration, gerrymandering, voting laws across 50 capitals
+  reliability: high
+  notes: Stateline (founded 1998 by Pew) joined States Newsroom in May 2023; network operates in all 50 state capitals (39 wholly-owned 501(c)(3) newsrooms). Left / High factual. Fills state-level democracy gap
+- name: Democracy Docket
+  type: Election law litigation tracker
+  rss_feed: https://www.democracydocket.com/feed/
+  coverage: Voting rights litigation, redistricting cases, ballot access challenges, election certification disputes
+  reliability: high
+  notes: High factual per MBFC; founded by Democratic lawyer Marc Elias (Elias Law Group) — claims editorial firewall. Cite the case docket and filings, not the commentary. Strongest single source for voting-rights litigation tracking
+- name: Bolts Magazine
+  type: Nonprofit digital magazine
+  url: https://boltsmag.org/
+  coverage: State and local democracy — prosecutors, sheriffs, election administration, voting rights, local criminal justice
+  reliability: high
+  notes: No third-party bias rating yet (founded Feb 2022 by Daniel Nichanian); INN member with stated editorial firewall. Best available source for state/local democracy coverage
+- name: Electronic Frontier Foundation (EFF)
+  type: Civil liberties watchdog / news
+  rss_feed: https://www.eff.org/rss/updates.xml
+  coverage: Government surveillance, digital privacy, FBI/NSA accountability, journalist surveillance, free speech online
+  reliability: high
+  notes: Founded 1990; Left-Center / High factual. Both watchdog and analysis publisher — civil-liberties counterpart to ACLU for the digital domain
+independent_journalists:
+- name: Marcy Wheeler (emptywheel)
+  type: Independent journalist / blog
+  url: https://emptywheel.net
+  coverage: Surveillance, intelligence community, DOJ, FISA — works primarily from declassified documents
+  reliability: high
+  notes: 20+ year track record; Sidney Hillman Award, AccessNow Internet Human Rights hero. Per CJR "few people are wrong less often." Live-blogged Scooter Libby trial; uncovered KSM waterboarding count
+- name: Steve Vladeck (One First)
+  type: Academic Substack
+  url: https://www.stevevladeck.com
+  coverage: Supreme Court rulings and procedure, shadow docket, constitutional law
+  reliability: high
+  notes: Georgetown Law professor; CNN SCOTUS analyst; NYT-bestselling author (The Shadow Docket). Academic-tier analysis
+- name: Joyce Vance (Civil Discourse)
+  type: Substack
+  url: https://joycevance.substack.com
+  coverage: DOJ analysis, federal prosecution, rule-of-law issues
+  reliability: high
+  notes: Former US Attorney (N.D. Alabama); University of Alabama law professor; MSNBC legal analyst. Insider DOJ perspective
+- name: Brian Klaas (The Garden of Forking Paths)
+  type: Academic Substack
+  url: https://www.forkingpaths.co
+  coverage: Comparative democracy, authoritarianism, political violence, power and corruption
+  reliability: high
+  notes: UCL Associate Professor in Global Politics; Atlantic contributing writer; author of five books on power/corruption/democracy
+- name: Judd Legum (Popular Information)
+  type: Substack
+  url: https://popular.info
+  coverage: Corporate accountability, dark money, political donations to extremist causes, voter suppression
+  reliability: high
+  notes: Left / High factual per MBFC; impactful corporate-accountability reporting (sparked corporate policy changes). Founder/former editor of ThinkProgress — partisan lineage explicit but factual record clean. No paywall
