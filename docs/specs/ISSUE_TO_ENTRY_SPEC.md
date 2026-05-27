@@ -58,7 +58,7 @@ What the agent will skip-flag (skip + comment + `invalid` label, leave issue ope
 
 - **Body is incomprehensible** as a news event description.
 - **All primary sources have been retracted** or the live article content contradicts the issue's claim about what happened.
-- **No abuse in `taxonomy/abuses.yaml` cleanly applies** to what the sources actually describe (and the agent is confident, not just unsure — uncertainty defaults to correction, not discard).
+- **No abuse in `taxonomy/abuses.yaml` cleanly applies** — this is a **taxonomy-gap signal**, not a discard reason. Route through [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) instead: re-run archive-fit on the issue, which will open a PR adding the missing abuse and apply `blocked-on-taxonomy` to the issue. Discard only if the operator subsequently closes the taxonomy PR without merging.
 - **The "event" is debunked** by subsequent reporting between scan time and process time.
 
 The agent does NOT close issues, even when flagging them invalid. Closure is a human call.
@@ -394,7 +394,7 @@ The issue stays open. A human can decide whether to fix the underlying problem (
 - The body cannot be read as a news event description at all.
 - All primary sources are gone OR retracted OR substantively contradict the issue's claim about what happened.
 - After reading source content, the agent concludes the "event" was a misunderstanding, hoax, or was debunked by subsequent reporting.
-- No abuse in `taxonomy/abuses.yaml` cleanly applies, even after re-reading the body and sources against the full taxonomy. (If the agent is uncertain rather than confident-no, that's a correction case, not a discard case.)
+- No abuse in `taxonomy/abuses.yaml` cleanly applies, even after re-reading the body and sources against the full taxonomy. **Treat this as a taxonomy-gap signal, not a discard.** Re-run [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) on the issue; it will open a PR proposing the missing abuse and apply `blocked-on-taxonomy`. Only discard if the operator declines the taxonomy PR.
 - Build verification (Step 6) fails in a way that points to bad input rather than a build-system bug.
 
 **Comment template:**
@@ -503,8 +503,4 @@ That said, the upstream monitor *should* still produce bodies in the format show
 
 **Soft expectations** (not enforced, but worth maintaining):
 
-- Body uses `**Date:**` (or `**Scan date:**`) and `**Event date:**` headers.
-- Every slug in "Mapped abuses" exists in `taxonomy/abuses.yaml` at the time the issue is opened.
-- Sections appear in the order shown in Step 2.
-
-When these expectations are violated, the failure comment posted by Step 11 tells the upstream monitor (or a human editor) what to fix.
+- Body uses 
