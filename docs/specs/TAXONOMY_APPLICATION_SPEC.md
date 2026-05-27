@@ -239,7 +239,24 @@ If you tag an entry with `voter-suppression`, the build system:
 2. That abuse doesn't fit existing definitions
 3. You expect future similar events (not one-off)
 
-**Process:**
+### Two ways a new abuse gets proposed
+
+**Automatic (story-driven):** When [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md)
+evaluates a candidate story that matches one of the 12 ideals but no
+existing abuse fits cleanly, archive-fit opens a PR against
+`taxonomy/abuses.yaml` proposing the new abuse and applies
+`blocked-on-taxonomy` to the source issue. This is the default path —
+most new abuses originate from a real story that exposed the gap. The
+operator reviews the PR; merging it unblocks the source issue, which
+re-evaluates cleanly on the next archive-fit run.
+
+**Manual (editor-driven):** When an editor notices a gap unrelated to a
+specific in-flight story — reviewing the taxonomy, comparing against
+external frameworks, or anticipating future events — the steps below
+still apply. Manual additions are rarer in practice but remain
+supported.
+
+**Manual process:**
 1. Propose new abuse to Bill (via GitHub issue in taxonomy)
 2. Define it clearly
 3. Assign to appropriate ideal
@@ -280,25 +297,4 @@ If you tag an entry with `voter-suppression`, the build system:
 
 **Executive power:** executive-overreach, bypassing-congress, defying-court-orders, weaponizing-DOJ
 
-**Corruption:** nepotism, self-dealing, bribery, undisclosed-financial-conflicts, pay-to-play, monetizing-office
-
-**See `/taxonomy/abuses.yaml` for complete list and definitions.**
-
----
-
-## Workflow Integration
-
-**Where taxonomy application happens:**
-1. **Monitoring sourcing:** Claude agent identifies relevant abuses during semantic evaluation
-2. **Tip research:** Editorial team maps abuses during research phase
-3. **Editorial review:** Verify abuse mapping is correct and matches event
-4. **Archive pages:** Ideals and abuses are auto-generated from tagged entries
-
-**What comes after:** Build generates ideal pages, actor pages, and entry relationships automatically from your abuse tags.
-
----
-
-## Related Skills & Workflows
-- EDITORIAL_WORKFLOW_SPEC.md — How editors review and approve entries
-- PROJECT_PLAN.md → Taxonomy section — Full taxonomy and inclusion criteria
-- `/taxonomy/abuses.yaml` — Source of truth for abuse definitions
+**Corruption:** nepotism, self-dealing, bribery, undisclosed-financial-conflicts, pay-to-pla

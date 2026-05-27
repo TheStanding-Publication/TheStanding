@@ -7,14 +7,26 @@ A fast, headline-level scan of a single day's news, compared against The Standin
 
 ```
 NEWS_TRIAGE     → tip
-NEWS_RESEARCH   → ready-for-entry   (vet-tip mode promotes a tip; scheduled-scan and url-to-issue modes file directly)
+ARCHIVE_FIT     → archive-fit | archive-fit-merge | not-fit | blocked-on-taxonomy
+NEWS_RESEARCH   → ready-for-entry   (on archive-fit verdict, the tip-to-issue skill promotes; scheduled-scan and url-to-issue modes file directly after their own archive-fit pass)
 ISSUE_TO_ENTRY  → entry recorded    (issue closed by the entry PR)
 ```
 
-Triage produces `tip` issues and nothing else. It never produces a `ready-for-entry` issue, and a tip is never sent straight to entry recording — every tip passes through vetting first.
+Triage produces `tip` issues and nothing else. It never produces a `ready-for-entry` issue, and a tip is never sent straight to entry recording — every tip passes through [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) and then research before becoming entry-eligible.
 
 ## Key principle: speed over depth
 Triage deliberately does little per story. It reads **headlines, not articles**. It maps to the **12 broad ideals, not the 77 specific abuses**. It does a **cursory** duplicate check, not an exhaustive one. It writes a **thin tip**, not a researched issue. Every instinct to "just check one more thing" belongs in the vetting step, not here. The job is breadth and throughput — catch candidates, move on.
+
+## Relationship to ARCHIVE_FIT
+Triage is intentionally calibrated to a **lower bar** than the canonical
+inclusion judgment in [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md).
+Triage's job is to surface candidates cheaply; archive-fit's job is to
+gate them rigorously at vetting (mission → ideal → abuse → archive
+dedup). The asymmetry is deliberate: a false positive at triage costs
+one archive-fit pass, while a false negative is a story lost from the
+archive. Do **not** import archive-fit's strict criteria here — the
+headline-only, plausibility-based check below is the right tool for
+this step. Archive-fit will reject what doesn't fit downstream.
 
 ## How this skill is used
 Triage is **ledger-driven** and processes **exactly one day per run**. It is invoked by a scheduled task and/or on-demand by an operator. Because each run's state lives in a coverage ledger (below), runs need no memory of one another and a missed run is self-healing — the next run simply picks up the same next-oldest day.
@@ -93,7 +105,7 @@ Body:
 [The headline, and the one-line standfirst if there was one — nothing more.]
 
 ---
-*Filed by The Standing's news-triage scan (triaged date: [YYYY-MM-DD]). This is an unvetted lead — it needs vet-tip research before it can become an entry.*
+*Filed by The Standing's news-triage scan (triaged date: [YYYY-MM-DD]). This is an unvetted lead — it needs an archive-fit verdict and tip-to-issue research before it can become an entry.*
 ```
 
 A tip carries a headline, a URL, a date, and candidate ideals — **nothing verified**. It deliberately has no actors, no abuse slugs, no event-date research, no corroboration. Those are the vetting step's job.
@@ -119,10 +131,4 @@ The scheduled task supplies **no** date — triage marches the backlog from the 
 
 1. **Speed over depth** — headlines not articles, ideals not abuses, cursory not exhaustive. Throughput is the point.
 2. **Ledger-driven** — the coverage ledger (issue #77) is the single source of truth for what has been triaged; every run reads it and updates it.
-3. **One day per run** — bounded, predictable, self-healing.
-4. **Tips are leads, not records** — thin by design, never `ready-for-entry`, always vetted before entry recording.
-5. **Low bar — caught, not confirmed** — a false positive costs a vetting pass; a false negative loses a story. Lean toward filing.
-6. **Mark every triaged day** — covered means covered, tips or no tips.
-
-## Downstream contract (vet-tip mode of NEWS_RESEARCH)
-A `tip` issue is a lead. The vetting step — NEWS_RESEARCH in vet-tip mode — takes a tip, performs full event research, rewrites it into a complete monitoring issue, and transitions the tag `tip` → `ready-for-entry`; or, if the tip does not pan out, closes it (which keeps it in the dedup set so the same story is not re-tipped). Triage should be reasonably good but it does not need to be perfect — some tips will be rejected at vetting, and that is the system working as designed.
+3. **One day per r
