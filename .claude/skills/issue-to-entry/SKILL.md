@@ -29,9 +29,17 @@ referencing it) and refuses with a clear error if it is not eligible.
 ## Output
 
 An entry pull request against `TheStanding-Publication/TheStanding`,
-with corrections-in-flight documented in the PR body — or a skip-flag
-(`invalid` label + comment) if the issue cannot be made into a valid
-entry. See the spec for the exact behavior.
+with corrections-in-flight documented in the PR body — or, when the
+issue cannot be made into a valid entry, one of:
+
+- **Skip-flag** (`invalid` label + comment) for body, source, or event
+  problems the agent cannot correct.
+- **Taxonomy-gap re-route** when no abuse in `abuses.yaml` fits cleanly:
+  the spec routes back through `ARCHIVE_FIT_SPEC`, which opens a
+  taxonomy PR and applies `blocked-on-taxonomy` to the issue. Discard
+  only if the operator declines that PR.
+
+See the spec for the full behavior.
 
 This skill has side effects (it pushes a branch and opens a PR), so it
 is user-invoked only — it does not auto-trigger. The scheduled

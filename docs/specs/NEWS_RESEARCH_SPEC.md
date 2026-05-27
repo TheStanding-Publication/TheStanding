@@ -32,6 +32,8 @@ Invoked on-demand by an operator (editor) providing a single URL. The agent uses
 - `source_url` — a single URL (news article, court filing, agency press release, social-media post, primary document — anything on the open web). Editors do preliminary vetting before submitting; the agent still applies all editorial standards downstream.
 - `scan_label` — `url-to-issue` (or operator-supplied identifier for the report)
 
+**Inclusion judgment for this mode is delegated to [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md).** The `url-to-issue` skill runs archive-fit in URL mode before this spec executes; a story only reaches the URL-to-issue research mechanics below when archive-fit's verdict is `archive-fit`. The mode-specific in-scope check (Step 3) and duplicate handling (Step 5) that previously lived here have been removed accordingly — archive-fit owns those.
+
 ## Workflow
 
 ### Step 1: Load the current taxonomy
@@ -66,16 +68,12 @@ For each story you found in Step 2, ask:
 
 Use semantic understanding, not pattern matching. You understand that "weakening Voting Rights Act enforcement" maps to `voter-suppression` (or one of the more specific election slugs) without needing keyword overlap.
 
-**URL-to-issue mode — explicit in-scope check before proceeding:**
-
-After evaluation, if you conclude the story does *not* fall within The Standing's scope — i.e. it doesn't describe an abuse of power affecting one of the 12 ideals, or it's political conduct/criticism rather than abuse (parallel to the editorial reasoning applied to backlog issue #8) — **refuse and stop**. Report to the operator:
-
-- Which URL was submitted
-- The agent's read on what the story is actually about
-- Why it falls outside The Standing's scope
-- The closest abuse slugs considered and why none cleanly apply
-
-Do not create an issue. The operator can override by re-submitting with an explicit "file anyway" instruction; otherwise the URL is logged as discussed and not archived.
+**URL-to-issue mode — in-scope check:** archive-fit has already
+rendered the inclusion verdict before this spec runs. Stories reach this
+step only when archive-fit returned `archive-fit`. No additional
+in-scope refusal logic lives here. See
+[`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) for the mission test, ideal
+match, abuse match, and refusal semantics.
 
 ### Step 4: For relevant stories, conduct comprehensive research
 
@@ -97,13 +95,14 @@ Before creating an issue, search the repo `TheStanding-Publication/TheStanding` 
 
 **Scheduled-scan mode:** If a duplicate exists, skip silently — the event is already in the archive's intake queue. If unclear whether it's a duplicate, note in research and proceed with caution.
 
-**URL-to-issue mode:** If a duplicate exists, **do NOT auto-act**. Surface the apparent duplicate to the operator: report the existing issue number, title, and which fields suggest the match. Then stop. The operator decides whether to:
-
-- File as new (rare — usually means a related but distinct event)
-- Add the URL as a source comment on the existing issue
-- Skip entirely
-
-The agent never silently appends to or duplicates an existing issue in manual-URL mode.
+**URL-to-issue mode:** duplicate handling has moved to
+[`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) (Step 5, event-level
+duplicate check). Stories reaching this step have already been judged
+against the existing archive — if archive-fit's verdict was
+`archive-fit-merge` rather than `archive-fit`, the operator was told to
+merge into the existing entry and never invoked `url-to-issue`. The
+agent in this mode therefore proceeds without an additional duplicate
+search; the recording flow is mechanical.
 
 ### Step 6: Create the GitHub issue
 
@@ -211,4 +210,4 @@ Scan parameters for this run:
 - scan_label: [morning / midday / afternoon / evening]
 ```
 
-The scheduled task prompt should be no more than ~15 lines. If a behavior change needs to land in the scheduled scans, change it **here**, not in the scheduled-task prompts.
+The scheduled task prompt should be no more than ~15 lines. If a behavior change needs to land in th
