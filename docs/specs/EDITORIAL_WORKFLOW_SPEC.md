@@ -3,6 +3,43 @@
 ## Purpose
 Define the human review and approval process for entries before they are recorded in the archive. This skill addresses two intake channels (monitoring and tips) with different workflows, and ensures all entries meet The Standing's editorial standards while respecting the broken-windows principle (no significance threshold — proper sourcing is what matters).
 
+## Inclusion judgment is owned by ARCHIVE_FIT
+
+The machine-level inclusion judgment — does this story belong in the
+archive at all? — lives in [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md).
+By the time an issue reaches an editor for any of the review gates
+below, archive-fit has already rendered a verdict (`archive-fit`,
+`archive-fit-merge`, `not-fit`, or `blocked-on-taxonomy`) on it as a
+label plus an explanatory comment.
+
+The editor's job at each gate is no longer to re-derive the inclusion
+judgment from scratch — it is to **read archive-fit's verdict and decide
+whether to accept, override, or escalate it**. Specifically:
+
+- **`archive-fit`** — proceed with the gate as usual. The verdict
+  comment names the ideal, abuses, and any precedent entries; use those
+  as the starting point for editorial review rather than rebuilding from
+  the issue body.
+- **`archive-fit-merge`** — the gate's outcome is usually "merge into
+  the named existing entry," not "approve as new." Override only when
+  you see something archive-fit missed about why the candidate is a
+  distinct event (different date, location, or actors — see the
+  event-level dedup rule in archive-fit Step 5).
+- **`not-fit`** — close the issue with the verdict comment as
+  reasoning, unless you have a substantive disagreement; if so, document
+  the override in a reply comment so archive-fit's reasoning trail and
+  your override sit side by side.
+- **`blocked-on-taxonomy`** — review the taxonomy PR archive-fit opened
+  before this gate proceeds. The issue is held until the PR resolves.
+
+The rubrics below (decision points, approval criteria, rejection
+criteria) remain useful as **editorial standards for the human
+judgment** that archive-fit's verdict cannot fully replace — headline
+neutrality, framing, summary quality, source diversity, broken-windows
+application at the edges. Where the rubrics duplicate archive-fit (does
+the story match an abuse, is it a duplicate, is it in mission scope),
+defer to archive-fit and don't re-derive.
+
 ## Key Principle: Broken Windows
 *No anti-democratic action is too small to record.* An entry is worthy of the archive if it credibly describes an abuse in The Standing's taxonomy and meets the sourcing standard. There is no requirement that an event be part of a wider pattern. The threshold is proper sourcing + relevant abuse, not "significance" or "part of a bigger story." Small accumulating breaches are themselves the pattern.
 
@@ -26,7 +63,7 @@ Define the human review and approval process for entries before they are recorde
 - **Actor:** Automated monitoring system
 - **Trigger:** Story evaluated as relevant by Claude agent
 - **Contents:** Full comprehensive research (event date, jurisdiction, location, actors, evidence, mapped abuses)
-- **Labels:** `monitoring-intake`, `needs-research`, `[abuse-slug]`
+- **Labels:** `ready-for-entry` (status tag only). **Do NOT apply abuse slugs as labels** — the mapped abuses live in the "Mapped abuses" section of the issue body (the canonical place the entry-recording step reads them). Labelling them as well causes unbounded label sprawl and goes stale when slugs are corrected downstream. See `NEWS_RESEARCH_SPEC` Step 6 for the authoritative labelling policy.
 - **Status:** Issue created, awaiting editorial review
 
 #### 2. Editorial Review of Issue (Optional)
@@ -132,8 +169,8 @@ Define the human review and approval process for entries before they are recorde
 - Follow same comprehensive research process as NEWS_RESEARCH_SPEC.md
 
 **Outcome:**
-- Update issue with research findings
-- Add labels for mapped abuses
+- Update issue with research findings (including the "Mapped abuses" section in the body).
+- **Do NOT apply abuse slugs as labels.** Mapped abuses live in the issue body, not the label set. See `NEWS_RESEARCH_SPEC` Step 6.
 
 #### 4. Editorial Review of Issue (Second Gate)
 **Can we confidently record this?**
@@ -247,79 +284,4 @@ Define the human review and approval process for entries before they are recorde
 
 ## Approval Checklist (Use for All PR Reviews)
 
-**Entry PR Review Checklist:**
-
-- [ ] Headline is factual and neutral
-- [ ] Summary is 2-3 sentences and accurate
-- [ ] Event date is correct (YYYY-MM-DD or appropriate approximate format)
-- [ ] Jurisdiction is correctly identified (federal/state/local/international/private)
-- [ ] Location meets jurisdiction requirements (state for state/local, city/county/state for local, etc.)
-- [ ] All actors are correctly named and roles/titles are accurate
-- [ ] Abuses are correctly mapped to taxonomy (verify against `/taxonomy/abuses.yaml`)
-- [ ] Primary abuse is appropriate (first abuse listed)
-- [ ] Sources meet floor (primary OR 2+ investigative)
-- [ ] All URLs are live and content-verified
-- [ ] No factual errors in summary or analysis
-- [ ] Breaks no sources (quoted material never exceeds 15 words)
-- [ ] Follows broken-windows principle (recorded because credible + relevant, not because "significant")
-
----
-
-## Workflow Overview (Visual)
-
-**Monitoring Intake:**
-```
-Automated Issue Creation
-    ↓
-[Optional: Editorial comment on issue]
-    ↓
-Automated Entry Recording → PR Created
-    ↓
-Editorial PR Review (APPROVAL GATE) → Approve/Reject/Revise
-    ↓
-[If approved] Merge to main → Publish
-```
-
-**Tips:**
-```
-Issue Created (from tip submission)
-    ↓
-Editorial Triage Review (First Gate) → Approve for research/Reject
-    ↓
-[If approved] Research phase
-    ↓
-Editorial Issue Review (Second Gate) → Approve for recording/Reject
-    ↓
-[If approved] Automated Entry Recording → PR Created
-    ↓
-Editorial PR Review (Approval Gate) → Approve/Reject/Revise
-    ↓
-[If approved] Merge to main → Publish
-```
-
----
-
-## Handling Uncertainty
-
-**If unsure whether to include:**
-- Lean toward inclusion if:
-  - Credible primary source
-  - Clear match to abuse definition
-  - Broken-windows principle applies
-- Consult with Bill or co-editors if:
-  - Abuse mapping is ambiguous
-  - Confidence is unusually low
-  - Event is political but possibly not institutional abuse
-
-**If unsure about abuse mapping:**
-- Read the abuse definition in `/taxonomy/abuses.yaml`
-- Check if the event matches that specific definition
-- Look at similar entries to see how they were mapped
-- Err toward the narrower mapping (primary abuse) and avoid over-tagging
-
----
-
-## Related Skills & Workflows
-- NEWS_RESEARCH_SPEC.md — Sourcing (internal monitoring)
-- ENTRY_RECORDING_SPEC.md — Automated validation & PR creation
-- PROJECT_PLAN.md → Editorial Standards — Full standards document
+**Entry PR Revie
