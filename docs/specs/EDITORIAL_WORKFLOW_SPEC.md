@@ -63,7 +63,7 @@ defer to archive-fit and don't re-derive.
 - **Actor:** Automated monitoring system
 - **Trigger:** Story evaluated as relevant by Claude agent
 - **Contents:** Full comprehensive research (event date, jurisdiction, location, actors, evidence, mapped abuses)
-- **Labels:** `monitoring-intake`, `needs-research`, `[abuse-slug]`
+- **Labels:** `ready-for-entry` (status tag only). **Do NOT apply abuse slugs as labels** — the mapped abuses live in the "Mapped abuses" section of the issue body (the canonical place the entry-recording step reads them). Labelling them as well causes unbounded label sprawl and goes stale when slugs are corrected downstream. See `NEWS_RESEARCH_SPEC` Step 6 for the authoritative labelling policy.
 - **Status:** Issue created, awaiting editorial review
 
 #### 2. Editorial Review of Issue (Optional)
@@ -169,8 +169,8 @@ defer to archive-fit and don't re-derive.
 - Follow same comprehensive research process as NEWS_RESEARCH_SPEC.md
 
 **Outcome:**
-- Update issue with research findings
-- Add labels for mapped abuses
+- Update issue with research findings (including the "Mapped abuses" section in the body).
+- **Do NOT apply abuse slugs as labels.** Mapped abuses live in the issue body, not the label set. See `NEWS_RESEARCH_SPEC` Step 6.
 
 #### 4. Editorial Review of Issue (Second Gate)
 **Can we confidently record this?**
@@ -284,12 +284,4 @@ defer to archive-fit and don't re-derive.
 
 ## Approval Checklist (Use for All PR Reviews)
 
-**Entry PR Review Checklist:**
-
-- [ ] Headline is factual and neutral
-- [ ] Summary is 2-3 sentences and accurate
-- [ ] Event date is correct (YYYY-MM-DD or appropriate approximate format)
-- [ ] Jurisdiction is correctly identified (federal/state/local/international/private)
-- [ ] Location meets jurisdiction requirements (state for state/local, city/county/state for local, etc.)
-- [ ] All actors are correctly named and roles/titles are accurate
-- [ ] Abuses are correctly mapped to taxonomy (
+**Entry PR Revie
