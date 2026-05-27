@@ -1,5 +1,15 @@
 # The Standing: Entry Recording Skill
 
+> **DEPRECATED — superseded by [`ISSUE_TO_ENTRY_SPEC`](./ISSUE_TO_ENTRY_SPEC.md).**
+>
+> This document predates the current entry-recording workflow and is
+> retained for historical reference only. `ISSUE_TO_ENTRY_SPEC` is the
+> canonical recording spec — it is the document the `issue-to-entry`
+> skill and the `standing-entry-recorder` scheduled task execute.
+> Inclusion judgment (mission, taxonomy, duplicate) is owned by
+> [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md). Do not update this file
+> in response to behavior changes; update the active specs instead.
+
 ## Purpose
 Take a monitoring-intake GitHub issue (or tip submission), run automated validation checks, record it as an entry file, and create a PR for human review.
 
@@ -181,17 +191,4 @@ After recording and PR creation, report:
 - Automated checks only
 - Skip human editorial review at issue stage
 - Confidence: "monitoring"
-- PR describes as automated entry
-
-**Tip submissions (`tip` label):**
-- Human reviews issue first (editorial decides if worth investigating)
-- If approved, runs same automated checks
-- Confidence: varies by source quality
-- PR is secondary review gate
-
-## TODO
-
-1. **Design slug generation**: Issue number + date + other identifiers
-2. **Implement URL content hashing**: SHA256 or similar to detect changes
-3. **Archive snapshot strategy**: WayBack Machine integration or local archiving
-4. **Handle failures gracefully**: What happens if URL validation fails? Who gets notified?
+- PR describes 
