@@ -287,4 +287,18 @@ The archive tracks **events**, not topics or coverage clusters. If research surf
 
 ## Approval Checklist (Use for All PR Reviews)
 
-**Entry PR Revie
+**Entry PR Review Checklist:**
+
+- [ ] Headline is factual and neutral
+- [ ] Summary is 2-3 sentences and accurate
+- [ ] Event date is correct (YYYY-MM-DD or appropriate approximate format)
+- [ ] Jurisdiction is correctly identified (federal/state/local/international/private)
+- [ ] Location meets jurisdiction requirements (state for state/local, city/county/state for local, etc.)
+- [ ] All actors are correctly named and roles/titles are accurate
+- [ ] Abuses are correctly mapped to taxonomy (verify against `/taxonomy/abuses.yaml`)
+- [ ] Primary abuse is appropriate (first abuse listed)
+- [ ] Sources meet floor (primary OR 2+ investigative)
+- [ ] All URLs are live and content-verified
+- [ ] No factual errors in summary or analysis
+- [ ] Breaks no sources (quoted material never exceeds 15 words)
+- [ ] Follows broken-windows principle (recorded because credible + relevant, not because "significant")

@@ -133,4 +133,11 @@ The scheduled task supplies **no** date — triage marches the backlog from the 
 
 1. **Speed over depth** — headlines not articles, ideals not abuses, cursory not exhaustive. Throughput is the point.
 2. **Ledger-driven** — the coverage ledger (issue #77) is the single source of truth for what has been triaged; every run reads it and updates it.
-3. **One day per r
+3.
+3. **One day per run** — bounded, predictable, self-healing.
+4. **Tips are leads, not records** — thin by design, never `ready-for-entry`, always vetted before entry recording.
+5. **Low bar — caught, not confirmed** — a false positive costs a vetting pass; a false negative loses a story. Lean toward filing.
+6. **Mark every triaged day** — covered means covered, tips or no tips.
+
+## Downstream contract (vet-tip mode of NEWS_RESEARCH)
+A `tip` issue is a lead. The vetting step — NEWS_RESEARCH in vet-tip mode — takes a tip, performs full event research, rewrites it into a complete monitoring issue, and transitions the tag `tip` → `ready-for-entry`; or, if the tip does not pan out, closes it (which keeps it in the dedup set so the same story is not re-tipped). Triage should be reasonably good but it does not need to be perfect — some tips will be rejected at vetting, and that is the system working as designed.

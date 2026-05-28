@@ -511,4 +511,4 @@ Next steps:
 
 ## Upstream Contract (NEWS_RESEARCH_SPEC)
 
-The hard precondition is that an issue is opened by the `thestanding` bot account **and** carries the `ready-for-entry` tag. Authorship marks it as bot-produced; the tag marks it as a fully-researched monitoring issue rather than an unvetted `tip`. Anything `thestanding` opens with `ready-for-entry` is in scope; human-opened issues, issues from a different bot, and untagged `tip` issues 
+The hard precondition is that an issue is opened by the `thestanding` bot account **and** carries the `ready-for-entry` tag. Authorship marks it as bot-produced; the tag marks it as a fully-researched monitoring issue rather than an unvetted `tip`. Anything `thestanding` opens with `ready-for-entry` is in scope; human-opened issues, issues from a different bot, and untagged `tip` issues are out of scope.
