@@ -1,6 +1,6 @@
 # Project Plan — The Standing
 
-*Working draft. Last updated 2026-05-13.*
+*Working draft. Last updated 2026-05-28.*
 
 A daily newsletter and durable historical archive that tracks US news and events involving authoritarianism, anti-democratic behavior, and corruption — applied without partisan favor.
 
@@ -58,41 +58,43 @@ Quality > quantity. Every entry must meet the sourcing floor in [editorial stand
 
 **Content store: a public GitHub repo.** Every entry is a Markdown file with frontmatter. Drafts live on feature branches; merges to `main` publish. Git history is the public audit trail — every edit, retraction, and correction is timestamped and attributable. Public-from-day-one is a "show your work" signal for a non-partisan watchdog.
 
-**Automation: GitHub Actions + Cowork scheduled tasks.** GitHub Actions (unlimited minutes for public repos) runs the daily sourcing pipeline at 6:00 AM ET, writes `candidates/YYYY-MM-DD.md` to the repo. Cowork scheduled task drafts the day's issue from the candidates file for Bill's review.
+**Automation: Cowork scheduled tasks.** A set of Cowork scheduled tasks (`standing-monitor-*`, `standing-news-triage`, `standing-tip-vetter`, `standing-entry-recorder`, `standing-daily-digest`) execute the pipeline end to end. Each task is a thin wrapper that fetches a canonical spec from `docs/specs/` and follows it exactly. See [`PIPELINE.md`](./PIPELINE.md) for the full system view.
 
-**Secrets management.** API keys, social tokens, etc. live in GitHub Actions secrets and never get committed. Critical because the repo is public.
+**Secrets management.** The bot account's GitHub fine-grained PAT is held outside the repo and rotated periodically. The repo is public; no credentials are committed.
 
-**Backup/mirror.** Nightly Wayback Machine snapshot of every entry URL. Optional later: IPFS pinning for true permanence.
+**Backup/mirror.** Nightly Wayback Machine snapshot of every entry URL is a planned addition (see `TASKS.md` → source archive snapshot). Optional later: IPFS pinning for true permanence.
 
 ---
 
 ## 5. Data model (each archive entry)
 
-Each entry is a Markdown file under `entries/YYYY/MM/DD/slug.md` with frontmatter:
+Each entry is a Markdown file under `src/entries/YYYY/MM/DD/slug.md` with frontmatter. The build (`.eleventy.js`) validates every entry against the contract documented in [`BUILD_SPEC`](./specs/BUILD_SPEC.md):
 
 ```yaml
-date: 2026-03-15                   # date of the event
+id: 550e8400-e29b-41d4-a716-446655440000   # UUID v4. Required. Globally unique.
+                                           # Stable identifier; never changes.
+date: 2026-03-15                   # date of the event (YYYY-MM-DD)
 archived: 2026-03-16               # date the entry went live (display only)
 slug: doj-defies-subpoena          # URL-stable; never changes after publish
 
 headline: "..."                    # one-line factual headline
 summary: "..."                     # 1-3 sentence neutral summary
 
-abuses:                            # 1-3 entries from controlled vocab (see taxonomy)
-  - voter-suppression
-  - gerrymandering
-# At build time, parent ideals are auto-derived from the listed abuses.
+abuses:                            # 1-3 entries from controlled vocab (see taxonomy).
+  - voter-suppression              # Every slug must exist in taxonomy/abuses.yaml.
+  - gerrymandering                 # Parent ideals are auto-derived from these at
+                                   # build time — do not list ideals on entries.
 
-episodes:                          # optional: link to one or more named compound events
+episodes:                          # optional: link to one or more named compound events.
   - 2026-05-12-philadelphia-protest
 
-actors:                            # free-form strings; normalized via aliases.yaml
-  - "Stephen Miller (Deputy Chief of Staff)"
-  - "U.S. Department of Justice"
+actors:                            # free-form strings; normalized via aliases.yaml.
+  - "Stephen Miller (Deputy Chief of Staff)"   # The build strips the parenthetical role
+  - "U.S. Department of Justice"               # and resolves the bare name through aliases.
 
-jurisdiction: federal              # federal | state:CA | local:NYC:NY | international:UN
-
-confidence: well-reported          # confirmed | well-reported | developing | alleged
+jurisdiction: federal              # federal | state | local | international | private-actor
+location: "Washington, DC"         # see EDITORIAL_WORKFLOW_SPEC for per-jurisdiction
+                                   # location requirements.
 
 sources:
   - url: "https://..."
@@ -106,7 +108,7 @@ sources:
     title: "..."
     accessed: 2026-03-16
 
-quote:                             # optional: <15 word quote from primary source
+quote:                             # optional. Build enforces fewer than 30 words.
   text: "..."
   source-index: 0
 
@@ -130,29 +132,26 @@ status: published                  # draft | published | corrected | retracted
 
 **Schema rules enforced at build time:**
 
-- Every entry must have at least one `primary` source OR two independent `investigative` sources.
-- Every `abuse` must exist in `taxonomy/abuses.yaml`. New abuses require their own PR.
-- Actors are free strings, normalized at build time via `taxonomy/aliases.yaml`. New actors do NOT require a PR — they're just mentioned. Aliases get added only when sprawl is observed.
-- Actor pages are auto-generated for any actor appearing in ≥3 entries (threshold configurable). Lower-frequency actors are still indexed in search and visible in the entries that mention them.
-- The build emits warnings for probable duplicate actors (Levenshtein distance + abbreviation matching) so they can be reconciled in `aliases.yaml`.
+See [`BUILD_SPEC`](./specs/BUILD_SPEC.md) for the authoritative list. In summary:
+
+- Every entry carries a UUID v4 `id`, globally unique across the archive.
+- Every entry has at least one `primary` source OR two independent `investigative` sources.
+- Every `abuse` slug must exist in `taxonomy/abuses.yaml`. New abuses require their own PR (typically opened by `ARCHIVE_FIT_SPEC` when a candidate story exposes a gap).
+- Actors are free strings, normalized at build time via `taxonomy/aliases.yaml`. New actors do NOT require a PR — they're just mentioned. Aliases get added only when sprawl is observed; see [`ACTOR_NORMALIZATION_SPEC`](./specs/ACTOR_NORMALIZATION_SPEC.md).
+- Actor pages are auto-generated for any actor appearing in ≥3 entries.
 - Slugs are immutable after `status: published`.
+- Quote text is fewer than 30 words.
+
+A planned weekly retrospective will flag probable duplicate actors via Levenshtein-style matching and propose aliases — not yet built (see `TASKS.md`).
 
 ### Taxonomy: Ideals → Abuses
 
-Two-level taxonomy. Entries tag specific abuses; the parent ideal is auto-derived. Each ideal has a written explainer page (the norm and why it matters) plus its rolled-up entry list.
+Two-level taxonomy. Entries tag specific abuses; the parent ideal is auto-derived at build time. Each ideal has a written explainer page (the norm and why it matters) plus its rolled-up entry list.
 
-1. **Free and fair elections.** voter-suppression, gerrymandering, election-denial, certification-refusal, voter-intimidation, election-worker-intimidation, disinformation-campaigns, post-election-overturning-attempts, alternate-electors, refusal-to-concede.
-2. **Rule of law and equal application.** defying-court-orders, selective-prosecution, pardons-for-allies-or-self, politicized-investigations, ignoring-statutory-requirements, selective-non-enforcement.
-3. **Separation of powers and independent oversight.** executive-overreach, bypassing-congress, defying-subpoenas, weaponizing-DOJ, IG-firings, watchdog-defunding, obstruction-of-OIG-investigations, retaliation-against-whistleblowers, attacks-on-judicial-independence, lying-to-congress.
-4. **Free press.** press-retaliation, prosecution-of-journalists, expulsion-from-public-proceedings, access-restrictions-for-critical-outlets, legal-threats-against-publishers, FCC-or-licensing-as-leverage.
-5. **Freedom of speech, assembly, and association.** protester-surveillance, prosecution-of-protected-speech, viewpoint-based-permit-denials, targeting-critics-with-government-power, blacklisting.
-6. **Public service over self-dealing.** self-dealing, bribery, undisclosed-financial-conflicts, nepotism, emoluments-violations, pay-to-play, monetizing-office, procurement-irregularities.
-7. **Civilian control of armed and uniformed services.** politicization-of-uniformed-services, domestic-deployment-overreach, pardons-for-uniformed-misconduct, retaliation-against-officers-following-law.
-8. **Honest government data and scientific integrity.** suppression-of-government-data, politicized-science-appointments, retaliation-against-government-scientists, alteration-of-official-records, censoring-agency-research.
-9. **Civil rights and equal protection.** discriminatory-policy, targeting-marginalized-communities, voter-roll-purges, religious-favoritism-in-policy.
-10. **Due process.** denial-of-counsel, unlawful-detention, denial-of-hearing, ignoring-habeas, denial-of-due-process-in-immigration-enforcement, extrajudicial-actions.
-11. **National sovereignty and foreign influence.** undisclosed-foreign-payments-to-officials, foreign-influence-on-policy, intelligence-irregularities, accepting-foreign-electoral-help.
-12. **Accountable use of state force.** excessive-force-by-law-enforcement, deaths-in-custody, no-knock-raid-misuse, militarization-of-policing, shielding-officers-from-prosecution, failure-to-discipline-misconduct, corrections-abuse, violence-in-immigration-enforcement, federal-deployment-against-civilians.
+- The 12 ideals are defined in [`taxonomy/ideals.yaml`](../taxonomy/ideals.yaml).
+- The abuses (currently 80, and growing as `ARCHIVE_FIT_SPEC` surfaces taxonomy gaps) are defined in [`taxonomy/abuses.yaml`](../taxonomy/abuses.yaml). Each abuse references its parent ideal via the `ideal:` field.
+
+For the abuse-mapping rules (when to tag what, how to handle ambiguity, the taxonomy-gap path), see [`TAXONOMY_APPLICATION_SPEC`](./specs/TAXONOMY_APPLICATION_SPEC.md).
 
 The taxonomy applies symmetrically to anyone exercising public power — including private actors (contractors, platforms, foreign states) when their actions intersect with these abuses. Type metadata (person, agency, court, legislature, party, company, ngo, foreign-state, individual) is optional and only attached to actors that get promoted into `aliases.yaml`.
 
@@ -188,52 +187,29 @@ URL stability: slugs and structural URLs are immutable after publish. If an abus
 
 ---
 
-## 6. Daily workflow (target state)
+## 6. Daily workflow
 
-1. **6:00 AM ET** — scheduled task runs. Pulls last 24h from RSS, APIs, and watched social accounts.
-2. **Filter** — drops anything not matching inclusion criteria via a classifier.
-3. **Cluster** — groups stories about the same event together.
-4. **Draft** — produces a daily brief: 5–10 items, each with headline + 1–3 sentence summary + links.
-5. **Review** — Bill reviews the draft (mechanism TBD), edits, kills, or adds items.
-6. **Publish** — approval commits to Git → site rebuilds → newsletter sends.
+The pipeline runs end to end as a series of Cowork scheduled tasks against the specs in `docs/specs/`. See [`PIPELINE.md`](./PIPELINE.md) for the diagram, the per-stage cadence, and the labels and tags that move issues from stage to stage.
 
-We won't have this on day one. The phased roadmap below builds toward it.
+In short: monitor scans and triage produce `tip` and `[Monitoring]` issues; archive-fit (via `standing-tip-vetter`) renders the inclusion verdict and promotes the worthwhile candidates to `ready-for-entry`; the entry recorder turns each ready issue into an entry PR; editor reviews and merges; the daily digest assembles the day's archived entries and sends to subscribers via Buttondown.
 
 ---
 
 ## 7. Roadmap
 
-**Phase 0 — Decisions and scaffolding (this week)**
-- Lock platform stack (site host, email service, repo location).
-- Settle name and domain.
-- Decide review workflow.
-- Stand up the Git repo skeleton, Eleventy starter, and Buttondown account.
+**Phase 0 — Decisions and scaffolding.** ✓ Done. Stack locked; name and domain settled; Git repo, Eleventy build, and Buttondown account live.
 
-**Phase 1 — Manual daily issue (week 2–3)**
-- Bill (or Bill + Claude in chat) hand-curates the first 10–14 issues.
-- Each issue ships to the site and the newsletter.
-- We learn what the format actually wants to be and refine the template.
+**Phase 1 — Manual daily issue.** ✓ Done. Manual entries shipped, format refined.
 
-**Phase 2 — Sourcing pipeline (week 4–5)**
-- Build the candidate-fetcher: RSS, NewsAPI, GDELT, watched social accounts.
-- Output: a daily "candidates.md" file Bill reviews to pick the day's items from.
+**Phase 2 — Sourcing pipeline.** ✓ Done in a different shape than originally drafted. Instead of a "candidates.md" file, the live pipeline is a set of agent-driven scheduled tasks (`NEWS_RESEARCH_SPEC`, `NEWS_TRIAGE_SPEC`) that file `[Monitoring]` and `[Tip]` issues directly. See [`PIPELINE.md`](./PIPELINE.md).
 
-**Phase 3 — Classifier + draft generator (week 6–7)**
-- Add a classifier that scores candidates against inclusion criteria.
-- Auto-cluster duplicates and generate first-pass summaries.
-- Bill's job shrinks to review-and-approve.
+**Phase 3 — Classifier + draft generator.** ✓ Done in a different shape. The "classifier" role is owned by [`ARCHIVE_FIT_SPEC`](./specs/ARCHIVE_FIT_SPEC.md), which renders the inclusion verdict per candidate; the "draft" role is owned by [`ISSUE_TO_ENTRY_SPEC`](./specs/ISSUE_TO_ENTRY_SPEC.md), which produces fully-formed entry PRs the editor reviews.
 
-**Phase 4 — Archive features (week 8+)**
-- Theme and actor index pages.
-- Full-text search.
-- Timeline view.
-- Cross-reference links between related entries.
-- Wayback Machine snapshots, optional IPFS mirror.
+**Phase 4 — Archive features.** ✓ Mostly done. Ideal and abuse index pages, actor pages, episode pages, timeline, corrections, RSS feed, and see-also derivation all ship from the build. Full-text search and Wayback snapshots remain — both tracked in [`TASKS.md`](../TASKS.md).
 
-**Phase 5 — Growth (post-launch)**
-- Reader corrections workflow (PR-based or form-based).
-- Citations / "cite this entry" links.
-- API for researchers.
+**Phase 5 — Growth (post-launch).** Open. Reader corrections workflow, citation/cite-this links, API for researchers — all open.
+
+**Current focus.** Hardening and observability — pipeline drift detection, daily summary, auto-merge for high-confidence entry PRs, weekly actor/episode retrospective. See [`TASKS.md`](../TASKS.md) for the live list.
 
 ---
 

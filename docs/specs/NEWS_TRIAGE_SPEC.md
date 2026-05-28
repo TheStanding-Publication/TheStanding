@@ -139,5 +139,5 @@ The scheduled task supplies **no** date — triage marches the backlog from the 
 5. **Low bar — caught, not confirmed** — a false positive costs a vetting pass; a false negative loses a story. Lean toward filing.
 6. **Mark every triaged day** — covered means covered, tips or no tips.
 
-## Downstream contract (vet-tip mode of NEWS_RESEARCH)
-A `tip` issue is a lead. The vetting step — NEWS_RESEARCH in vet-tip mode — takes a tip, performs full event research, rewrites it into a complete monitoring issue, and transitions the tag `tip` → `ready-for-entry`; or, if the tip does not pan out, closes it (which keeps it in the dedup set so the same story is not re-tipped). Triage should be reasonably good but it does not need to be perfect — some tips will be rejected at vetting, and that is the system working as designed.
+## Downstream contract
+A `tip` issue is a lead. The vetting step — `standing-tip-vetter`, which calls [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) for the inclusion verdict and then acts mechanically on it — takes a tip and either promotes it (full research run, body rewritten in place, label `tip` → `ready-for-entry`, title `[Tip]` → `[Monitoring]`) or closes it (kept in the dedup set so the same story is not re-tipped). Triage should be reasonably good but it does not need to be perfect — some tips will be rejected by archive-fit, and that is the system working as designed.

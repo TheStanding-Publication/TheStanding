@@ -13,7 +13,7 @@ eleventyExcludeFromCollections: true
 
 The publication documents events involving authoritarianism, anti-democratic behavior, and corruption — applied to any actor, regardless of party, position, or political alignment.
 
-The standard is not "things the editor disagrees with." It is "things that erode small-d democratic norms," with the norms catalogued in the [twelve ideals](/ideals/) and the specific patterns catalogued in the [seventy-seven abuses](/ideals/).
+The standard is not "things the editor disagrees with." It is "things that erode small-d democratic norms," with the norms catalogued in the [twelve ideals](/ideals/) and the specific patterns catalogued in the [abuse taxonomy](/ideals/).
 
 The publication takes a broken-windows view of democratic decline: no anti-democratic action is too small to record. A precinct-level voter intimidation incident sits in the archive alongside a national overturning attempt — both fit the taxonomy, both are recorded with the same rigor. The premise is that democratic norms erode through the accumulation of small breaches at least as much as through dramatic single events, and the historical record should reflect that. There is no significance threshold beyond the inclusion criteria themselves.
 
@@ -68,17 +68,6 @@ When the source is anonymous, the entry includes this disclaimer prominently in 
 
 The "no anonymous sources" rule applies to claims that depend on someone whose identity is hidden — for example, an unnamed government employee said by a reporter to have confirmed something. A citizen-captured recording whose author is anonymous is a different category: the recording itself is the source, and its authenticity can be evaluated on its own terms without depending on the captor's identity. The captor remains anonymous; the evidence is published.
 
-## Confidence
-
-The `confidence` field calibrates how sure the publication is that the recorded event happened as described.
-
-- **confirmed** — a primary source establishes the event directly. No meaningful dispute. A court has issued an order; the entry links to the order. The fact pattern speaks for itself.
-- **well-reported** — multiple credible outlets converge on the same fact pattern with no significant contradictions in subsequent reporting. The publication is comfortable stating the event as fact but is not the original investigator.
-- **developing** — active reporting. The basic fact pattern is documented but specific details may shift. The entry should note that the story is developing.
-- **alleged** — a specific accusation has been made, with a named accuser. The publication is recording the allegation, not adjudicating it. Use this for active prosecutions, lawsuit allegations, and other not-yet-resolved claims.
-
-Allegations are still in scope, but they are labeled as allegations, and the character of the source is made plain. A federal indictment is a different kind of allegation than a tabloid claim, and the entry reflects that.
-
 ## Anonymous sources
 
 The publication distinguishes two categories that the phrase "anonymous source" tends to blur together: anonymous *institutional* sources and anonymous *citizen* documentation. The first is excluded; the second is accepted with conditions.
@@ -99,7 +88,7 @@ The publication is documentary, not polemic. Read like a historian writing for t
 
 **Body prose** can provide more context but maintains the same standard. Quote primary documents when the wording matters. Avoid scare quotes; if a term is contested, say so directly rather than punctuating it with skepticism.
 
-**Quotes** are limited to one per entry and fewer than fifteen words. The cited quote must come from a primary source listed in the entry's sources. The quote field is for the most factually load-bearing line in the underlying record, not the most damning or rhetorically effective line.
+**Quotes** are limited to one per entry and fewer than thirty words. The cited quote must come from a primary source listed in the entry's sources. The quote field is for the most factually load-bearing line in the underlying record, not the most damning or rhetorically effective line.
 
 ## Actor attribution
 
