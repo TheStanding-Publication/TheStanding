@@ -19,7 +19,7 @@
   - Labels: monitoring-intake, needs-research, [abuse slug]
 
 - [x] ~~**Entry recording workflow**~~ - Automated checks + PR creation (2026-05-18)
-  - Single skill: docs/specs/ENTRY_RECORDING_SPEC.md
+  - Single skill: docs/specs/ISSUE_TO_ENTRY_SPEC.md (originally ENTRY_RECORDING_SPEC; the latter was retired 2026-05-28)
   - URL validation (live + content integrity via hashing)
   - Actors validation (verified against sources, normalized if in actors.yaml)
   - Location validation (required per jurisdiction)
