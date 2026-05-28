@@ -51,16 +51,18 @@ taxonomy/
 
 docs/
   PROJECT_PLAN.md           # full design document
-  WORKFLOWS_COMPLETED.md    # workflow status and architecture summary
-  skills/                   # workflow skill documentation
+  specs/                    # operational specs (single sources of truth)
     NEWS_RESEARCH_SPEC.md
     NEWS_TRIAGE_SPEC.md
-    ENTRY_RECORDING_SPEC.md
+    URL_TO_ISSUE_SPEC.md
+    ARCHIVE_FIT_SPEC.md
+    ISSUE_TO_ENTRY_SPEC.md
     EDITORIAL_WORKFLOW_SPEC.md
-    TAXONOMY_APPLICATION_SPEC.md
     DAILY_DIGEST_SPEC.md
+    TAXONOMY_APPLICATION_SPEC.md
     ACTOR_NORMALIZATION_SPEC.md
-    NEWS_RESEARCH_TEST_SPEC.md
+    BUILD_SPEC.md
+  PIPELINE.md               # end-to-end system overview
 ```
 
 ## Contributing
