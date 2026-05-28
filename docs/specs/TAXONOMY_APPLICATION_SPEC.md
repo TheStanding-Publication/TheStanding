@@ -1,300 +1,124 @@
-# The Standing: Taxonomy Application Skill
+# The Standing: Taxonomy Application
 
 ## Purpose
-Guide editors and automated systems on how to map documented events to the correct abuses within The Standing's taxonomy. This ensures consistent, accurate categorization across the archive.
+
+This spec is the **canonical source of truth** for how events are mapped to abuses in The Standing's taxonomy. Other specs defer to it: `NEWS_RESEARCH_SPEC` Step 3 (semantic evaluation), `ARCHIVE_FIT_SPEC` Step 4 (abuse match), and `ISSUE_TO_ENTRY_SPEC` Step 3 (validate-and-correct) all apply this spec's rules rather than restating them.
+
+When the mapping logic changes — what counts as a clean match, how to handle ambiguity, when to use secondary abuses, what the taxonomy-gap path is — the change lands here. All callers fetch this document on next run.
+
+## Inputs
+
+- `taxonomy/ideals.yaml` — the 12 democratic ideals.
+- `taxonomy/abuses.yaml` — the 77 (and growing) abuses, each tied to one ideal via the `ideal:` field.
+- The candidate event — a story, an issue body, or a source article.
+
+## How callers use this spec
+
+| Caller | Where | What it expects |
+|---|---|---|
+| `NEWS_RESEARCH_SPEC` | Step 3 (semantic evaluation) | Map 1–5 abuses per story; emit only slugs that exist in the live `abuses.yaml`. |
+| `ARCHIVE_FIT_SPEC` | Step 4 (abuse match) | Match per ideal; use the taxonomy-gap path when nothing fits. |
+| `ISSUE_TO_ENTRY_SPEC` | Step 3 (validate-and-correct) | Re-derive abuse slugs when the upstream issue used invalid or stale ones. |
+
+A caller never invents slugs, never extends the taxonomy inline, and never silently substitutes a related abuse for one that doesn't fit. The taxonomy-gap path (below) is how that gets handled.
 
 ## The Taxonomy Structure
 
-The Standing's taxonomy has two levels:
-
-**Level 1: Democratic Ideals (12 total)**
-- Free and fair elections
-- Rule of law and equal application
-- Separation of powers and independent oversight
-- Free press
-- Freedom of speech, assembly, and association
-- Public service over self-dealing
-- Civilian control of armed and uniformed services
-- Due process and fair trials
-- Transparent governance
-- Constitutional limits on executive power
-- Non-interference in elections (domestic and foreign)
-- Protection of vulnerable populations
-
-**Level 2: Abuses (77 total)**
-Each ideal has multiple specific abuses. For example, "Free and fair elections" includes:
-- voter-suppression
-- gerrymandering
-- election-denial
-- election-worker-intimidation
-- disinformation-campaigns
-- (and more)
+Two levels, with auto-derivation between them.
 
-**Key rule:** When you tag an entry with an abuse, **the parent ideal is auto-derived at archive build time.** You only need to list abuse slugs — the ideal pages and entry-to-ideal relationships are handled automatically.
-
----
-
-## How to Apply the Taxonomy
-
-### Step 1: Understand the Event
-Read the entry's headline, summary, and sources carefully. **What specifically happened?**
-
-- WHO did it? (Actor name, title, agency)
-- WHAT did they do? (Specific action)
-- WHEN? (Date)
-- WHERE? (Location, jurisdiction)
-- HOW does it violate democratic norms? (Which ideal(s)?)
-
-### Step 2: Identify the Primary Abuse
-**Ask: What specific abuse definition does this event match?**
-
-Refer to `/taxonomy/abuses.yaml` and read the definition for candidate abuses. Match the event to the abuse definition, not to a vague keyword.
+**Level 1: Democratic Ideals (12 total).** Each is a positive principle (e.g. "Free and fair elections"). Ideals are not assigned to events directly — they're auto-derived at build time from the abuses an entry is tagged with. See `BUILD_SPEC` → auto-derivation.
 
-**Examples:**
-
-**Event:** "State election official certifies results despite losing candidate's public pressure campaign."
-- Candidate abuses: election-denial, voter-suppression, election-worker-intimidation
-- **Primary abuse:** election-worker-intimidation (the official faced pressure/intimidation)
-- Why not election-denial? The official didn't deny the election; they resisted denial.
-
-**Event:** "Federal court rules executive order exceeded constitutional authority."
-- Candidate abuses: executive-overreach, separation-of-powers-violation
-- **Primary abuse:** executive-overreach (executive acted beyond authority)
-- Why not ambiguous? The abuse definition explicitly covers acting beyond constitutional limits.
-
-**Event:** "Police use force against protesters during legal assembly; 5 people injured."
-- Candidate abuses: excessive-force-by-law-enforcement, freedom-of-assembly-restriction
-- **Primary abuse:** excessive-force-by-law-enforcement (force was the abuse)
-- Why not freedom-of-assembly? The restriction came through force, not through permit denial or legal barrier.
-
-### Step 3: Check for Secondary Abuses
-**Ask: Does this event also clearly violate other ideals?**
-
-Use secondary abuses sparingly. Typical entry has 1-3 abuses. Avoid tagging just because it's "related" — tag only if the abuse definition clearly applies.
-
-**Examples of appropriate secondary tags:**
-
-**Event:** "President fires inspector general who was investigating the president's agency; DOJ then launches investigation of the fired IG for alleged crimes."
-- Primary: retaliation-against-whistleblowers
-- Secondary: weaponizing-DOJ (DOJ launching politically-motivated investigation)
-- Tertiary: IG-firings (if appropriate under separation-of-powers ideal)
-- Why? All three abuses are clearly at play.
-
-**Event:** "State passes law requiring voter ID; research shows impact is 3x higher on minority voters."
-- Primary: voter-suppression
-- Secondary: NOT discrimination-of-protected-class (unless law explicitly targets by race)
-- Why? The data shows impact but the law doesn't explicitly discriminate. Voter-suppression is sufficient.
-
-### Step 4: Avoid Common Over-Tagging Mistakes
-
-**Mistake 1: Tagging the actor, not the abuse.**
-- ✗ "A politician lied in a speech" tagged as `selective-prosecution` (because we associate the actor with abuse)
-- ✓ "A politician lied in court testimony, obstructing investigation" tagged as `obstruction-of-OIG-investigations`
-- Why? Tag the specific abuse, not the actor's general bad behavior.
+**Level 2: Abuses (77+).** Each abuse has a `slug`, a `title`, a `description`, and an `ideal` it violates. Authors tag entries with abuse slugs only.
 
-**Mistake 2: Tagging political disagreement.**
-- ✗ "Senator votes against regulation" tagged as `executive-overreach`
-- ✓ Only if the event describes an abuse (executive exceeded authority, not legislative disagreement)
+**Key rule:** the parent ideal is auto-derived from the abuse at build time. Tagging both is redundant — and the build will fail if an ideal slug appears where an abuse slug is expected.
 
-**Mistake 3: Confusing correlation with abuse.**
-- ✗ "Event occurs in state where abuse happens, so tag it" (location ≠ causal abuse)
-- ✓ Tag only if the event itself describes abuse.
-
-**Mistake 4: Over-specificity.**
-- ✗ "This is both voter-suppression AND election-denial" (when only one applies)
-- ✓ Identify the primary abuse and include secondary only if both clearly apply.
+## Mapping workflow
 
-**Mistake 5: Missing the real abuse by focusing on the symptoms.**
-- ✗ Event: "State legislature passes law that happens to impact minorities; tagged as discrimination-of-protected-class"
-- ✓ Event: "State legislature passes law that explicitly targets voters by race or felony history; tagged as voter-suppression + potential discrimination" (if law is explicit)
-- Why? Impact without intent or explicit targeting is noted in sources; the abuse classification is about the law itself.
+### Step 1: Understand what happened
 
----
+Read the headline, summary, and primary source. Be specific:
 
-## Decision Trees for Common Scenarios
+- **Who** did it? (Actor — title, agency, organization.)
+- **What** did they do? (Specific action — not "behaved badly," but "fired the inspector general.")
+- **When** and **where**?
+- **How** does it violate democratic norms? (Which ideal does it touch?)
 
-### Election-Related Events
+If you can't answer "what specifically happened," you can't tag — and you probably can't archive. Surface to the operator before proceeding.
 
-**Event involves voters not being able to vote:**
-- Is access blocked by law, administrative action, or polling place closure? → `voter-suppression`
-- Are election workers being pressured/intimidated? → `election-worker-intimidation`
-- Is someone denying election results? → `election-denial`
-- Are election workers not certifying? → `certification-refusal`
+### Step 2: Identify the primary abuse
 
-**Event involves election integrity:**
-- Is someone spreading false claims about election? → `election-denial` + `disinformation-campaigns`
-- Are districts redrawn for political advantage? → `gerrymandering`
-- Are voting machines or procedures undermined? → `election-integrity-sabotage` (if exists)
+Match the event to an abuse's **definition** in `abuses.yaml`, not to a keyword. The slug is a hook; the description is the contract.
 
-### Law Enforcement / Protest Events
+The primary abuse is the **core** of what happened — what an unfamiliar reader would say the event was an instance of, in one phrase. Each entry has exactly one primary abuse; it appears first in the `abuses[]` list and feeds the slug generation in `ISSUE_TO_ENTRY_SPEC`.
 
-**Event involves police and protesters:**
-- Did police use force? → `excessive-force-by-law-enforcement`
-- Did police arrest protesters for lawful speech? → `prosecution-of-protected-speech`
-- Did police require permits unreasonably? → `viewpoint-based-permit-denials` (if permit was denied for viewpoint)
-- Did police or government surveil protesters? → `protester-surveillance`
+Worked examples:
 
-### Press / Speech Events
+- **State election official certifies despite a losing candidate's pressure campaign.** Primary: `election-worker-intimidation`. Not `election-denial` — the official resisted denial; the abuse was directed *at* them.
+- **Federal court rules an executive order exceeded constitutional authority.** Primary: `executive-overreach`. The abuse is the order itself, not the ruling.
+- **Police use force against protesters during a lawful assembly; injuries result.** Primary: `excessive-force-by-law-enforcement`. Not `freedom-of-assembly-restriction` — the restriction came through force, not through permit denial or a legal barrier.
 
-**Event involves journalists:**
-- Was journalist arrested/prosecuted for journalism? → `prosecution-of-journalists`
-- Did government retaliate against press outlet? → `press-retaliation`
-- Did government restrict press access? → `expulsion-from-public-proceedings`
-- Did government threaten publisher? → `legal-threats-against-publishers`
+### Step 3: Add secondary abuses sparingly
 
-**Event involves speech restrictions:**
-- Was speech prosecuted? → `prosecution-of-protected-speech`
-- Was speech targeted by government? → `targeting-critics-with-government-power`
-- Was speech restricted by permit denial? → `viewpoint-based-permit-denials`
+Tag a secondary abuse only when the abuse definition clearly applies — not because the event is "related" to it or because the actor is the kind who often commits it. Typical entries map to 1–3 abuses. Most editorial mis-mappings come from over-tagging, not under-tagging.
 
-### Government Accountability Events
+Worked examples:
 
-**Event involves oversight/investigation:**
-- Did official refuse to comply with investigation? → `defying-subpoenas`
-- Did official fire watchdog/IG? → `IG-firings`
-- Did official block investigation? → `obstruction-of-OIG-investigations`
-- Did official retaliate against person reporting wrongdoing? → `retaliation-against-whistleblowers`
+- **President fires the IG investigating his agency; DOJ launches an investigation of the fired IG.** Primary: `retaliation-against-whistleblowers`. Secondary: `weaponizing-DOJ` (the politically motivated DOJ investigation), `IG-firings`. All three abuses are independently present.
+- **State passes voter-ID law; research shows 3x impact on minority voters.** Primary: `voter-suppression`. Secondary: **none**. Impact data is not the same as explicit targeting; the law's mechanism is what's tagged, not the demographics of who it falls on.
 
-**Event involves executive power:**
-- Did executive act beyond authority? → `executive-overreach`
-- Did executive bypass legislature? → `bypassing-congress`
-- Did executive defy court order? → `defying-court-orders`
-- Did executive improperly pardon? → `pardons-for-allies-or-self`
+### Step 4: Handle ambiguity and gaps
 
-### Corruption / Self-Dealing Events
+Two cases the mapper has to recognize.
 
-**Event involves financial benefit to official:**
-- Did official benefit from conflict of interest? → `undisclosed-financial-conflicts`
-- Did official family get job/contract? → `nepotism`
-- Did official use office for personal enrichment? → `self-dealing` + `monetizing-office`
-- Did official accept bribe? → `bribery`
-- Did official use executive power to help business associate? → `pay-to-play` + `self-dealing`
+**Ambiguous fit — multiple abuses could plausibly apply.** Read each candidate definition. Ask: which is the **core** of what happened? Pick that as primary. Add others as secondary only if their definitions independently apply. Err narrow.
 
----
+**No fit — no existing abuse cleanly describes the event.** This is a **taxonomy-gap signal**, not a discard signal. The taxonomy grows by design when real events expose missing categories.
 
-## Guidelines for Handling Ambiguity
+The handling depends on which caller is mapping:
 
-### When the Event Could Fit Multiple Abuses
+- **`ARCHIVE_FIT_SPEC` (issue mode):** verdict is `blocked-on-taxonomy`. Archive-fit drafts the new abuse and opens a PR against `taxonomy/abuses.yaml`. Source issue is held until the PR resolves.
+- **`NEWS_RESEARCH_SPEC` (Step 3):** pick the closest existing abuse, flag the imperfect fit in the issue body's **Analysis** section. The downstream archive-fit/issue-to-entry will catch the gap and either re-map or open the taxonomy PR.
+- **`ISSUE_TO_ENTRY_SPEC` (Step 3):** re-run archive-fit on the issue rather than skip-flagging. Archive-fit owns the taxonomy-gap path.
 
-**Approach:**
-1. Read each candidate abuse definition in `/taxonomy/abuses.yaml`
-2. Ask: "Which abuse is the CORE of what happened?"
-3. Tag the core abuse as primary
-4. Tag 1-2 secondary abuses only if they're equally clear
+Never invent a slug. Never apply a wrong-fit slug to avoid the gap path. Stretched abuses poison the archive's analytical value.
 
-**Example:** Official threatens journalist to stop investigating corruption.
-- Candidate abuses: `press-retaliation`, `targeting-critics-with-government-power`
-- Primary: `press-retaliation` (the abuse is retaliation against press)
-- Secondary: `targeting-critics-with-government-power` (also fits, but press-specific abuse is more precise)
+## Common over-tagging mistakes
 
-### When the Event Doesn't Fit an Abuse Exactly
+A few patterns to avoid:
 
-**Decision:** Don't force-fit. If it doesn't match the defined abuse, it may not be an entry.
+- **Tagging the actor, not the abuse.** "A senator lied in a speech" is not `obstruction-of-OIG-investigations` just because the actor is unsympathetic. Tag what was done, not who did it.
+- **Tagging political disagreement.** A senator voting against a regulation is not `executive-overreach` — it's ordinary politics. The event itself must be an abuse.
+- **Tagging proximity.** An abuse happening in a state does not mean every event from that state is tagged with the abuse. The event itself must match the definition.
+- **Splitting one act into two abuses.** Tagging both `voter-suppression` AND `election-denial` when only one applies. Pick the core.
+- **Confusing impact with intent.** Disparate impact is noted in sources; the abuse classification is about the act itself.
 
-**Example:** "Mayor proposes budget that would reduce park funding"
-- Does this match any abuse? No. It's governance disagreement, not abuse.
-- Don't create entry.
+## Decision sketches (not rules)
 
-**Example:** "Police use non-lethal force against protesters during unlawful assembly"
-- Is this `excessive-force`? Only if force was disproportionate to threat.
-- If lawful assembly → likely excessive-force
-- If unlawful assembly → may not be excessive-force; depends on context.
+These are quick reference patterns — read the abuse definition for the real answer.
 
-### When You're Unsure
+- **Voters can't vote** — access blocked by law/policy → `voter-suppression`; election workers pressured → `election-worker-intimidation`; results denied → `election-denial`; certification refused → `certification-refusal`.
+- **Police vs. protesters** — force used → `excessive-force-by-law-enforcement`; protesters arrested for lawful speech → `prosecution-of-protected-speech`; permits denied by viewpoint → `viewpoint-based-permit-denials`; surveillance → `protester-surveillance`.
+- **Press incidents** — journalist arrested → `prosecution-of-journalists`; outlet retaliated against → `press-retaliation`; press access blocked → `expulsion-from-public-proceedings`; publisher threatened → `legal-threats-against-publishers`.
+- **Oversight blocked** — refused to comply → `defying-subpoenas`; watchdog fired → `IG-firings`; investigation obstructed → `obstruction-of-OIG-investigations`; whistleblower retaliated against → `retaliation-against-whistleblowers`.
+- **Executive power** — acted beyond authority → `executive-overreach`; bypassed legislature → `bypassing-congress`; defied a court → `defying-court-orders`; improper pardon → `pardons-for-allies-or-self`.
+- **Self-dealing** — conflict undisclosed → `undisclosed-financial-conflicts`; family hired → `nepotism`; office monetized → `monetizing-office`; bribe accepted → `bribery`; power used to help an associate → `pay-to-play` + `self-dealing`.
 
-**Consult:**
-1. Read the ideal's explainer page (if exists)
-2. Look at similar entries already in the archive and see how they're tagged
-3. Ask: "Would future readers expect to find this under [ideal name]?"
-4. If still unsure, err toward the narrower, more defensible abuse
-5. Add a note in the entry for editorial review
+For the complete current list of abuse slugs and definitions, read [`taxonomy/abuses.yaml`](../../taxonomy/abuses.yaml) directly — it is the source of truth, and any list quoted in spec text drifts.
 
----
+## Key principles
 
-## Auto-Derivation Rules
+1. **Match definitions, not keywords.** The slug is a hook for storage; the description is the contract.
+2. **One primary abuse.** Whatever a reader would call the event in one phrase.
+3. **Secondary abuses are evidence-driven, not associative.** Add only if the definition independently applies.
+4. **Gaps are signals.** No fit means the taxonomy needs a new abuse, not that the wrong abuse should be force-fit.
+5. **Never invent slugs.** Every emitted slug must already exist in the live `abuses.yaml`.
+6. **The build auto-derives ideals.** Tagging ideals is redundant and an error — see `BUILD_SPEC`.
 
-**You do NOT manually assign ideals.** The build process automatically derives them from abuses.
+## Related specs
 
-**Example:**
-If you tag an entry with `voter-suppression`, the build system:
-1. Looks up `voter-suppression` in `/taxonomy/abuses.yaml`
-2. Finds its parent ideal: "Free and fair elections"
-3. Auto-adds this entry to the ideal's page and entry list
-
-**This means:**
-- One abuse → one ideal
-- Multiple abuses → entry appears on multiple ideal pages
-- No extra work needed from you
-
----
-
-## Taxonomy Maintenance (Editorial)
-
-### When to Create a New Abuse
-
-**Do NOT create new abuses lightly.** The taxonomy is designed to be stable.
-
-**Only create new abuse if:**
-1. An event clearly describes institutional abuse
-2. That abuse doesn't fit existing definitions
-3. You expect future similar events (not one-off)
-
-### Two ways a new abuse gets proposed
-
-**Automatic (story-driven):** When [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md)
-evaluates a candidate story that matches one of the 12 ideals but no
-existing abuse fits cleanly, archive-fit opens a PR against
-`taxonomy/abuses.yaml` proposing the new abuse and applies
-`blocked-on-taxonomy` to the source issue. This is the default path —
-most new abuses originate from a real story that exposed the gap. The
-operator reviews the PR; merging it unblocks the source issue, which
-re-evaluates cleanly on the next archive-fit run.
-
-**Manual (editor-driven):** When an editor notices a gap unrelated to a
-specific in-flight story — reviewing the taxonomy, comparing against
-external frameworks, or anticipating future events — the steps below
-still apply. Manual additions are rarer in practice but remain
-supported.
-
-**Manual process:**
-1. Propose new abuse to Bill (via GitHub issue in taxonomy)
-2. Define it clearly
-3. Assign to appropriate ideal
-4. Generate slug (kebab-case)
-5. Add to `/taxonomy/abuses.yaml`
-6. Submit PR for team review
-
-### Avoiding Abuse Sprawl
-
-**Principle:** Reuse existing abuses. New abuses only when necessary.
-
-**Example:**
-- "Official improperly fires agency official" → `IG-firings` or `retaliation-against-whistleblowers` (don't create `improper-firing`)
-- "Judge rules against defendant without hearing" → `due-process-violation` (don't create `denial-of-hearing`)
-
----
-
-## Confidence Levels and Abuse Mapping
-
-**Confidence level** (monitoring, preliminary, well-reported, primary-source) refers to **source quality**, not abuse clarity.
-
-**Abuse mapping confidence** is separate:
-- If sources are clear and abuse is obvious → "well-reported" or "primary-source"
-- If sources are clear but abuse definition is fuzzy → note in editorial review
-- If sources are developing and abuse is unclear → "developing" confidence level
-
----
-
-## Common Abuse Slugs Reference
-
-**Elections:** voter-suppression, election-denial, election-worker-intimidation, gerrymandering, certification-refusal
-
-**Law enforcement:** excessive-force-by-law-enforcement, protester-surveillance, prosecution-of-protected-speech
-
-**Press:** press-retaliation, prosecution-of-journalists, expulsion-from-public-proceedings, legal-threats-against-publishers
-
-**Oversight:** defying-subpoenas, IG-firings, obstruction-of-OIG-investigations, retaliation-against-whistleblowers
-
-**Executive power:** executive-overreach, bypassing-congress, defying-court-orders, weaponizing-DOJ
-
-**Corruption:** nepotism, self-dealing, bribery, undisclosed-financial-conflicts, pay-to-play, monetizing-office
+- [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) — owns the inclusion verdict; uses this spec's rules at its Step 4.
+- [`NEWS_RESEARCH_SPEC`](./NEWS_RESEARCH_SPEC.md) — uses this spec at Step 3 (semantic evaluation).
+- [`ISSUE_TO_ENTRY_SPEC`](./ISSUE_TO_ENTRY_SPEC.md) — uses this spec at Step 3 (validate-and-correct).
+- [`BUILD_SPEC`](./BUILD_SPEC.md) — what the build does (and doesn't) enforce about abuses on entries.
+- [`taxonomy/abuses.yaml`](../../taxonomy/abuses.yaml) — definitions, source of truth.
+- [`taxonomy/ideals.yaml`](../../taxonomy/ideals.yaml) — the 12 ideals.

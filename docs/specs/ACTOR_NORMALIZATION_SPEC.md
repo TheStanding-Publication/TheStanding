@@ -1,413 +1,116 @@
-# The Standing: Actor Normalization Skill
+# The Standing: Actor Normalization
 
 ## Purpose
-Ensure that actors (people and organizations) are consistently named across the archive, reducing fragmentation and enabling readers to find all entries related to a person or organization. This skill defines when and how to add aliases to `taxonomy/aliases.yaml`.
 
----
+This spec is the **canonical source of truth** for actor naming and consolidation in the archive. Other specs defer to it: `ISSUE_TO_ENTRY_SPEC` Step 3 (actor filtering and normalization), `EDITORIAL_WORKFLOW_SPEC` (PR review of actors), and `BUILD_SPEC` (build-time alias resolution) all apply this spec's rules rather than restating them.
 
-## The Problem
+Actor sprawl is the problem this spec solves: the same person or organization appearing under multiple names ("Trump" / "Donald Trump" / "President Trump") fragments the actor page system. The build resolves variants to a canonical name using [`taxonomy/aliases.yaml`](../../taxonomy/aliases.yaml). This spec defines when an alias goes into that file and what the canonical name should be.
 
-Without normalization, the same actor might appear as:
-- "Donald Trump"
-- "Trump, Donald"
-- "President Trump"
-- "Donald J. Trump"
-- "D. Trump"
+## Inputs
 
-This causes fragmentation — readers searching for "Trump" might miss entries where he appears as "President Trump" or "Donald J. Trump."
+- [`taxonomy/aliases.yaml`](../../taxonomy/aliases.yaml) — the alias registry.
+- The actor names appearing on entries — raw, from the issue body's "Actors involved" section.
 
-**Solution:** Maintain a controlled alias file that maps variations to a canonical name.
+## How callers use this spec
 
----
+| Caller | Where | What it expects |
+|---|---|---|
+| `ISSUE_TO_ENTRY_SPEC` | Step 3 (validate-and-correct) | Filter the actor list to entities that **took the action**; emit names as-found (build will normalize). |
+| `EDITORIAL_WORKFLOW_SPEC` | PR review | Spot fragmentation across recent entries; flag actors that need an alias. |
+| `BUILD_SPEC` | Build time | Resolve every raw actor string through `aliases.yaml`; generate the actor page using the canonical name. |
 
-## The Aliases File
+Entries are not required to use canonical names — the build handles the lookup. What the build can't do is detect that two different-looking names refer to the same person; that's an editorial judgment call this spec governs.
 
-**Location:** `/taxonomy/aliases.yaml`
+## Who counts as an actor
 
-**Format:**
-```yaml
-canonical_name: "Donald Trump"
-aliases:
-  - "Donald J. Trump"
-  - "President Trump"
-  - "Trump, Donald"
-  - "D. Trump"
-```
+Actors are entities that **took the action** the entry describes — the perpetrators of the abuse, not the context, not the targets. This is the filter `ISSUE_TO_ENTRY_SPEC` applies at Step 3.
 
-**Build process:** When the site builds, the system normalizes all actor names using this file. All variations are replaced with the canonical name in display.
+- **Include:** named individuals who committed the act; the agencies, organizations, or companies whose decision made it possible.
+- **Exclude:** a court whose prior ruling enabled the action (context, not actor); an opposition party that protested it (commentary, not action); the target of the action (victim, not actor).
 
----
+When in doubt, ask: "Did this entity *do* the abuse, or are they here for backstory?" If backstory, mention in the body, not the actor list.
 
-## When to Add an Alias
+## The alias registry
 
-**Rule:** Add an alias when:
-1. An actor appears in multiple entries with different name variations, AND
-2. That actor is appearing in ≥3 total entries (threshold for creating actor page)
-
-**Don't prematurely normalize.** Wait until you see evidence of fragmentation across multiple entries. One-off name variations can be handled in editorial review.
-
-### Triggers for Adding an Alias
-
-**Trigger 1: Multiple entries show name variation**
-- Entry 1: "Donald Trump"
-- Entry 2: "President Trump"
-- Entry 3: "Donald J. Trump"
-→ Create alias
-
-**Trigger 2: Build system flags probable duplicates**
-- Build system uses Levenshtein distance + abbreviation matching to flag likely duplicates
-- Example: "Steve Miller" and "Stephen Miller" in different entries
-- Build output: ⚠️ Probable duplicate: "Steve Miller" ≈ "Stephen Miller"
-→ Create alias if they're the same person
-
-**Trigger 3: Known person with multiple identities**
-- Example: Someone who held multiple titles (e.g., "Captain, NYPD" then "Police Commissioner")
-- Don't fragment — use canonical name + roles in separate metadata
-→ Create alias to unify
-
-### Triggers to IGNORE (Don't Add Alias)
-
-**Different people with similar names:**
-- "John Smith" (senator) and "John Smith" (activist)
-→ Keep separate; add clarifying role/context in entries, not aliases
-
-**One-off typo or variation:**
-- Entry: "Stephen Miller" (correct)
-- Another entry: "Stephen Milller" (typo)
-→ Fix the typo in editorial review; don't add alias
-
-**Organizational rebranding:**
-- "FBI" and "Federal Bureau of Investigation"
-→ Use alias (both refer to same organization)
-
-**Organizational restructuring:**
-- "U.S. Department of Justice" (old) → "Department of Justice" (new)
-→ Use alias; readers should find both under same organization
-
----
-
-## How to Create an Alias
-
-### Step 1: Identify the Canonical Name
-**Choose the most formal/complete name:**
-- For individuals: Full legal name without title
-  - ✓ "Donald Trump" not "President Trump"
-  - ✓ "Stephen Miller" not "Steve Miller"
-- For organizations: Full official name
-  - ✓ "U.S. Department of Justice" not "DOJ"
-  - ✓ "Federal Bureau of Investigation" not "FBI"
-
-### Step 2: List All Known Variations
-**Search entries and sources for all versions:**
-- How does the person appear in news articles? (formal, informal, abbreviated)
-- How do they appear in official documents? (titles, full name)
-- How do they appear in social media? (nicknames, abbreviations)
-
-**Example: Stephen Miller**
-- "Stephen Miller" (most common)
-- "Stephen G. Miller" (formal)
-- "Steve Miller" (informal)
-- "Senior Advisor Stephen Miller" (with title)
-→ Canonical: "Stephen Miller" (remove title, use formal first name)
-→ Aliases: "Stephen G. Miller", "Steve Miller"
-
-### Step 3: Add to aliases.yaml
-
-**Edit `/taxonomy/aliases.yaml`:**
+The registry lives at [`taxonomy/aliases.yaml`](../../taxonomy/aliases.yaml). Each entry has the following shape:
 
 ```yaml
-# Existing entries above...
-
-- canonical_name: "Stephen Miller"
+- slug: us-doj
+  canonical: "U.S. Department of Justice"
+  type: agency
   aliases:
-    - "Stephen G. Miller"
-    - "Steve Miller"
-    - "Senior Advisor Stephen Miller"
-
-# Continue alphabetically...
+    - "DOJ"
+    - "Department of Justice"
+    - "Justice Department"
+    - "USDOJ"
 ```
 
-**Rules for the file:**
-- Sort entries alphabetically by canonical name
-- Canonical name should NOT be in aliases list (only in canonical_name)
-- One canonical per actor (no circular aliases)
-- Comments are OK to explain context
+Fields:
 
-### Step 4: Test the Build
+- **`slug`** — URL-safe identifier for the actor page (`/actors/<slug>/`).
+- **`canonical`** — the display name. Used everywhere the actor appears: archive pages, see-also lists, the actor's own page.
+- **`type`** *(optional)* — one of `person`, `agency`, `court`, `legislature`, `party`, `company`, `ngo`, `foreign-state`, `individual`. Used by templates for formatting.
+- **`aliases`** — list of alternate spellings that should resolve to this canonical entry.
+- **`notes`** *(optional)* — editorial context (former names, disambiguation, etc.).
 
-**After adding alias, run the build:**
-```bash
-npm run build
-```
+**Matching is case-insensitive but exact-string** after dropping any parenthetical trailing role: `"Donald Trump (President)"` becomes `"Donald Trump"` before the lookup. See `.eleventy.js` → `normalizeActor()` for the precise algorithm.
 
-**Check:**
-- No build errors
-- Actor pages are generated correctly
-- All variations now appear as canonical name in entries
-- See-also relationships work correctly
+## When to add an alias
 
-### Step 5: Create PR
+The trigger is **observed fragmentation**: the same actor appears in entries under two or more distinct names. Don't pre-register actors before fragmentation exists — `aliases.yaml` is a reactive registry, not a directory.
 
-**Submit change to version control:**
-- PR title: `[Alias] Normalize [Canonical Name]`
-- Description: "Normalizing [number] name variations for [canonical name] across [number] entries"
-- No need for approval; this is metadata; can merge after build passes
+In practice, add an alias when both of these are true:
 
----
+1. The actor has appeared in **3 or more** entries (the threshold at which the build generates an actor page — see `BUILD_SPEC`).
+2. **At least two** of those entries use different names for the same actor.
 
-## Guidelines for Specific Actor Types
+Below the threshold, the actor exists on the entries but has no dedicated page, so fragmentation has no public-facing cost.
 
-### Government Officials (Federal)
+## When NOT to add an alias
 
-**Canonical format:** `[First Name] [Last Name]` (no title)
-- ✓ "Donald Trump" not "President Trump"
-- ✓ "Eric Holder" not "Attorney General Eric Holder"
-- ✓ "Merrick Garland" not "AG Merrick Garland"
+- **Different people with similar names.** "John Smith" the senator and "John Smith" the activist stay separate. Disambiguate in the entry's actor list (e.g. `"John Smith (NY-12)"` vs `"John Smith (ACLU)"`) — do not collapse via alias.
+- **A one-off typo in a single entry.** Fix the typo in the entry, not the registry.
+- **A name still in flux.** If a new public figure's commonly-used name is shifting in real time, wait for it to stabilize. Adding an alias now and reversing it later is more disruptive than waiting.
 
-**Aliases:** Include common abbreviations, nicknames, full formal names
-- "Donald Trump" → aliases: "Donald J. Trump", "President Trump", "Donald John Trump"
+## Choosing the canonical name
 
-**Note:** Titles are tracked separately in entry metadata (e.g., "Donald Trump (President)"). Use canonical name only.
+The canonical name is what readers see. Prefer the **most recognizable** form a literate reader would use unprompted:
 
-### Government Agencies
+- **People** — full name without title. `"Donald Trump"`, not `"President Trump"` or `"Donald J. Trump"`. Title goes in the entry's parenthetical role, not the canonical.
+- **Agencies** — full official name. `"U.S. Department of Justice"`, with `"DOJ"` as an alias.
+- **Companies** — common public name. `"Meta"`, with `"Meta Platforms, Inc."` and `"Facebook Inc."` as aliases. Use the legal name only if it's the form most readers would search for.
+- **Activist groups / NGOs** — common name. `"ACLU"` can be canonical if that's how it's referred to in headlines; `"American Civil Liberties Union"` then becomes the alias.
+- **International figures** — most common English transliteration. `"Vladimir Putin"`, with formal and alternate spellings as aliases.
 
-**Canonical format:** Full official name
-- ✓ "U.S. Department of Justice"
-- ✓ "Federal Bureau of Investigation"
-- ✓ "Department of Homeland Security"
+For an actor who held multiple titles over time (e.g. `"Police Captain"` then `"Police Commissioner"`), keep one canonical (the bare name); the titles live in each entry's actor list as parentheticals.
 
-**Aliases:** Abbreviations and alternate names
-- "U.S. Department of Justice" → aliases: "DOJ", "Department of Justice", "Justice Department"
-- "Federal Bureau of Investigation" → aliases: "FBI", "Federal Bureau"
+For an actor whose legal name changed (transition, marriage), use the current legal name as canonical; include the prior name as an alias to keep historical entries discoverable.
 
-### State/Local Officials & Agencies
+## Workflow: adding an alias
 
-**Canonical format:** Full name with state/city context (if needed to disambiguate)
-- ✓ "Governor Ron DeSantis" or "Ron DeSantis"?
-  → "Ron DeSantis" (title tracked separately; state context in metadata)
-- ✓ "Mayor Eric Adams" or "Eric Adams"?
-  → "Eric Adams, New York" (if other Eric Adams in archive); or just "Eric Adams" (if unique)
+1. **Verify the trigger.** Three or more entries; at least two different names for the same actor.
+2. **Pick the canonical name** per the rules above.
+3. **List the aliases.** Search the archive for every name variant currently in use. Include common abbreviations and any prior names worth preserving for discoverability.
+4. **Pick or generate the slug.** Slug is kebab-case, URL-safe, and disambiguating where needed (e.g. `john-smith-ny` if there's a name collision).
+5. **Edit [`taxonomy/aliases.yaml`](../../taxonomy/aliases.yaml).** Place the entry in alphabetical order by canonical name; the file is small enough that ordering helps review.
+6. **Run `npm run build`.** Confirm no errors (the build resolves all actor strings at load time). Spot-check the actor page renders under the canonical name.
+7. **Open a PR.** Title: `aliases: normalize <Canonical Name>`. Body: name the entries that exposed the fragmentation. No editorial approval needed — alias additions are metadata.
 
-**Aliases:** All variations including with/without location
+## Future: weekly retrospective
 
-### Private Organizations
+A planned scheduled job (see [`TASKS.md`](../../TASKS.md) → "Weekly retrospective: actor aliases + episode grouping") will scan recent entries for actor-name fragmentation and propose aliases automatically. Until that lands, this is a manual editorial pass — typically prompted by spotting variants during PR review.
 
-**Canonical format:** Official legal name
-- ✓ "Meta Platforms, Inc." or "Meta"?
-  → "Meta Platforms, Inc." (legal name); alias: "Meta", "Facebook Inc." (former name)
-- ✓ "Tesla, Inc." or "Tesla"?
-  → "Tesla, Inc." (legal name); alias: "Tesla"
+## Key principles
 
-**Aliases:** Brand names, former names, colloquial names
-- "Meta Platforms, Inc." → aliases: "Meta", "Facebook Inc.", "Facebook"
+1. **Reactive, not preemptive.** Aliases are added when fragmentation is observed, not before.
+2. **Threshold-gated.** Three entries minimum. Below that there's no actor page and no fragmentation cost.
+3. **Recognizability first.** Canonical names are what readers expect, not what's most formal.
+4. **One canonical per actor.** No chained aliases, no circular references.
+5. **Titles live on entries, not the registry.** The registry has names; the entry has the role they held at the time.
 
-### Activist Groups / NGOs
+## Related specs
 
-**Canonical format:** Official legal name (if registered); otherwise most common name
-- ✓ "American Civil Liberties Union" (legal name)
-- ✓ "Black Lives Matter" or "Black Lives Matter Global Network Foundation"?
-  → Check official registration; use legal name if distinct
-
-**Aliases:** Abbreviations, alternate names
-- "American Civil Liberties Union" → aliases: "ACLU"
-
----
-
-## Special Cases
-
-### Name Changes
-
-**Scenario:** Person changes legal name (e.g., gender transition, marriage)
-- Canonical: Use current legal name
-- Aliases: Include previous legal names
-- Build: Display current name; historical accuracy preserved via aliases
-
-**Example:**
-```yaml
-- canonical_name: "Chelsea Manning"
-  aliases:
-    - "Bradley Manning"
-```
-
-### Organizational Mergers/Splits
-
-**Scenario:** Organization merges or splits
-- If organizations remain distinct: Treat as separate actors
-- If organization renamed/consolidated: Use aliases
-
-**Example (consolidation):**
-```yaml
-- canonical_name: "Department of Homeland Security"
-  aliases:
-    - "DHS"
-    - "Office of Homeland Security" # former name
-```
-
-### Temporary Names vs. Canonical Names
-
-**Scenario:** Person holds temporary title (e.g., "Acting Attorney General")
-- Canonical: Base name only
-- Don't include "Acting" in canonical; include in entry-level metadata if needed
-
-**Example:**
-```yaml
-- canonical_name: "Jeffrey Rosen"
-  aliases:
-    - "Acting Attorney General Jeffrey Rosen"
-```
-
-### International Figures
-
-**Scenario:** Non-English name with transliteration variations
-- Canonical: Most common English transliteration
-- Aliases: Alternative transliterations
-
-**Example:**
-```yaml
-- canonical_name: "Vladimir Putin"
-  aliases:
-    - "Vladimir Vladimirovich Putin"
-    - "V. Putin"
-```
-
----
-
-## Manual Normalization vs. Automatic Detection
-
-**Manual normalization (this skill):**
-- Used for actors appearing in ≥3 entries
-- Proactively managed by editorial team
-- Creates aliases in taxonomy file
-
-**Automatic detection (build system):**
-- Build flags probable duplicates using string similarity
-- Shows warnings: "⚠️ Probable duplicate: 'Steve Miller' ≈ 'Stephen Miller'"
-- Editor reviews warnings and decides whether to create alias
-
-**Workflow:**
-1. Build generates list of probable duplicates
-2. Editor reviews list
-3. Editor creates aliases for confirmed matches
-4. Re-run build to apply normalization
-
----
-
-## When NOT to Normalize
-
-**Don't create aliases for:**
-
-**Case 1: Genuinely different people with similar names**
-- "John Smith" (senator) appearing in 2 entries
-- "John Smith" (activist) appearing in 1 entry
-→ Keep separate; use roles/context to distinguish, don't alias
-
-**Case 2: Typographical errors in sources**
-- Entry text has typo from source article
-→ Fix typo in editorial review; don't alias
-→ Exception: If same typo appears in multiple entries, then alias
-
-**Case 3: Informal vs. formal (used consistently)**
-- Some entries use "FBI" (every entry, consistently)
-- Some entries use "Federal Bureau of Investigation" (every entry, consistently)
-- Readers clearly understand they're the same
-→ Still create alias; consistency helps discovery
-
-**Case 4: Abbreviations for one-off appearances**
-- "FBI" appears once; "Federal Bureau of Investigation" used elsewhere
-→ Create alias (normalization aids discovery)
-
----
-
-## Maintenance & Auditing
-
-### Periodic Audit (Monthly)
-
-**Task:** Review `aliases.yaml` for completeness and accuracy
-
-**Check:**
-1. Are all duplicates from build warnings captured as aliases?
-2. Are canonical names still the most common form?
-3. Are there obvious missing aliases (e.g., new actor appearing multiple times)?
-4. Do any aliases reference actors that no longer appear in archive?
-
-**Actions:**
-- Add new aliases as needed
-- Remove obsolete aliases (if actor no longer in archive)
-- Update canonical names if convention changes
-
-### PR Review for Aliases
-
-**When someone submits PR with new alias:**
-- Verify the actor appears in ≥3 entries (trigger met)
-- Check that canonical name is truly canonical
-- Ensure all common variations are in aliases list
-- Run build to confirm no errors
-- Merge after check passes
-
----
-
-## Integration with Build System
-
-**Build process uses aliases.yaml to:**
-1. Normalize actor names in entry display
-2. Generate actor pages (one page per canonical name)
-3. Auto-detect actor pages (threshold: ≥3 entries)
-4. Build see-also relationships
-5. Flag probable duplicates (for next audit)
-
-**Build warnings:**
-```
-⚠️ Probable duplicate actors:
-  - "Steve Miller" (2 entries) ≈ "Stephen Miller" (3 entries)
-  → Create alias? Run: git edit taxonomy/aliases.yaml
-```
-
----
-
-## Related Skills & Workflows
-- EDITORIAL_WORKFLOW_SPEC.md — Entry review (where actor names are verified)
-- ENTRY_RECORDING_SPEC.md — Entry creation (where actors are normalized)
-- PROJECT_PLAN.md → Data Model section — Actor field definition
-
----
-
-## Examples in Practice
-
-### Example 1: Federal Official Over Time
-
-**Entries:**
-1. "Steve Miller" (2020 entry, informal style)
-2. "Stephen Miller" (2024 entry, formal style)
-3. "Stephen G. Miller" (2026 entry, very formal)
-4. "Senior Policy Advisor Stephen Miller" (2026 entry, with title)
-
-**Action:**
-- Create alias: canonical "Stephen Miller" (formal, first-name variant)
-- Aliases: "Steve Miller", "Stephen G. Miller", "Senior Policy Advisor Stephen Miller"
-- Result: All 4 entries appear under "Stephen Miller" actor page
-
-### Example 2: Organizational Rebranding
-
-**Entries:**
-1. "Attorney General of the United States" (formal, 1 entry)
-2. "Department of Justice" (informal, 3 entries)
-3. "U.S. Department of Justice" (formal, 5 entries)
-4. "DOJ" (abbreviation, 2 entries)
-
-**Action:**
-- Create alias: canonical "U.S. Department of Justice" (official full name)
-- Aliases: "Department of Justice", "Attorney General of the United States", "DOJ"
-- Result: All 11 entries appear under "U.S. Department of Justice" actor page
-
-### Example 3: Person with Multiple Roles
-
-**Entries:**
-1. "Captain John Smith, NYPD" (2020, as police captain)
-2. "Police Commissioner John Smith" (2024, after promotion)
-3. "John Smith" (2026, quoted in unrelated context)
-
-**Action:**
-- Create alias: canonical "John Smith"
-- Aliases: "Police Commissioner John Smith", "Captain John Smith, NYPD"
-- Metadata: Entry 1 has `role: "Captain, NYPD"`, Entry 2 has `role: "Police Commissioner"`
-- Result: All 3 entries under same actor page, but roles are displayed contextually
+- [`ISSUE_TO_ENTRY_SPEC`](./ISSUE_TO_ENTRY_SPEC.md) Step 3 — filters actors to those who took the action; passes raw names through to the entry.
+- [`EDITORIAL_WORKFLOW_SPEC`](./EDITORIAL_WORKFLOW_SPEC.md) — PR review catches fragmentation in practice.
+- [`BUILD_SPEC`](./BUILD_SPEC.md) — actor normalization, actor-page threshold, see-also derivation.
+- [`taxonomy/aliases.yaml`](../../taxonomy/aliases.yaml) — the registry itself.
