@@ -168,6 +168,17 @@ Required fields and what counts as "valid enough":
 
 **When correction isn't enough:** if the agent cannot in good conscience produce a valid entry from this issue (the event isn't real, the body is incoherent, the taxonomy genuinely has no place for it), → **Step 11: Discarding Issues**.
 
+**When the issue conflates multiple distinct events:** if the agent
+discovers during validation or source re-verification that the issue
+body actually describes **more than one distinct event** (different
+date, location, actors, or specific act bundled into one issue),
+**do not record a composite entry and do not silently pick one**.
+Skip-flag the issue via Step 11 with a comment that names each distinct
+event found and recommends the operator split it into one issue per
+event. The one-issue-per-event rule is owned upstream by
+`NEWS_RESEARCH_SPEC` Step 6 and `ARCHIVE_FIT_SPEC`; this skill enforces
+it at the recording boundary rather than papering over upstream drift.
+
 ### Step 4: Source Re-verification (URL + Content)
 
 This is more than a 200-OK check — but it is also not an exhaustive re-read of every link. The agent fully re-verifies the **primary source(s)** and corroborates the entry's key details against **one genuinely independent source**; remaining sources get only a lightweight liveness check. The agent makes these calls with judgment; no fixed status-code table.
@@ -397,6 +408,7 @@ The issue stays open. A human can decide whether to fix the underlying problem (
 - All primary sources are gone OR retracted OR substantively contradict the issue's claim about what happened.
 - After reading source content, the agent concludes the "event" was a misunderstanding, hoax, or was debunked by subsequent reporting.
 - No abuse in `taxonomy/abuses.yaml` cleanly applies, even after re-reading the body and sources against the full taxonomy. **Treat this as a taxonomy-gap signal, not a discard.** Re-run [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) on the issue; it will open a PR proposing the missing abuse and apply `blocked-on-taxonomy`. Only discard if the operator declines the taxonomy PR.
+- The issue body conflates multiple distinct events. Skip-flag with a comment listing the events the agent identified and recommending one issue per event (the upstream rule lives in `NEWS_RESEARCH_SPEC` Step 6).
 - Build verification (Step 6) fails in a way that points to bad input rather than a build-system bug.
 
 **Comment template:**

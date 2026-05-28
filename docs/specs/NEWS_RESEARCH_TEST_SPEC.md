@@ -81,6 +81,7 @@ Results are saved to `docs/scripts/outputs/standing-monitoring-issues-TIMESTAMP.
 - **Same sources as production**: Test uses the same `taxonomy/sources.yaml` as the live monitoring system, so you're testing against real sources
 - **Agent-based evaluation**: Uses Claude semantic analysis, not pattern matching, to evaluate relevance
 - **Review before publishing**: Results include proposed GitHub issue bodies for editorial review before filing
+- **One proposed issue per distinct event**: When a single source covers more than one distinct event (different date, location, actors, or specific act), the test output emits one proposed issue per event — the same rule the live monitor follows (`NEWS_RESEARCH_SPEC` Step 6). Bundled "summary issues" covering multiple events are a test failure, not a feature.
 - **Iterate on taxonomy**: If the evaluation seems off on a story, it suggests the taxonomy might need refinement or that Claude's interpretation was reasonable but different from expected
 - **No duplicates check**: The test version doesn't check for existing issues (the live version does)
 
