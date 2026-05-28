@@ -377,7 +377,7 @@ Unsubscribe | Manage preferences | Contact
 - Automatically: Daily at 6:00 AM ET
 
 **Related skills:**
-- ENTRY_RECORDING_SPEC.md — Creates entries that feed into digest
+- ISSUE_TO_ENTRY_SPEC.md — Creates entries that feed into digest
 - EDITORIAL_WORKFLOW_SPEC.md — Approves entries before they're available for digest
 - PROJECT_PLAN.md → Buttondown section — Newsletter platform details
 
