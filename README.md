@@ -51,7 +51,6 @@ taxonomy/
 
 docs/
   PROJECT_PLAN.md           # full design document
-  WORKFLOWS_COMPLETED.md    # workflow status and architecture summary
   skills/                   # workflow skill documentation
     NEWS_RESEARCH_SPEC.md
     NEWS_TRIAGE_SPEC.md
