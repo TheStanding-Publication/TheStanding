@@ -64,7 +64,6 @@ For each story you found in Step 2, ask:
 - Is this describing an anti-democratic action or abuse of power?
 - Which abuse slugs from the loaded `abuses.yaml` does it map to? (1-5 slugs; only emit slugs that exist in the current taxonomy.)
 - Is the source credible?
-- What's your confidence level?
 
 Use semantic understanding, not pattern matching. You understand that "weakening Voting Rights Act enforcement" maps to `voter-suppression` (or one of the more specific election slugs) without needing keyword overlap.
 
@@ -232,4 +231,4 @@ Scan parameters for this run:
 - scan_label: [morning / midday / afternoon / evening]
 ```
 
-The scheduled task prompt should be no more than ~15 lines. If a behavior change needs to land in th
+The scheduled task prompt should be no more than ~15 lines. If a behavior change needs to land in the scheduled scans, change it **here**, not in the scheduled-task prompts.

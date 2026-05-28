@@ -381,10 +381,7 @@ Closes #[issue-number]
 *Automated entry recording from issue #[issue-number]*
 ```
 
-**Add labels:**
-- `entry-intake` (always)
-
-**Do NOT apply abuse slugs as labels on the PR.** The mapped abuses live in the entry file's frontmatter (and are also surfaced in the PR body's "Entry Details" section) — those are the canonical places. Labelling abuse slugs on PRs causes unbounded label sprawl and goes stale when slugs are corrected during validate-and-correct (Step 3). The same policy applies to issues (per `NEWS_RESEARCH_SPEC` Step 6); the PR is no different. `entry-intake` is the only label this step applies.
+**Do not apply labels to the PR.** Entry PRs carry no labels — the mapped abuses live in the entry file's frontmatter (and are surfaced in the PR body's "Entry Details" section), and pipeline-status labels (`tip`, `ready-for-entry`, `invalid`) live on issues, not on entry PRs. The same no-abuse-slug-labels policy applies to issues (per `NEWS_RESEARCH_SPEC` Step 6); the PR is no different.
 
 ### Step 10: Clean Up Git
 
@@ -511,4 +508,4 @@ Next steps:
 
 ## Upstream Contract (NEWS_RESEARCH_SPEC)
 
-The hard precondition is that an issue is opened by the `thestanding` bot account **and** carries the `ready-for-entry` tag. Authorship marks it as bot-produced; the tag marks it as a fully-researched monitoring issue rather than an unvetted `tip`. Anything `thestanding` opens with `ready-for-entry` is in scope; human-opened issues, issues from a different bot, and untagged `tip` issues 
+The hard precondition is that an issue is opened by the `thestanding` bot account **and** carries the `ready-for-entry` tag. Authorship marks it as bot-produced; the tag marks it as a fully-researched monitoring issue rather than an unvetted `tip`. Anything `thestanding` opens with `ready-for-entry` is in scope; human-opened issues, issues from a different bot, and untagged `tip` issues are out of scope.

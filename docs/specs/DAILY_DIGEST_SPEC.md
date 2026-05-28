@@ -37,7 +37,6 @@ For each entry, extract:
 - `abuses` — List of abuse slugs
 - `slug` — URL-stable entry identifier
 - `sources` — URLs with titles (primary source highlighted)
-- `confidence` — monitoring/preliminary/well-reported/primary-source
 
 ---
 
@@ -224,16 +223,6 @@ international:[Country] → [Country]
 private-actor → Private Actor (Multi-State Policy)
 ```
 
-### Confidence Level → Friendly Name
-```
-monitoring → Automated Monitoring
-preliminary → Preliminary Report
-well-reported → Well Reported
-primary-source → Primary Source
-```
-
----
-
 ## Location Field in Newsletter
 
 **Display rule:** Include location for all jurisdictions except federal (unless location is specific and noteworthy)
@@ -388,7 +377,7 @@ Unsubscribe | Manage preferences | Contact
 - Automatically: Daily at 6:00 AM ET
 
 **Related skills:**
-- ENTRY_RECORDING_SPEC.md — Creates entries that feed into digest
+- ISSUE_TO_ENTRY_SPEC.md — Creates entries that feed into digest
 - EDITORIAL_WORKFLOW_SPEC.md — Approves entries before they're available for digest
 - PROJECT_PLAN.md → Buttondown section — Newsletter platform details
 

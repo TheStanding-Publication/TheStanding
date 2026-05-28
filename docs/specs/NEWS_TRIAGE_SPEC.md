@@ -133,4 +133,11 @@ The scheduled task supplies **no** date — triage marches the backlog from the 
 
 1. **Speed over depth** — headlines not articles, ideals not abuses, cursory not exhaustive. Throughput is the point.
 2. **Ledger-driven** — the coverage ledger (issue #77) is the single source of truth for what has been triaged; every run reads it and updates it.
-3. **One day per r
+3.
+3. **One day per run** — bounded, predictable, self-healing.
+4. **Tips are leads, not records** — thin by design, never `ready-for-entry`, always vetted before entry recording.
+5. **Low bar — caught, not confirmed** — a false positive costs a vetting pass; a false negative loses a story. Lean toward filing.
+6. **Mark every triaged day** — covered means covered, tips or no tips.
+
+## Downstream contract
+A `tip` issue is a lead. The vetting step — `standing-tip-vetter`, which calls [`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) for the inclusion verdict and then acts mechanically on it — takes a tip and either promotes it (full research run, body rewritten in place, label `tip` → `ready-for-entry`, title `[Tip]` → `[Monitoring]`) or closes it (kept in the dedup set so the same story is not re-tipped). Triage should be reasonably good but it does not need to be perfect — some tips will be rejected by archive-fit, and that is the system working as designed.
