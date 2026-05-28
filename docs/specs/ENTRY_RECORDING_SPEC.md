@@ -191,4 +191,18 @@ After recording and PR creation, report:
 - Automated checks only
 - Skip human editorial review at issue stage
 - Confidence: "monitoring"
-- PR describes 
+-
+- PR describes as automated entry
+
+**Tip submissions (`tip` label):**
+- Human reviews issue first (editorial decides if worth investigating)
+- If approved, runs same automated checks
+- Confidence: varies by source quality
+- PR is secondary review gate
+
+## TODO
+
+1. **Design slug generation**: Issue number + date + other identifiers
+2. **Implement URL content hashing**: SHA256 or similar to detect changes
+3. **Archive snapshot strategy**: WayBack Machine integration or local archiving
+4. **Handle failures gracefully**: What happens if URL validation fails? Who gets notified?

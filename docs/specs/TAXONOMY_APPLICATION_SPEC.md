@@ -297,4 +297,4 @@ supported.
 
 **Executive power:** executive-overreach, bypassing-congress, defying-court-orders, weaponizing-DOJ
 
-**Corruption:** nepotism, self-dealing, bribery, undisclosed-financial-conflicts, pay-to-pla
+**Corruption:** nepotism, self-dealing, bribery, undisclosed-financial-conflicts, pay-to-play, monetizing-office

@@ -232,4 +232,4 @@ Scan parameters for this run:
 - scan_label: [morning / midday / afternoon / evening]
 ```
 
-The scheduled task prompt should be no more than ~15 lines. If a behavior change needs to land in th
+The scheduled task prompt should be no more than ~15 lines. If a behavior change needs to land in the scheduled scans, change it **here**, not in the scheduled-task prompts.
