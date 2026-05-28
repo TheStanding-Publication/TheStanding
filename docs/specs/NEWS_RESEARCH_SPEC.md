@@ -77,6 +77,17 @@ match, abuse match, and refusal semantics.
 
 ### Step 4: For relevant stories, conduct comprehensive research
 
+**One issue per distinct event.** If the research surfaces more than one
+distinct event — for example, a single article that reports two separate
+voter-intimidation incidents on different days, or a URL that bundles a
+firing and a separate retaliatory action — treat each event as its own
+research target and gather the full Step 4 field set per event. The
+archive tracks events, not topics or coverage clusters. This mirrors the
+event-level deduplication rule in
+[`ARCHIVE_FIT_SPEC`](./ARCHIVE_FIT_SPEC.md) Step 5: two incidents that
+differ in date, location, actors, or specific act are two events, even
+when reported in the same source.
+
 Before creating an issue, gather all of:
 
 - **Event description** — 2-3 sentences.
@@ -105,6 +116,16 @@ agent in this mode therefore proceeds without an additional duplicate
 search; the recording flow is mechanical.
 
 ### Step 6: Create the GitHub issue
+
+**One issue per distinct event** (restating the Step 4 rule at the
+creation boundary because it is easy to lose at this step). If
+Step 4 produced research records for multiple distinct events, emit one
+issue per event using the template below — do **not** bundle them into
+a single "[Monitoring]" issue, even if they share a source URL, a
+storyline, or an actor. Each issue stands alone, carries its own event
+date, actors, mapped abuses, and evidence, and flows through
+`ISSUE_TO_ENTRY_SPEC` independently. Cross-link related issues in the
+**Analysis** section if the connection matters editorially.
 
 For each new relevant story, create an issue with this template:
 
@@ -173,6 +194,7 @@ Return a summary to the conversation:
 5. **Taxonomy-driven** — abuse slugs MUST exist in the live `abuses.yaml`. Inventing slugs is the single most common cause of downstream entry failures.
 6. **Evidence-based** — primary sources only; citizen documentation acceptable if verifiable.
 7. **Scan the full source list** — many of The Standing's strongest entries originate in watchdog and specialized outlets that wire services pick up only later, or not at all.
+8. **One issue per distinct event** — if research surfaces multiple distinct events (different date, location, actors, or specific act), each becomes its own issue. Never bundle multiple events into a single issue, even when they share a source URL or storyline.
 
 ## Validation Responsibility
 

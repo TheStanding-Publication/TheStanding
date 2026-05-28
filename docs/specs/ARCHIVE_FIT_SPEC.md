@@ -64,6 +64,28 @@ URL mode produces a **chat verdict only** — no GitHub mutations. Once the
 operator records the URL as an issue via `url-to-issue`, that issue is
 eligible for issue-mode evaluation.
 
+### Multiple distinct events in a single input
+
+Both modes assume the candidate is **one event**. If the input bundles
+more than one distinct event (different date, location, actors, or
+specific act), the skill renders **one verdict per event**, not a single
+verdict over the bundle:
+
+- **Issue mode:** if the existing issue body conflates two events,
+  surface the conflation in the verdict comment, render the verdict for
+  the primary event on the existing issue, and recommend that the
+  operator open a separate issue per additional event (which will then
+  flow through archive-fit independently). Do not silently average the
+  verdicts.
+- **URL mode:** enumerate the events found in the URL in the chat
+  verdict and render an archive-fit verdict for each. Each `archive-fit`
+  event becomes its own monitoring issue via `url-to-issue`, mirroring
+  the one-issue-per-event rule in `NEWS_RESEARCH_SPEC` Step 6.
+
+Event identity here is the same as in Step 5 (event-level dedup): two
+incidents that share a topic or an actor are still two events if any of
+date, location, or specific act differs.
+
 ## Workflow
 
 ### Step 1: Load the candidate story and the live taxonomy

@@ -43,6 +43,9 @@ defer to archive-fit and don't re-derive.
 ## Key Principle: Broken Windows
 *No anti-democratic action is too small to record.* An entry is worthy of the archive if it credibly describes an abuse in The Standing's taxonomy and meets the sourcing standard. There is no requirement that an event be part of a wider pattern. The threshold is proper sourcing + relevant abuse, not "significance" or "part of a bigger story." Small accumulating breaches are themselves the pattern.
 
+## Key Principle: One Issue Per Distinct Event
+The archive tracks **events**, not topics or coverage clusters. If research surfaces more than one distinct event from a single source — different dates, locations, actors, or specific acts — each event gets its own issue and its own entry. Editors reviewing an issue or PR that bundles multiple distinct events should either request a split before approval, or do the split themselves and re-route the pieces through the pipeline. This rule is enforced upstream by `NEWS_RESEARCH_SPEC` Step 6 and `ARCHIVE_FIT_SPEC`, but editorial review is the human check on it.
+
 ## Two Intake Channels
 
 ### Channel 1: Monitoring Intake (`monitoring-intake` label)

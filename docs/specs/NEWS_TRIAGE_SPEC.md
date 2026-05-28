@@ -82,6 +82,8 @@ Before filing a tip, do a quick check that the event is not already in the pipel
 ### Step 6: File a tip issue
 For each surviving candidate, create a GitHub issue using the template below. Apply the **`tip`** label. Do **not** apply `ready-for-entry` — a tip is not ready for entry recording, and the entry-recorder must not pick it up.
 
+**One tip per distinct event.** Headlines are usually 1:1 with events, so this rule rarely fires at triage — but if a single headline or standfirst plainly references two distinct events (different dates, locations, actors, or acts), file a separate tip per event. Do not collapse them into one tip just because they appeared in the same headline. The archive tracks events, not topics; downstream archive-fit and research workflows assume one event per issue.
+
 ### Step 7: Update the coverage ledger
 Update issue #77 to record the target date as covered — whether or not the day produced any tips.
 

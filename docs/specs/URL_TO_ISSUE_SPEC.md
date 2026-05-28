@@ -46,3 +46,31 @@ canonical workflow, and a change to it propagates to both the
 scheduled scans and URL-to-issue intake at once.
 
 ## Quick reference
+
+- **Invocation:** the `url-to-issue` skill (slash command), or ask an
+  operator agent to run URL-to-issue mode.
+- **Input:** a single URL — news article, court filing, agency press
+  release, primary document, anything on the open web.
+- **Output:** a `[Monitoring]` GitHub issue in
+  `TheStanding-Publication/TheStanding`, labelled `monitoring-intake`,
+  `needs-research`, and the mapped abuse slug(s) — identical in form to
+  a scheduled-scan issue. It then flows through `ISSUE_TO_ENTRY_SPEC`
+  like any other monitoring issue. **If research surfaces more than one
+  distinct event from the submitted URL, the output is one issue per
+  event** — see `NEWS_RESEARCH_SPEC` Step 6.
+- **Refusal:** if the URL is out of scope, the agent explains why and
+  creates no issue. Override by re-submitting with an explicit
+  "file anyway" instruction.
+
+## One URL can produce multiple issues
+
+A single submitted URL is not necessarily a single archive event. An
+investigative piece may bundle two voter-intimidation incidents; an
+agency press release may announce both a firing and a separate
+retaliatory action; a court order may rule on two distinct claims.
+When research at Step 4 of `NEWS_RESEARCH_SPEC` surfaces more than one
+distinct event (different date, location, actors, or specific act), the
+skill emits one `[Monitoring]` issue per event, not one issue bundling
+them. Archive-fit must have already rendered an `archive-fit` verdict
+per event before issue creation; if the operator only ran archive-fit
+on the URL as a whole, re-run it per event before filing.
