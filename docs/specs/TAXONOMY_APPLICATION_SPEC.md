@@ -274,17 +274,6 @@ supported.
 
 ---
 
-## Confidence Levels and Abuse Mapping
-
-**Confidence level** (monitoring, preliminary, well-reported, primary-source) refers to **source quality**, not abuse clarity.
-
-**Abuse mapping confidence** is separate:
-- If sources are clear and abuse is obvious → "well-reported" or "primary-source"
-- If sources are clear but abuse definition is fuzzy → note in editorial review
-- If sources are developing and abuse is unclear → "developing" confidence level
-
----
-
 ## Common Abuse Slugs Reference
 
 **Elections:** voter-suppression, election-denial, election-worker-intimidation, gerrymandering, certification-refusal

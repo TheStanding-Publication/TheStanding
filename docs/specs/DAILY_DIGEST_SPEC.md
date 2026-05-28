@@ -37,7 +37,6 @@ For each entry, extract:
 - `abuses` — List of abuse slugs
 - `slug` — URL-stable entry identifier
 - `sources` — URLs with titles (primary source highlighted)
-- `confidence` — monitoring/preliminary/well-reported/primary-source
 
 ---
 
@@ -223,16 +222,6 @@ local:[City]:[State] → [City], [State]
 international:[Country] → [Country]
 private-actor → Private Actor (Multi-State Policy)
 ```
-
-### Confidence Level → Friendly Name
-```
-monitoring → Automated Monitoring
-preliminary → Preliminary Report
-well-reported → Well Reported
-primary-source → Primary Source
-```
-
----
 
 ## Location Field in Newsletter
 

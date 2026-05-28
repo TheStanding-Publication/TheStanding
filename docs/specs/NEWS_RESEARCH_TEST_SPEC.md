@@ -21,11 +21,9 @@ The argument specifies the number of articles to fetch and evaluate (default: 10
 4. For each story found:
    - Evaluate relevance using Claude agent-based semantic analysis (not pattern matching)
    - If relevant: identify which abuses from the taxonomy it describes
-   - Assess confidence level (high/medium/low)
 5. Save results to markdown file with:
    - Each story's headline, source, URL, publication date
    - Relevance assessment (which ideals/abuses matched)
-   - Confidence level
    - Proposed GitHub issue format (for review before publishing)
 6. Report summary: stories evaluated, relevant hits, evaluation method
 
@@ -51,7 +49,6 @@ Results are saved to `docs/scripts/outputs/standing-monitoring-issues-TIMESTAMP.
 
 ### ✓ RELEVANT
 
-**Confidence:** high/medium/low
 **Matched abuses:** abuse-slug-1, abuse-slug-2
 
 **Generated issue body:**
