@@ -24,7 +24,8 @@ summary: >
 abuses:
   - corrections-abuse
 
-episodes: []
+episodes:
+  - doj-death-penalty-expansion-2026
 
 actors:
   - "U.S. Department of Justice — Office of Public Affairs"

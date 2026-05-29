@@ -23,7 +23,8 @@ abuses:
   - procurement-irregularities
   - targeting-marginalized-communities
 
-episodes: []
+episodes:
+  - trump-admin-no-bid-contracts
 
 actors:
   - "U.S. Department of Homeland Security — Office of Inspector General"
