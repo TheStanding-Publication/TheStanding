@@ -106,4 +106,8 @@
 
 - [x] ~~**Migrate cross-references from slug to id**~~ — Considered 2026-05-19 and **declined**. With build-time validation of relationship slugs in place and slugs already enforced-unique (PR #40), slug-based cross-references in `relationships.*` and `episodes:` are both safe (broken refs fail the build) and human-readable. Migrating them to opaque UUIDs would trade readability for rename-safety we no longer need. The `id` field stays as the canonical identifier; cross-references stay slug-based. Recorded so the decision isn't re-litigated.
 
+- [ ] **Research and split issue-12 by federal agency** — Per the 2026-05-28 event-split audit, issue-12 (federal agencies refuse records to oversight investigation of DOGE data access; GSA officials block physical inspection) bundles records-refusals across multiple federal agencies plus a specific GSA physical-inspection block. Current Washington Post sourcing names GSA specifically but is less specific about which other agencies refused records. Research the underlying oversight investigation and any later reporting that named specific agencies; split into one event per agency refusal plus the GSA-specific block when sourcing supports it.
+
+- [ ] **Research and split issue-89's two STOCK Act fines** — Per the 2026-05-28 event-split audit, issue-89 (Trump misses STOCK Act 45-day deadline; OGE fines him twice) bundles two distinct $200 fines for two separate late filings, but the current Washington Post sourcing does not name which specific late-disclosed trade triggered which fine. Research subsequent reporting (or the underlying OGE record) that names the dates and trades behind each fine; split into one event per fine when sourcing supports it.
+
 ## Done
