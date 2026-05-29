@@ -24,7 +24,8 @@ abuses:
   - targeting-marginalized-communities
   - procurement-irregularities
 
-episodes: []
+episodes:
+  - trump-admin-no-bid-contracts
 
 actors:
   - "U.S. Department of Homeland Security"
