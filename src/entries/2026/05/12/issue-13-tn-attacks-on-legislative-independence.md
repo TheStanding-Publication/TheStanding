@@ -21,7 +21,8 @@ summary: >
 abuses:
   - attacks-on-legislative-independence
 
-episodes: []
+episodes:
+  - 2026-mid-decade-redistricting-wave
 
 actors:
   - "Cameron Sexton (Speaker, Tennessee House of Representatives)"

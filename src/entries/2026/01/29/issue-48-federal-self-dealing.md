@@ -24,7 +24,8 @@ summary: >
 abuses:
   - self-dealing
 
-episodes: []
+episodes:
+  - trump-irs-lawsuit-settlement
 
 actors:
   - "Donald Trump (President of the United States)"
