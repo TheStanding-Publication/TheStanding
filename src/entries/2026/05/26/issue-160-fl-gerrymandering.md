@@ -24,7 +24,8 @@ summary: >
 abuses:
   - gerrymandering
 
-episodes: []
+episodes:
+  - 2026-mid-decade-redistricting-wave
 
 actors:
   - "Ron DeSantis (Governor of Florida)"
