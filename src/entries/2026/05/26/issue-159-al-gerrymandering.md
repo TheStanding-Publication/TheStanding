@@ -24,7 +24,8 @@ abuses:
   - voter-suppression
   - narrowing-civil-rights-protections
 
-episodes: []
+episodes:
+  - 2026-mid-decade-redistricting-wave
 
 actors:
   - "Alabama Legislature"
