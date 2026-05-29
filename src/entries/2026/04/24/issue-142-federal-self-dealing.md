@@ -23,7 +23,8 @@ abuses:
   - self-dealing
   - monetizing-office
 
-episodes: []
+episodes:
+  - trump-admin-no-bid-contracts
 
 actors:
   - "Donald Trump (President of the United States)"
