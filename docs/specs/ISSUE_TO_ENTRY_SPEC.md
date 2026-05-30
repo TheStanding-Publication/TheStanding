@@ -42,7 +42,7 @@ This skill is a Claude agent that orchestrates the full workflow:
 4. Create PR with appropriate labels
 5. Report summary of what was processed (entries recorded, issues discarded, corrections made)
 
-**Key principle:** This agent is responsible for **validity**, not just transcription. Each step is a chance to detect and correct drift between what the monitor saw and what's actually true now. An invalid issue is either corrected by the agent or skip-flagged with the `invalid` label and an explanatory comment.
+**Key principle:** This agent is responsible for **validity**, not just transcription. Each step is a chance to detect and correct drift between what the monitor saw and what's actually true now. An invalid issue is either corrected by the agent, skip-flagged with the `invalid` label when the agent is confident it is unrecordable, or — when the agent cannot adjudicate it confidently — flagged `needs-human-review` so an editor can. In every case the run continues to the next issue rather than halting; only a channel-wide integrity failure stops the whole run.
 
 ## Validation Philosophy
 
@@ -429,6 +429,45 @@ The agent did not close this issue. That's intentional — discarding events is 
 
 **For corrections made in flight (not skip-flag):** the agent does not add a comment on the issue. Instead, the **PR body** describes any corrections made (re-mapped slugs, normalized fields, updated summary from current sources). This keeps issue threads clean and makes correction history reviewable at PR time, which is the right place for it.
 
+### Step 11b: Flag for Human Review (Don't Halt the Queue)
+
+Step 11 (`invalid`) is for an issue the agent is **confident** cannot become a valid entry. This step is for the other case: a **single issue** the agent **cannot resolve on its own and is not confident about** — a validation tripwire, a source/claim mismatch it can't adjudicate, or a suspected data-integrity or fabrication problem on that issue. The goal is to get an editor's eyes on that one issue **without blocking every other eligible issue behind it.**
+
+When the agent hits such a case, it:
+
+1. **Removes the `ready-for-entry` label.** This drops the issue out of the eligibility query (`label:ready-for-entry`), so it is not re-picked on later runs until a human clears it.
+2. **Adds the `needs-human-review` label.**
+3. **Adds a comment** with its findings — what it was validating, what tripped, what the source actually shows vs. what the issue claims, and why it stopped short of recording.
+4. **Continues to the next eligible issue.** It does **not** halt the run.
+
+The issue stays open. An editor reviews the findings and either fixes the underlying problem and re-adds `ready-for-entry` (returning it to the queue), or applies `invalid` / closes it if it genuinely shouldn't be recorded.
+
+**`invalid` vs. `needs-human-review`:**
+
+- `invalid` — the agent is **confident** the issue is unrecordable (body incomprehensible, all primaries retracted, event debunked). Kept out of the queue by the skip-`invalid` rule.
+- `needs-human-review` — the agent is **uncertain** and wants a human to adjudicate (validation tripwire, suspected fabrication/data-integrity problem, ambiguous source contradiction). `ready-for-entry` is removed so the queue keeps moving.
+
+**Per-issue vs. run-level failures.** A problem with **one issue** never halts the run — flag that issue (`invalid` or `needs-human-review`) and move on. The whole run halts **only** when the agent cannot trust its own outputs at all: a channel-wide integrity failure where even reading and labeling would be unreliable (the run performs output-channel integrity checks before any writes for exactly this reason). A single suspect issue is flag-and-continue; a compromised channel is stop-everything.
+
+**Comment template:**
+
+```markdown
+🔎 **Flagged for human review** (by ISSUE_TO_ENTRY)
+
+The agent could not confidently record this issue and wants an editor to look before it proceeds. It did **not** record an entry and did **not** mark the issue `invalid`.
+
+**[One-line summary of what tripped]**
+
+Details:
+[2-4 sentences: what the agent was validating, what it found in the sources vs. what the issue claims, why it could not resolve this itself.]
+
+What to do:
+- If the issue is sound, re-add the `ready-for-entry` label to return it to the queue.
+- If it should not be recorded, apply `invalid` or close it.
+
+`ready-for-entry` was removed so the rest of the queue keeps moving; this issue will not be re-picked until an editor restores the label.
+```
+
 ### Step 12: Final Report
 
 After processing all issues, agent outputs summary:
@@ -444,6 +483,7 @@ RESULTS:
 - Total issues processed: N
 - Successful PRs created: N (links to PRs)
 - Issues skip-flagged invalid: N (with reasons)
+- Issues flagged needs-human-review: N (with reasons)
 - Corrections applied in flight: N (re-mapped slugs, normalized fields, updated summaries from current sources)
 
 SUCCESSFUL ENTRIES:
@@ -454,9 +494,13 @@ SKIP-FLAGGED (invalid label applied, issue left open):
 - #44: All primary sources retracted; live articles contradict the event claim
 - #45: No taxonomy slug applies; event is real but not a Standing-tracked abuse
 
+FLAGGED FOR HUMAN REVIEW (needs-human-review applied, ready-for-entry removed, issue left open):
+- #46: Source content could not be reconciled with the issue's central claim; needs an editor's call
+
 Next steps:
 - Review open PRs
 - Review issues with the `invalid` label and decide whether to fix, close, or update the taxonomy
+- Review issues with the `needs-human-review` label, validate them, and re-add `ready-for-entry` or close
 ```
 
 ---
@@ -470,6 +514,7 @@ Next steps:
 5. **Build validation** — Every entry must pass `npm run build`
 6. **Source preservation** — Dead URLs get marked for hold, not removed
 7. **Automatic recovery** — 24-hour hold issues re-check automatically
+8. **Flag, don't block** — a problem with one issue flags that issue (`invalid` or `needs-human-review`) and the run continues; only a channel-wide integrity failure halts the whole run
 
 ## Error Scenarios
 
@@ -482,7 +527,10 @@ Next steps:
 | All primary sources gone | Skip-flag (event in doubt) |
 | Sourcing insufficient after re-verification | Skip-flag |
 | Build fails on what looks like bad input | Skip-flag with build output in comment |
-| Git command fails / PR creation fails | Stop run, report to operator; do not modify issue |
+| Single-issue validation tripwire or source/claim mismatch the agent can't adjudicate | Flag `needs-human-review` (remove `ready-for-entry` + comment); continue to next issue |
+| Suspected fabrication / data-integrity problem on one issue | Flag `needs-human-review` (remove `ready-for-entry` + comment); continue to next issue |
+| Git command fails / PR creation fails for one issue | Report to operator; do not modify the issue; continue to next issue |
+| Output channel itself untrustworthy (channel-wide fabrication) | **Halt the entire run; make no writes** — relabeling assumes the channel can write correctly |
 
 ---
 

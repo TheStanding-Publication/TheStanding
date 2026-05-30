@@ -414,6 +414,6 @@ the repo's label set):
 - `blocked-on-taxonomy` — passes mission and ideal, no existing abuse.
 
 These are **verdict labels**, distinct from pipeline-status labels
-(`tip`, `ready-for-entry`, `invalid`, `watching`). A given issue can
+(`tip`, `ready-for-entry`, `invalid`, `needs-human-review`, `watching`). A given issue can
 carry one verdict label and one pipeline-status label simultaneously
 without contradiction.
