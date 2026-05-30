@@ -46,6 +46,10 @@ Not gated on any specific event. While reviewing, an editor may notice that the 
 
 Until the planned weekly retrospective job lands, both are caught reactively in PR review.
 
+### 4. Issues flagged `needs-human-review`
+
+When `issue-to-entry` cannot confidently record an issue and is not sure it should be discarded — a validation tripwire, a source that can't be reconciled with the issue's claim, a suspected data-integrity problem — it does not halt the pipeline and does not mark the issue `invalid`. It removes `ready-for-entry`, adds `needs-human-review`, and comments its findings. **Held for editor.** Read the agent's comment, check the sources it names, then either fix the issue and re-add `ready-for-entry` to return it to the queue, or apply `invalid` / close it if it genuinely shouldn't be recorded. Removing `ready-for-entry` is what keeps the rest of the queue moving while the one issue waits for you.
+
 ## Editorial standards
 
 These are the rubrics the editor applies at PR review (gate #2 above).
