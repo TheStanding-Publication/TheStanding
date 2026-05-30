@@ -25,7 +25,8 @@ abuses:
   - procurement-irregularities
   - ignoring-statutory-requirements
 
-episodes: []
+episodes:
+  - trump-admin-no-bid-contracts
 
 actors:
   - "Jessica Bowron (Acting Director, National Park Service)"

@@ -26,7 +26,8 @@ abuses:
   - weaponizing-doj
   - selective-prosecution
 
-episodes: []
+episodes:
+  - doj-brennan-investigation
 
 actors:
   - "U.S. Department of Justice"
