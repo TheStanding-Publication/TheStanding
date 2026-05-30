@@ -26,7 +26,8 @@ abuses:
   - executive-overreach
   - denial-of-due-process-in-immigration-enforcement
 
-episodes: []
+episodes:
+  - manhattan-immigration-court-arrests
 
 actors:
   - "U.S. Immigration and Customs Enforcement"
