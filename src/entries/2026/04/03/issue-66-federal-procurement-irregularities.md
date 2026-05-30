@@ -24,7 +24,8 @@ abuses:
   - procurement-irregularities
   - ignoring-statutory-requirements
 
-episodes: []
+episodes:
+  - trump-admin-no-bid-contracts
 
 actors:
   - "Donald Trump (President of the United States)"
