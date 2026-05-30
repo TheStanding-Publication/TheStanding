@@ -273,10 +273,35 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addCollection("episodes", function (collectionApi) {
     const items = collectionApi.getFilteredByGlob("src/content/episodes/*.md");
 
+    // Episode ids mirror entry ids: a stable, globally unique UUID v4 separate
+    // from the slug. The slug is for URLs/display; the id is the canonical
+    // identifier. (Cross-references in entries' `episodes:` lists stay
+    // slug-based by design — the id is the canonical key, not the foreign key.)
+    const EPISODE_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const episodeIdsSeen = new Map();
+
     // Validate each episode.
     for (const item of items) {
       const fname = path.basename(item.inputPath, ".md");
       const slug = item.data.slug || fname;
+
+      // --- id presence + UUID v4 format + global uniqueness ---
+      if (!item.data.id) {
+        throw new Error(
+          `Episode "${slug}": missing required "id" frontmatter (must be a UUID v4 like 550e8400-e29b-41d4-a716-446655440000).`
+        );
+      }
+      if (!EPISODE_UUID_RE.test(item.data.id)) {
+        throw new Error(
+          `Episode "${slug}": id "${item.data.id}" is not a valid UUID v4 format. Generate with \`python3 -c "import uuid; print(uuid.uuid4())"\` or \`uuidgen\`.`
+        );
+      }
+      if (episodeIdsSeen.has(item.data.id)) {
+        throw new Error(
+          `Duplicate episode id "${item.data.id}" in "${item.inputPath}" — also used by "${episodeIdsSeen.get(item.data.id)}". Episode ids must be globally unique.`
+        );
+      }
+      episodeIdsSeen.set(item.data.id, item.inputPath);
 
       if (!item.data.title) {
         throw new Error(`Episode "${slug}": missing required "title" frontmatter.`);
