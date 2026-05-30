@@ -21,7 +21,8 @@ abuses:
   - extrajudicial-actions
   - politicization-of-uniformed-services
 
-episodes: []
+episodes:
+  - southcom-drug-boat-strikes
 
 actors:
   - "U.S. Southern Command"

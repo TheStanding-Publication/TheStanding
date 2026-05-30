@@ -21,7 +21,8 @@ abuses:
   - gerrymandering
   - discriminatory-policy
 
-episodes: []
+episodes:
+  - 2026-mid-decade-redistricting-wave
 
 actors:
   - "Donald Trump (President of the United States)"

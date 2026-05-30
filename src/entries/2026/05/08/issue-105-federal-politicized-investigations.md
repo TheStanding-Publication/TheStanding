@@ -33,7 +33,8 @@ abuses:
   - weaponizing-doj
   - targeting-critics-with-government-power
 
-episodes: []
+episodes:
+  - doj-brennan-investigation
 
 actors:
   - "Donald Trump (President of the United States)"
