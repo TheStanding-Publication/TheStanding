@@ -23,7 +23,8 @@ summary: >
 abuses:
   - defying-court-orders
 
-episodes: []
+episodes:
+  - manhattan-immigration-court-arrests
 
 actors:
   - "U.S. Immigration and Customs Enforcement"

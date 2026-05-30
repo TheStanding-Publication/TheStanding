@@ -27,7 +27,8 @@ abuses:
   - pardons-for-allies-or-self
   - self-dealing
 
-episodes: []
+episodes:
+  - trump-irs-lawsuit-settlement
 
 actors:
   - "Todd Blanche (Acting Attorney General)"

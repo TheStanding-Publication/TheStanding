@@ -25,7 +25,8 @@ abuses:
   - self-dealing
   - procurement-irregularities
 
-episodes: []
+episodes:
+  - trump-admin-no-bid-contracts
 
 actors:
   - "Doug Burgum (U.S. Secretary of the Interior)"
