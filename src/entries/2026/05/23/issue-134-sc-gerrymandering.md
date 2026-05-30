@@ -23,7 +23,8 @@ abuses:
   - gerrymandering
   - discriminatory-policy
 
-episodes: []
+episodes:
+  - 2026-mid-decade-redistricting-wave
 
 actors:
   - "South Carolina State Senate"

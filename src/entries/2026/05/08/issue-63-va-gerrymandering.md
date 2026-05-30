@@ -23,7 +23,8 @@ abuses:
   - gerrymandering
   - ignoring-statutory-requirements
 
-episodes: []
+episodes:
+  - 2026-mid-decade-redistricting-wave
 
 actors:
   - "Virginia General Assembly"

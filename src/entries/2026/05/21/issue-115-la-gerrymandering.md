@@ -22,7 +22,8 @@ abuses:
   - gerrymandering
   - discriminatory-policy
 
-episodes: []
+episodes:
+  - 2026-mid-decade-redistricting-wave
 
 actors:
   - "Louisiana House and Governmental Affairs Committee"
