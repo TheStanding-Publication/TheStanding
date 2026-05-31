@@ -5,7 +5,7 @@ archived: 2026-05-30
 slug: issue-125-federal-violence-in-immigration-enforcement
 status: published
 
-headline: "ICE pepper-sprays crowd and drags semi-conscious detainee from Brooklyn hospital; nine arrested"
+headline: "ICE pepper-sprays crowd during hospital removal of semi-conscious detainee in Brooklyn"
 
 summary: >
   On May 2, 2026, masked ICE agents who had arrested Nigerian national
