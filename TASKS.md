@@ -16,7 +16,7 @@
   - Comprehensive research upfront: event date, actors, jurisdiction, evidence, mapped abuses
   - Duplicate detection: checks open/closed issues before creating
   - Auto-creates GitHub issues with full event information
-  - Labels: monitoring-intake, needs-research, [abuse slug]
+  - Labels: monitoring-intake, needs-research (note: abuse slugs are NOT applied as labels — see NEWS_RESEARCH_SPEC Step 6 / ISSUE_TO_ENTRY_SPEC Step 9)
 
 - [x] ~~**Entry recording workflow**~~ - Automated checks + PR creation (2026-05-18)
   - Single skill: docs/specs/ISSUE_TO_ENTRY_SPEC.md (originally ENTRY_RECORDING_SPEC; the latter was retired 2026-05-28)

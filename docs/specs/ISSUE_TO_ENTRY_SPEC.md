@@ -381,7 +381,7 @@ Closes #[issue-number]
 *Automated entry recording from issue #[issue-number]*
 ```
 
-**Do not apply labels to the PR.** Entry PRs carry no labels — the mapped abuses live in the entry file's frontmatter (and are surfaced in the PR body's "Entry Details" section), and pipeline-status labels (`tip`, `ready-for-entry`, `invalid`) live on issues, not on entry PRs. The same no-abuse-slug-labels policy applies to issues (per `NEWS_RESEARCH_SPEC` Step 6); the PR is no different.
+**Do not apply labels to the PR.** Entry PRs carry no labels — the mapped abuses live in the entry file's frontmatter (and are surfaced in the PR body's "Entry Details" section), and pipeline-status labels (`tip`, `ready-for-entry`, `invalid`) live on issues, not on entry PRs. The same no-abuse-slug-labels policy applies to issues (per `NEWS_RESEARCH_SPEC` Step 6); the PR is no different. Concretely: when you open the PR, leave its label set empty. Do **not** create any new label, and do **not** copy any label onto the PR — in particular, never turn an abuse slug from the issue's `Mapped abuses` section into a label. If a label you are about to apply does not already exist in the repo, that is proof you should not be applying it: GitHub silently auto-creates unknown labels on first use, which is the exact label sprawl this rule exists to prevent. The only labels this pipeline ever writes are the issue pipeline-status tags (`ready-for-entry`, `invalid`); the entry PR itself carries none.
 
 ### Step 10: Clean Up Git
 
