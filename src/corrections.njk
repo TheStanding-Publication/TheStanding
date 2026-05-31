@@ -12,6 +12,31 @@ permalink: /corrections/index.html
   original, with both kept live forever.
 </p>
 
+<section class="corrections-submit">
+  <h2>How to submit a correction</h2>
+  <p>
+    We welcome corrections from anyone. There are two ways to reach us:
+    open a <a href="https://github.com/TheStanding-Publication/TheStanding/issues/new?template=correction.yml">correction request on GitHub</a>
+    (preferred — it walks you through everything we need), or email
+    <a href="mailto:{{ site.editorEmail }}">{{ site.editorEmail }}</a>.
+  </p>
+  <p>
+    Please include the URL of the entry, the specific text or claim that is wrong,
+    what it should say instead if you know it, and a source that establishes the
+    correct fact. Our <a href="/standards/#sourcing">sourcing standard</a> requires
+    at least one primary source (court filing, agency record, transcript, or
+    citizen-captured documentation) or two independent investigative outlets.
+  </p>
+  <p>
+    Once verified, substantive corrections and retractions are published as new
+    entries that reference the original; minor edits are logged in the affected
+    entry's correction log. Nothing is changed silently and every correction stays
+    live permanently. See our full
+    <a href="/standards/#corrections-and-retractions">corrections and retractions protocol</a>
+    for what we will and won't correct.
+  </p>
+</section>
+
 {% set correctedEntries = collections.entries | selectattr("data.relationships.corrects") %}
 {% set retractedEntries = collections.entries | selectattr("data.relationships.retracts") %}
 
