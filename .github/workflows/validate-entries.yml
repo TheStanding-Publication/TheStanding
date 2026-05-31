@@ -1,0 +1,54 @@
+# Pre-merge validation gate for the PUBLIC data repo (TheStanding-Publication/TheStanding).
+#
+# Entry PRs land here, but the validator (.eleventy.js + schema rules) lives in the
+# PRIVATE engine repo. This workflow checks out the engine via a read-only deploy key,
+# lays the data into src/ the same way build.sh does, and runs the Eleventy build.
+# A green check == a schema-valid entry. Requires secret ENGINE_DEPLOY_KEY.
+# Fork PRs don't receive secrets, so external-contributor entry PRs won't auto-validate.
+
+name: Validate entries
+
+on:
+  pull_request:
+
+jobs:
+  validate:
+    name: Build-validate against engine
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout data (the PR)
+        uses: actions/checkout@v4
+        with:
+          path: data
+
+      - name: Checkout engine (read-only deploy key)
+        uses: actions/checkout@v4
+        with:
+          repository: TheStanding-Publication/TheStanding-engine
+          ssh-key: ${{ secrets.ENGINE_DEPLOY_KEY }}
+          path: engine
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: engine/package-lock.json
+
+      - name: Assemble data into engine
+        run: |
+          cd engine
+          if [ -d ../data/entries ]; then ENTRIES_SRC=../data/entries; else ENTRIES_SRC=../data/src/entries; fi
+          if [ -d ../data/content ]; then CONTENT_SRC=../data/content; else CONTENT_SRC=../data/src/content; fi
+          echo "Using entries: $ENTRIES_SRC / content: $CONTENT_SRC"
+          mkdir -p src/entries src/content
+          cp -R "$ENTRIES_SRC"/. src/entries/
+          cp -R "$CONTENT_SRC"/. src/content/
+          rm -rf taxonomy
+          cp -R ../data/taxonomy taxonomy
+
+      - name: Install + build-validate
+        run: |
+          cd engine
+          npm ci --no-audit --no-fund
+          npm run build
