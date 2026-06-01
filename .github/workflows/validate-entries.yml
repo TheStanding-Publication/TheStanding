@@ -13,7 +13,7 @@ on:
 
 jobs:
   validate:
-    name: Build-validate against engine
+    name: Validate and build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout data (the PR)
