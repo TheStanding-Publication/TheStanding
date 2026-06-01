@@ -1,0 +1,63 @@
+# Debounced Cloudflare Pages deploy for The Standing.
+#
+# The site is built by the PRIVATE engine repo (TheStanding-engine) on Cloudflare
+# Pages; build.sh there pulls the latest content from THIS data repo at build time.
+# A merge to this repo therefore does NOT trigger Cloudflare on its own. This
+# workflow bridges that gap by POSTing a Cloudflare Deploy Hook.
+#
+# Debounced: runs on a 2-hour cron and deploys only if main actually changed in
+# the window, so a burst of entry merges collapses into at most one build per slot
+# (keeps Cloudflare build usage bounded). Also runnable on demand via "Run workflow".
+#
+# Requires repo secret CLOUDFLARE_DEPLOY_HOOK (Cloudflare Pages > Settings >
+# Builds & deployments > Deploy hooks). If unset, the workflow no-ops safely.
+
+name: Deploy site
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"   # every 2 hours (UTC); idle runs skip without building
+  workflow_dispatch: {}      # manual on-demand deploy
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Deploy via Cloudflare hook (debounced)
+        env:
+          HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${HOOK:-}" ]; then
+            echo "CLOUDFLARE_DEPLOY_HOOK is not set — skipping (no-op). Add the secret to enable deploys."
+            exit 0
+          fi
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "Manual dispatch — deploying."
+          else
+            RECENT="$(git log -1 --since='130 minutes ago' --format=%H || true)"
+            if [ -z "$RECENT" ]; then
+              echo "No commits to main in the last ~2h — skipping deploy (debounce)."
+              exit 0
+            fi
+            echo "Recent commit $RECENT found — deploying."
+          fi
+          CODE="$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$HOOK" --max-time 30)"
+          echo "Cloudflare deploy hook responded HTTP $CODE"
+          case "$CODE" in
+            200|201) echo "Deploy triggered." ;;
+            *) echo "Unexpected response $CODE"; exit 1 ;;
+          esac
