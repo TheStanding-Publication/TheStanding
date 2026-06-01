@@ -208,6 +208,11 @@
   title: "Retaliatory removal or discipline for protected speech"
   description: "A government employer or public institution demoting, removing, terminating, or otherwise disciplining an employee or officeholder in response to their constitutionally protected expression."
 
+- slug: curfew-or-zone-restrictions-on-assembly
+  ideal: speech-and-assembly
+  title: "Curfew or zone restrictions on assembly"
+  description: "Government curfews, area closures, or exclusion zones that restrict lawful assembly or protest in a designated place or time."
+
 # --- Public service over self-dealing ---
 - slug: self-dealing
   ideal: public-service
